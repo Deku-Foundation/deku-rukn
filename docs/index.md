@@ -6,6 +6,9 @@ hero:
   name: Rukn · ركن
   text: Arabic-first programming
   tagline: A small, readable language experiment with Arabic keywords, explicit semantics, and an interpreter written in Rust.
+  image:
+    src: /rukn-hero.svg
+    alt: Rukn's arch mark beside an Arabic-language example and its expected output.
   actions:
     - theme: brand
       text: Run your first program
