@@ -47,24 +47,3 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Build documentation
         run: npm run build
-
-  format-export:
-    name: Temporary rustfmt export
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt
-      - name: Format and export Rust sources for review
-        shell: bash
-        run: |
-          cargo fmt --all
-          echo RUKN_LIB_BEGIN
-          base64 -w0 src/lib.rs
-          echo
-          echo RUKN_LIB_END
-          echo RUKN_MAIN_BEGIN
-          base64 -w0 src/main.rs
-          echo
-          echo RUKN_MAIN_END
