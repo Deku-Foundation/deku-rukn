@@ -43,6 +43,7 @@ const frSidebar = [
 ]
 
 export default defineConfig({
+  base: '/deku-rukn/',
   title: 'Rukn',
   description: 'An experimental Arabic-first programming language built in Rust.',
   lang: 'en',
