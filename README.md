@@ -6,10 +6,10 @@
 
 Rukn explores programming syntax and diagnostics designed to read naturally in Arabic while remaining interoperable with the wider software ecosystem. The repository contains the language implementation, draft specification, tests, research notes, and multilingual documentation.
 
-- **Arabic-first:** Arabic keywords, Unicode identifiers, Arabic diagnostics and Arabic-Indic numerals.
+- **Arabic-first:** Arabic keywords, Unicode XID identifiers (including supported Arabic combining marks), Arabic diagnostics and Arabic-Indic numerals.
 - **Explicit semantics:** no implicit conversion between strings and numbers.
 - **Rust implementation:** a small tree-walk interpreter with no unsafe Rust.
-- **Evidence-led research:** language decisions distinguish implemented behavior from open questions and future proposals.
+- **Evidence-led research:** the XID identifier baseline uses pinned `unicode-ident`; normalization, visual confusables and invisible direction controls remain open design questions.
 - **Open development:** behavior is documented and tested; research sources are linked from the [technical reading list](docs/reference/research-reading-list.md).
 
 ## Current status

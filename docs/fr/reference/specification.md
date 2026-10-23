@@ -10,7 +10,9 @@ description: Grammaire et sémantique actuelles de Rukn.
 ## Règles lexicales
 
 - Les fichiers source sont en UTF-8.
-- Un identifiant commence par un souligné ou un caractère alphabétique Unicode ; les caractères suivants peuvent aussi être numériques.
+- Un identifiant commence par un souligné ou un caractère Unicode `XID_Start`; les caractères suivants utilisent `XID_Continue` ou le souligné, via la dépendance verrouillée `unicode-ident 1.0.27` (UAX #31). Les marques combinantes autorisées peuvent suivre le premier caractère.
+- Les identifiants ne sont pas normalisés ; la détection des confusables et des contrôles bidirectionnels n’est pas implémentée.
+- La notation scientifique ne fait pas partie de la grammaire numérique actuelle.
 - Mots réservés : دع, اطبع, صحيح, خطأ, لاشيء.
 - Les nombres acceptent les chiffres ASCII, arabo-indiens et persans ; le point ASCII sert de séparateur décimal.
 - Les chaînes utilisent des guillemets doubles ou les guillemets arabes «texte». Les retours à la ligne dans une chaîne sont interdits.

@@ -1,6 +1,7 @@
 //! A small Arabic-first interpreter. This milestone is experimental, not a stable language ABI.
 use std::collections::HashMap;
 use std::fmt;
+use unicode_ident::{is_xid_continue, is_xid_start};
 
 const MAX_SOURCE_BYTES: usize = 1_048_576;
 const MAX_TOKENS: usize = 16_384;
@@ -270,11 +271,13 @@ fn normalize_digits(text: &str) -> String {
         })
         .collect()
 }
+// UAX #31 identifier properties from the pinned unicode-ident dependency.
+// Underscore is a deliberate Rukn-specific addition to both positions.
 fn is_identifier_start(ch: char) -> bool {
-    ch == '_' || ch.is_alphabetic()
+    ch == '_' || is_xid_start(ch)
 }
 fn is_identifier_continue(ch: char) -> bool {
-    is_identifier_start(ch) || ch.is_numeric()
+    ch == '_' || is_xid_continue(ch)
 }
 
 #[derive(Debug, Clone)]
@@ -682,6 +685,23 @@ mod tests {
         );
     }
     #[test]
+    fn accepts_xid_identifiers_with_arabic_marks_and_persian_letters() {
+        let source = "دع عَلم = ٧؛ اطبع(عَلم)؛ دع پ = ۳؛ اطبع(پ)؛";
+        assert_eq!(run(source).unwrap(), ["7", "3"]);
+    }
+    #[test]
+    fn accepts_all_documented_digit_families() {
+        assert_eq!(
+            run("اطبع(123)؛ اطبع(١٢٣)؛ اطبع(۱۲۳)؛").unwrap(),
+            ["123", "123", "123"]
+        );
+    }
+    #[test]
+    fn rejects_a_combining_mark_at_identifier_start() {
+        let error = run("اطبع(َاسم)؛").unwrap_err();
+        assert!(error.message.contains("محرف غير مدعوم"));
+    }
+    #[test]
     fn respects_precedence_and_parentheses() {
         assert_eq!(
             run("اطبع(2 + 3 * 4)؛ اطبع((2 + 3) * 4)؛").unwrap(),
@@ -733,9 +753,14 @@ mod tests {
         assert!(error.message.contains("عمق التعبير"));
     }
     #[test]
-    fn numeric_overflow_is_a_language_error() {
-        let error = run("اطبع(1e308 * 1e308)؛").unwrap_err();
-        assert!(error.message.contains("غير محدود") || error.message.contains("توقعت"));
+    fn computed_numeric_overflow_is_a_language_error() {
+        // Scientific notation is not in the grammar. Large decimal literals
+        // let this test exercise overflowing arithmetic directly.
+        let left = "9".repeat(250);
+        let right = "9".repeat(100);
+        let source = format!("اطبع({left} * {right})؛");
+        let error = run(&source).unwrap_err();
+        assert!(error.message.contains("غير محدود"));
     }
     #[test]
     fn empty_program_is_valid() {

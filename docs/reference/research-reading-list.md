@@ -11,13 +11,15 @@ description: Primary standards and engineering references for developing Rukn as
 
 | Source | What it informs | Status in Rukn |
 | --- | --- | --- |
-| [UAX #31 — Unicode Identifiers and Syntax](https://www.unicode.org/reports/tr31/) | Identifier start/continue properties, profiles and normalization-related constraints | Research baseline; the current lexer uses Rust character properties rather than a declared UAX #31 profile |
+| [UAX #31 — Unicode Identifiers and Syntax](https://www.unicode.org/reports/tr31/) | Identifier start/continue properties, profiles and normalization guidance | Normative reference; Rukn uses pinned `unicode-ident 1.0.27` for XID_Start/XID_Continue, with underscore tailoring |
 | [UAX #15 — Unicode Normalization Forms](https://www.unicode.org/reports/tr15/) | NFC/NFKC and equivalence rules | Open design question; identifier normalization is not implemented |
 | [UTS #39 — Unicode Security Mechanisms](https://www.unicode.org/reports/tr39/) | Confusable detection, mixed-script review and security profiles | Open design question; no dedicated confusable checker exists |
 | [UAX #9 — Unicode Bidirectional Algorithm](https://www.unicode.org/reports/tr9/) | Correct display of mixed right-to-left and left-to-right text | Relevant to source display, diagnostics, documentation and future editor tooling |
 | [UTS #55 — Unicode Source Code Handling](https://www.unicode.org/reports/tr55/) | Unicode usability and security recommendations specifically for source code | Recommended design reference before stabilizing identifiers and editor diagnostics |
 
 The Unicode Consortium’s current Unicode 18.0 publications include UAX #31 revision 45 (1 September 2026), UAX #15 revision 58 (12 August 2026), UTS #39 revision 34 (27 August 2026), and UAX #9 revision 52 (1 September 2026). Use the “Latest Version” links above rather than copying tables from older articles. These version details were checked on 23 October 2026.
+
+Rukn uses [unicode-ident 1.0.27](https://docs.rs/unicode-ident/1.0.27/unicode_ident/) for XID classification. The crate is intentionally pinned in `Cargo.lock`; changing it may alter which source identifiers are accepted, so treat dependency updates as language-specification changes and run the conformance tests. NFC/NFKC normalization is not implemented.
 
 ### Questions to resolve before a stable identifier specification
 
@@ -32,6 +34,7 @@ Use valid/invalid program pairs and a versioned conformance corpus. Do not silen
 ## 2. Language semantics and Rust implementation
 
 - [The Rust Reference](https://doc.rust-lang.org/reference/) — authoritative reference for Rust syntax and language behaviour used by the implementation.
+- [Rust 1.99.1 release announcement](https://blog.rust-lang.org/2026/10/15/Rust-1.99.1/) — current stable release snapshot as of 23 October 2026; the CI workflow deliberately tracks stable and checks each commit.
 - [The Rust Book](https://doc.rust-lang.org/book/) — accessible foundation for ownership, error handling, testing and project structure.
 - [The Cargo Book](https://doc.rust-lang.org/cargo/) — dependency management, workspaces, lockfiles and reproducible builds.
 - [Rust Compiler Development Guide](https://rustc-dev-guide.rust-lang.org/) — compiler architecture, diagnostics, testing and development practices.
@@ -39,6 +42,8 @@ Use valid/invalid program pairs and a versioned conformance corpus. Do not silen
 - [Cranelift project](https://cranelift.dev/) — alternative code-generation ecosystem to evaluate if native code becomes justified.
 
 Rukn currently uses a hand-written lexer, recursive-descent parser and tree-walk evaluator. Do not select LLVM, Cranelift or a bytecode VM before the language semantics and correctness corpus are mature enough to compare implementations fairly.
+
+**Parser-library review (not adopted as a dependency):** [winnow 1.0.4](https://docs.rs/winnow/latest/winnow/) is a maintained parser-combinator toolbox with imperative and declarative styles. [Chumsky 0.13.0](https://docs.rs/chumsky/latest/chumsky/) offers error-recovery and parser-combinator capabilities; its GitHub repository was archived after the project moved to Codeberg ([repository notice](https://github.com/zesterer/chumsky)). For Rukn's small grammar, the existing recursive-descent parser remains easier to audit. Revisit a parser-library migration when grammar complexity, error recovery or measured maintenance costs justify it—not merely to increase the dependency count.
 
 ## 3. Testing, fuzzing and performance
 

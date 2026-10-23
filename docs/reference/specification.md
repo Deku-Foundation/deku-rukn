@@ -10,7 +10,9 @@ description: The current grammar, values and semantics of Rukn.
 ## Lexical rules
 
 - Source files are UTF-8.
-- Identifiers begin with an underscore or a Unicode alphabetic character; later characters may also be Unicode numeric characters.
+- Identifiers begin with underscore or a Unicode XID_Start character; later characters may be underscore or Unicode XID_Continue characters, using the pinned `unicode-ident 1.0.27` dependency (UAX #31). This permits supported combining marks after the first character.
+- Identifiers are not normalized; visually confusable detection and bidirectional-control diagnostics are not implemented.
+- Scientific notation is not part of the current numeric-literal grammar.
 - Reserved words: دع, اطبع, صحيح, خطأ, لاشيء.
 - Number literals accept ASCII, Arabic-Indic and Eastern Arabic-Indic digits. The decimal point is ASCII dot.
 - String literals use paired ASCII double quotes or Arabic guillemets: "text" or «نص». Newlines inside a string are rejected.

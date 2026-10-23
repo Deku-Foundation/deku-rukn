@@ -9,10 +9,10 @@ Rukn is experimental language research. Please open an issue before large change
     cargo clippy --all-targets --all-features --locked -- -D warnings
     cargo run --locked -- examples/hello.rukn
 
-For documentation:
+For documentation, use the checked-in lockfile so CI and local validation install the same dependency graph:
 
     cd docs
-    npm install
+    npm ci --no-audit --no-fund
     npm run build
 
 ## Change expectations
