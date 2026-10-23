@@ -778,7 +778,7 @@ mod tests {
             error.message
         );
         assert!(
-            error.message.to_ascii_lowercase().contains("\\\\u{202e}"),
+            error.message.to_ascii_lowercase().contains("\\u{202e}"),
             "diagnostic should show an escaped representation: {}",
             error.message
         );
