@@ -5,31 +5,31 @@ description: Observable milestones for the Rukn language and toolchain.
 
 # Roadmap
 
-Milestones are evidence-based. Dates are not promises, and a feature is not complete until tests and documentation cover it.
+Milestones are evidence-based, not time promises. A feature is complete only when implementation, tests and documentation agree.
 
 ## M0 — Repository foundation
 
 - [x] Rust crate, CLI entry point and initial test suite.
-- [x] Arabic keywords and Unicode identifiers.
+- [x] Arabic keywords, Unicode identifiers and Arabic diagnostics.
 - [x] Initial grammar and documentation in Arabic, French and English.
-- [ ] CI passes formatting, lint, unit tests and example output checks.
-- [ ] Publish a versioned design decision process.
+- [ ] CI passes formatting, lint, unit tests and example-output checks.
+- [ ] Publish a reviewed design-decision process.
 
 ## M1 — Language core
 
-- [ ] Add source-size, token-count and nesting limits.
-- [ ] Add parser fuzzing and a corpus of invalid programs.
-- [ ] Define Unicode normalization and identifier-confusable handling.
-- [ ] Add إذا / وإلا, blocks and lexical scopes after semantics are reviewed.
-- [ ] Define integer versus floating-point semantics and numeric overflow policy.
-- [ ] Stabilize structured diagnostics and machine-readable error codes.
+- [x] Bound source size, token count and parser nesting; reject non-finite numeric results.
+- [ ] Add parser fuzzing and a machine-readable corpus of invalid programs.
+- [ ] Define a versioned Unicode identifier profile, normalization, and confusable-character policy.
+- [ ] Add conditions, blocks and lexical scopes after semantics are reviewed.
+- [ ] Specify number semantics and error codes for tooling.
+- [ ] Stabilize structured diagnostics for editor integration.
 
 ## M2 — Programming abstractions
 
-- [ ] Functions and return values.
+- [ ] Functions, parameters and return values.
 - [ ] Collections and iteration.
 - [ ] Modules, imports and a dependency model.
-- [ ] Explicit error handling and resource limits.
+- [ ] Explicit error propagation and runtime behavior for future loops.
 - [ ] A standard library with documented stability levels.
 
 ## M3 — Tooling
@@ -43,11 +43,11 @@ Milestones are evidence-based. Dates are not promises, and a feature is not comp
 ## M4 — Compiler and bootstrap research
 
 - [ ] Specify a stable intermediate representation.
-- [ ] Compare tree-walk, bytecode VM and native back ends using measured workloads.
+- [ ] Compare tree-walk, bytecode VM and native back ends with a shared correctness suite and reproducible benchmarks.
 - [ ] Define an ABI and foreign-function interface before promising C interoperability.
-- [ ] Build a compiler in Rust that emits a documented target.
-- [ ] Establish reproducible bootstrap tests before considering a compiler written in Rukn.
+- [ ] Build a Rust compiler targeting a documented platform.
+- [ ] Establish reproducible bootstrap tests before considering a compiler in Rukn.
 
 ## Release policy
 
-A 0.1 release requires passing CI and a reviewed language specification. A 1.0 release additionally requires a compatibility policy, stable module semantics, migration policy, security review, documented limits, and a release/maintenance process. Self-hosting is not a 1.0 requirement unless the project later decides otherwise.
+A 0.1 release requires passing CI and a reviewed language specification. A 1.0 release additionally requires stable module semantics, compatibility and migration policies, a security review, documented resource limits, and a maintenance process. Self-hosting is not a 1.0 requirement unless a reviewed decision makes it one.

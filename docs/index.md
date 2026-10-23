@@ -1,40 +1,47 @@
 ---
-title: Rukn — an Arabic-first programming language
-description: Learn the experimental Arabic-first language and its Rust interpreter.
+layout: home
+title: Rukn — Arabic-first programming language
+description: Explore Rukn, an experimental Arabic-first programming language implemented in Rust.
+hero:
+  name: Rukn · ركن
+  text: Arabic-first programming
+  tagline: A small, readable language experiment with Arabic keywords, explicit semantics, and an interpreter written in Rust.
+  actions:
+    - theme: brand
+      text: Run your first program
+      link: /guide/getting-started
+    - theme: alt
+      text: Read the specification
+      link: /reference/specification
+    - theme: alt
+      text: اقرأ بالعربية
+      link: /ar/
+features:
+  - title: Arabic-first syntax
+    details: Arabic keywords, Unicode identifiers, and ASCII, Arabic-Indic, or Eastern Arabic-Indic digits.
+    link: /guide/language
+    linkText: Explore the language
+  - title: Small, explicit core
+    details: A Rust tree-walk interpreter with numbers, strings, booleans, variables, operators, and clear diagnostics.
+    link: /reference/architecture
+    linkText: Understand the interpreter
+  - title: Research before promises
+    details: Implemented behavior, open questions, and future proposals are documented separately and tested as the language evolves.
+    link: /project/design-decisions
+    linkText: Read design decisions
 ---
 
-# Programming should read naturally in Arabic.
+## A small program, end to end
 
-Rukn (ركن) is an experimental Arabic-first programming language. The first implementation is a small interpreter written in Rust. The initial goal is modest: make the language syntax explicit, make errors understandable, and make every implemented feature testable.
-
-<div class="vp-doc">
-
-[Run your first program](/guide/getting-started){.VPButton .medium .alt}
-[Read the language specification](/reference/specification){.VPButton .medium}
-
-</div>
-
-## What works today
-
-- Arabic keywords and Unicode identifiers.
-- Arabic-Indic, Eastern Arabic-Indic and ASCII digits in numeric literals.
-- Numbers, strings, booleans and a null-like value.
-- Variables, arithmetic, comparisons and equality.
-- Parentheses, semicolon-terminated statements and Arabic diagnostics.
-- A Rust library API, command-line runner and unit tests.
-
-## What does not work yet
-
-There are no functions, loops, user-defined types, modules, package manager, bytecode VM, native compiler, IDE integration or self-hosting compiler yet. Those are design and implementation milestones, not current features.
-
-## A first program
+The same example lives in `examples/hello.rukn` and is exercised by CI.
 
 ```rukn
-# examples/hello.rukn
+# أول برنامج بلغة ركن
 دع الاسم = «العالم»؛
 اطبع(«مرحبًا يا » + الاسم)؛
 دع الناتج = ٦ * ٧؛
 اطبع(الناتج)؛
+اطبع(صحيح == خطأ)؛
 ```
 
 Expected output:
@@ -42,16 +49,13 @@ Expected output:
 ```text
 مرحبًا يا العالم
 42
+خطأ
 ```
-
-## Design principles
-
-1. **Arabic-first, not Arabic-only.** Arabic keywords and diagnostics are first-class; ASCII digits and conventional operators remain available for interoperability.
-2. **A small grammar before a large feature list.** The specification and tests should lead implementation.
-3. **Useful errors.** Diagnostics should include source locations and explain the failed operation.
-4. **Explicit semantics.** No implicit type coercion in the initial language.
-5. **Build in public.** The repository should distinguish implemented behavior from proposals and record decisions in reviewable changes.
 
 ## Project status
 
-**Experimental, pre-alpha.** Rukn is not suitable for production use. Syntax and semantics may change before a 1.0 language specification.
+**Experimental · pre-alpha · not for production use.**
+
+Rukn does not yet include functions, loops, modules, collections, a package manager, a bytecode VM, native compilation, IDE integration, or a self-hosting compiler. Those are future research and engineering goals, not current features.
+
+The first priorities are a precise and tested language specification, robust diagnostics, Unicode identifier policy, regression tests, and a reproducible documentation build.

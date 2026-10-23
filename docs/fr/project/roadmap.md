@@ -5,30 +5,31 @@ description: Étapes vérifiables pour le langage Rukn et ses outils.
 
 # Feuille de route
 
-Les étapes reposent sur des preuves et des tests, pas sur des dates promises.
+Les étapes reposent sur des preuves, pas sur des dates promises. Une fonctionnalité est achevée lorsque le code, les tests et la documentation concordent.
 
 ## M0 — Fondation du dépôt
 
-- [x] Crate Rust, entrée CLI et premiers tests.
+- [x] Crate Rust, CLI et premiers tests.
 - [x] Mots-clés arabes, identifiants Unicode et diagnostics.
-- [x] Grammaire initiale et documentation arabe, française et anglaise.
-- [ ] CI réussie pour formatage, lint, tests et exemple.
-- [ ] Processus de décisions de conception documenté.
+- [x] Grammaire initiale et documentation trilingue.
+- [ ] CI réussie pour formatage, lint, tests et sortie de l’exemple.
+- [ ] Processus de décisions de conception examiné et documenté.
 
 ## M1 — Noyau du langage
 
-- [ ] Limites de taille source, jetons et profondeur.
-- [ ] Fuzzing de l’analyseur et corpus de programmes invalides.
-- [ ] Normalisation Unicode et identifiants visuellement confondables.
+- [x] Limites de taille source, de jetons et de profondeur syntaxique ; rejet des résultats numériques non finis.
+- [ ] Fuzzing du parseur et corpus machine-readable de programmes invalides.
+- [ ] Profil Unicode versionné, normalisation et politique des caractères confondables.
 - [ ] Conditions, blocs et portées après revue sémantique.
-- [ ] Politique numérique et codes d’erreur stables.
+- [ ] Sémantique numérique et codes d’erreur destinés aux outils.
+- [ ] Diagnostics structurés stables pour les éditeurs.
 
 ## M2 — Abstractions
 
-- [ ] Fonctions et valeurs de retour.
+- [ ] Fonctions, paramètres et valeurs de retour.
 - [ ] Collections et itération.
-- [ ] Modules, imports et dépendances.
-- [ ] Gestion explicite des erreurs et ressources.
+- [ ] Modules, imports et modèle de dépendances.
+- [ ] Propagation explicite des erreurs et comportement des futures boucles.
 - [ ] Bibliothèque standard avec niveaux de stabilité documentés.
 
 ## M3 — Outils
@@ -39,12 +40,14 @@ Les étapes reposent sur des preuves et des tests, pas sur des dates promises.
 - [ ] Manifeste et résolution reproductible des dépendances.
 - [ ] Benchmarks et corpus de non-régression.
 
-## M4 — Compilateur et amorçage
+## M4 — Recherche sur le compilateur et l’amorçage
 
 - [ ] Représentation intermédiaire stable.
-- [ ] Comparaison mesurée de l’interpréteur, de la VM bytecode et de la compilation native.
+- [ ] Comparaison mesurée de l’interpréteur, de la VM bytecode et de la compilation native avec un corpus commun.
 - [ ] ABI et FFI définies avant toute promesse de compatibilité C.
 - [ ] Compilateur Rust ciblant une plateforme documentée.
 - [ ] Tests d’amorçage reproductible avant l’auto-hébergement.
 
-La version 1.0 exigera une sémantique des modules stable, une politique de compatibilité, une revue de sécurité et un processus de maintenance. L’auto-hébergement n’est pas automatiquement une exigence de 1.0.
+## Politique de publication
+
+La version 0.1 exigera une CI réussie et une spécification examinée. La version 1.0 exigera en plus une sémantique des modules stable, des politiques de compatibilité et migration, une revue de sécurité, des limites de ressources documentées et une procédure de maintenance. L’auto-hébergement n’est pas une exigence automatique de la version 1.0.
