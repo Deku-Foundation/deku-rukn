@@ -153,7 +153,7 @@ impl Lexer {
                         "محرف Unicode غير مدعوم: U+{:04X} ({escaped})",
                         ch as u32
                     )));
-                },
+                }
             }
             if tokens.len() > MAX_TOKENS {
                 return Err(self
