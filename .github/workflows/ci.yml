@@ -1,0 +1,55 @@
+name: Quality gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rukn-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rust:
+    name: Rust format, lint and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Run tests
+        run: cargo test --locked
+      - name: Lint
+        run: cargo clippy --all-targets --all-features --locked -- -D warnings
+      - name: Verify example program
+        run: |
+          cargo run --locked -- examples/hello.rukn > /tmp/rukn-output.txt
+          diff -u <(printf 'مرحبًا يا العالم\n42\nخطأ\n') /tmp/rukn-output.txt
+
+  docs:
+    name: Documentation site
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Export npm lockfile for reproducible dependency installation
+        run: |
+          echo RUKN_LOCK_BEGIN
+          base64 -w0 package-lock.json
+          echo
+          echo RUKN_LOCK_END
+      - name: Build documentation
+        run: npm run build
