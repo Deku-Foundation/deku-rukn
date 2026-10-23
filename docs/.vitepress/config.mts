@@ -15,9 +15,11 @@ const enSidebar = [
   { text: 'Engineering and research', items: [
     { text: 'Unicode and security', link: '/reference/unicode-and-security' },
     { text: 'Testing strategy', link: '/reference/testing-strategy' },
+    { text: 'Research reading list', link: '/reference/research-reading-list' },
     { text: 'Design decisions', link: '/project/design-decisions' },
   ] },
   { text: 'Project', items: [
+    { text: 'Visual identity', link: '/project/visual-identity' },
     { text: 'Roadmap', link: '/project/roadmap' },
     { text: 'Contributing', link: '/project/contributing' },
   ] },
@@ -36,9 +38,11 @@ const arSidebar = [
   { text: 'الهندسة والأبحاث', items: [
     { text: 'Unicode والأمان', link: '/ar/reference/unicode-and-security' },
     { text: 'استراتيجية الاختبار', link: '/ar/reference/testing-strategy' },
+    { text: 'قائمة المراجع البحثية', link: '/ar/reference/research-reading-list' },
     { text: 'قرارات التصميم', link: '/ar/project/design-decisions' },
   ] },
   { text: 'المشروع', items: [
+    { text: 'الهوية البصرية', link: '/ar/project/visual-identity' },
     { text: 'خارطة الطريق', link: '/ar/project/roadmap' },
     { text: 'المساهمة', link: '/ar/project/contributing' },
   ] },
@@ -57,9 +61,11 @@ const frSidebar = [
   { text: 'Ingénierie et recherche', items: [
     { text: 'Unicode et sécurité', link: '/fr/reference/unicode-and-security' },
     { text: 'Stratégie de test', link: '/fr/reference/testing-strategy' },
+    { text: 'Bibliographie technique', link: '/fr/reference/research-reading-list' },
     { text: 'Décisions de conception', link: '/fr/project/design-decisions' },
   ] },
   { text: 'Projet', items: [
+    { text: 'Identité visuelle', link: '/fr/project/visual-identity' },
     { text: 'Feuille de route', link: '/fr/project/roadmap' },
     { text: 'Contribuer', link: '/fr/project/contributing' },
   ] },
@@ -75,7 +81,7 @@ export default defineConfig({
   sitemap: { hostname: 'https://deku-foundation.github.io/deku-rukn/' },
   head: [
     ['link', { rel: 'icon', type: 'image/svg+xml', href: '/deku-rukn/rukn-mark.svg' }],
-    ['meta', { name: 'theme-color', content: '#173f32' }],
+    ['meta', { name: 'theme-color', content: '#12372a' }],
     ['meta', { name: 'color-scheme', content: 'light dark' }],
     ['meta', { property: 'og:site_name', content: 'Rukn — ركن' }],
     ['meta', { property: 'og:type', content: 'website' }],
@@ -95,8 +101,10 @@ export default defineConfig({
       { text: 'Research', items: [
         { text: 'Unicode and security', link: '/reference/unicode-and-security' },
         { text: 'Testing strategy', link: '/reference/testing-strategy' },
+        { text: 'Research reading list', link: '/reference/research-reading-list' },
         { text: 'Design decisions', link: '/project/design-decisions' },
       ] },
+      { text: 'Visual identity', link: '/project/visual-identity' },
       { text: 'Roadmap', link: '/project/roadmap' },
       { text: 'GitHub', link: repoUrl },
     ],
@@ -120,8 +128,10 @@ export default defineConfig({
           { text: 'الأبحاث', items: [
             { text: 'Unicode والأمان', link: '/ar/reference/unicode-and-security' },
             { text: 'استراتيجية الاختبار', link: '/ar/reference/testing-strategy' },
+            { text: 'قائمة المراجع البحثية', link: '/ar/reference/research-reading-list' },
             { text: 'قرارات التصميم', link: '/ar/project/design-decisions' },
           ] },
+          { text: 'الهوية البصرية', link: '/ar/project/visual-identity' },
           { text: 'خارطة الطريق', link: '/ar/project/roadmap' },
           { text: 'المستودع', link: repoUrl },
         ],
@@ -143,8 +153,10 @@ export default defineConfig({
           { text: 'Recherche', items: [
             { text: 'Unicode et sécurité', link: '/fr/reference/unicode-and-security' },
             { text: 'Stratégie de test', link: '/fr/reference/testing-strategy' },
+            { text: 'Bibliographie technique', link: '/fr/reference/research-reading-list' },
             { text: 'Décisions de conception', link: '/fr/project/design-decisions' },
           ] },
+          { text: 'Identité visuelle', link: '/fr/project/visual-identity' },
           { text: 'Feuille de route', link: '/fr/project/roadmap' },
           { text: 'Dépôt', link: repoUrl },
         ],

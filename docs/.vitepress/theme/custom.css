@@ -1,49 +1,86 @@
 :root {
-  --vp-c-brand-1: #23664b;
-  --vp-c-brand-2: #194e39;
-  --vp-c-brand-3: #123b2b;
-  --vp-c-brand-soft: rgba(35, 102, 75, 0.12);
-  --vp-font-family-base: Inter, "Noto Sans Arabic", "Noto Sans", system-ui, sans-serif;
-  --vp-font-family-mono: "JetBrains Mono", "Cascadia Code", ui-monospace, monospace;
-  --vp-home-hero-name-color: #174b35;
-  --vp-home-hero-name-background: linear-gradient(125deg, #174b35 10%, #4f8b62 92%);
-  --rukn-border: rgba(35, 102, 75, 0.16);
+  --vp-c-brand-1: #18563a;
+  --vp-c-brand-2: #27734f;
+  --vp-c-brand-3: #12372a;
+  --vp-c-brand-soft: #e8f3e9;
+  --vp-c-bg: #f5f7f2;
+  --vp-c-bg-alt: #edf2e9;
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-bg-soft: #e8f3e9;
+  --vp-c-text-1: #17261e;
+  --vp-c-text-2: #43574b;
+  --vp-c-text-3: #58675e;
+  --vp-c-divider: #bdcdbf;
+  --vp-c-border: #d9e2d8;
+  --vp-c-gutter: #d9e2d8;
+  --vp-font-family-base: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Arabic", Tahoma, sans-serif;
+  --vp-font-family-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --vp-home-hero-name-color: #12372a;
+  --vp-home-hero-name-background: linear-gradient(125deg, #12372a 8%, #27734f 88%);
+  --rukn-border: rgba(18, 55, 42, 0.14);
+  --rukn-gold: #d5af66;
 }
 .dark {
-  --vp-c-brand-1: #8fcca4;
-  --vp-c-brand-2: #a7dfb6;
-  --vp-c-brand-3: #c4ebce;
-  --vp-c-brand-soft: rgba(143, 204, 164, 0.13);
-  --vp-home-hero-name-color: #c4ebce;
-  --vp-home-hero-name-background: linear-gradient(125deg, #c4ebce 10%, #80c99a 92%);
-  --rukn-border: rgba(143, 204, 164, 0.2);
+  --vp-c-brand-1: #bfe6a6;
+  --vp-c-brand-2: #7dbb81;
+  --vp-c-brand-3: #f0f7ea;
+  --vp-c-brand-soft: rgba(191, 230, 166, 0.12);
+  --vp-c-bg: #0b271d;
+  --vp-c-bg-alt: #12372a;
+  --vp-c-bg-elv: #12372a;
+  --vp-c-bg-soft: #194833;
+  --vp-c-text-1: #f0f7ea;
+  --vp-c-text-2: #cfddcf;
+  --vp-c-text-3: #a9bfae;
+  --vp-c-divider: #315746;
+  --vp-c-border: #315746;
+  --vp-c-gutter: #315746;
+  --vp-home-hero-name-color: #f0f7ea;
+  --vp-home-hero-name-background: linear-gradient(125deg, #f0f7ea 8%, #bfe6a6 88%);
+  --rukn-border: rgba(191, 230, 166, 0.2);
 }
-.VPNavBarTitle .title { font-weight: 760; letter-spacing: -0.025em; }
+.VPNavBarTitle .title { font-weight: 780; letter-spacing: -0.025em; }
+.VPNavBarTitle .logo { border-radius: 8px; }
 .VPHome .VPHero .name { letter-spacing: -0.045em; }
-.VPHome .VPHero .text { max-width: 17ch; line-height: 1.12; }
-.VPHome .VPHero .tagline { max-width: 52rem; line-height: 1.75; }
+.VPHome .VPHero .text { max-width: 17ch; line-height: 1.12; font-weight: 760; }
+.VPHome .VPHero .tagline { max-width: 52rem; line-height: 1.8; color: var(--vp-c-text-2); }
 .VPHome .VPHero .actions { gap: 0.75rem; }
+.VPHome .VPHero .action .VPButton { border-radius: 9px; font-weight: 650; }
 .VPHome .VPFeature {
   border: 1px solid var(--rukn-border);
   border-radius: 16px;
-  background: var(--vp-c-bg-soft);
-  transition: border-color 160ms ease, transform 160ms ease;
+  background: var(--vp-c-bg-elv);
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
-.VPHome .VPFeature:hover { border-color: var(--vp-c-brand-1); }
-.VPHome .VPFeature .title { font-weight: 650; }
-.vp-doc h1, .vp-doc h2, .vp-doc h3 { letter-spacing: -0.025em; }
+.VPHome .VPFeature:hover {
+  border-color: var(--vp-c-brand-2);
+  box-shadow: 0 12px 30px rgba(18, 55, 42, 0.08);
+}
+.VPHome .VPFeature .title { font-weight: 720; }
+.VPHome .VPFeature .details { line-height: 1.8; }
+.vp-doc { line-height: 1.8; }
+.vp-doc h1, .vp-doc h2, .vp-doc h3 { letter-spacing: -0.02em; }
+.vp-doc h2 { margin-top: 2.5rem; }
 .vp-doc table { display: table; width: 100%; }
 .vp-doc :where(pre, code) { font-variant-ligatures: none; }
-.vp-doc [dir="rtl"] { text-align: right; }
-html[lang="ar"] body { font-family: "Noto Sans Arabic", Tahoma, system-ui, sans-serif; }
-html[lang="ar"] .vp-doc, html[lang="ar"] .VPDoc { line-height: 1.9; }
-html[lang="ar"] .vp-doc pre, html[lang="ar"] .vp-doc code, html[lang="ar"] .vp-code-group {
-  direction: ltr;
-  text-align: left;
-}
+.vp-doc a { text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.vp-doc a:hover { text-decoration-thickness: 2px; }
+.vp-doc :where(pre) { border: 1px solid var(--vp-c-border); border-radius: 12px; }
+.vp-doc :where(blockquote) { border-radius: 0 10px 10px 0; }
+.vp-doc :where(th) { background: var(--vp-c-bg-alt); }
+.vp-doc :where(td, th) { border-color: var(--vp-c-border); }
+html[lang="ar"] body { font-family: "Noto Sans Arabic", Tahoma, Arial, system-ui, sans-serif; }
+html[lang="ar"] .vp-doc, html[lang="ar"] .VPDoc { line-height: 1.95; }
+html[lang="ar"] .vp-doc pre, html[lang="ar"] .vp-doc code, html[lang="ar"] .vp-code-group { direction: ltr; text-align: left; }
 html[lang="ar"] .VPHome .VPHero .text, html[lang="ar"] .VPHome .VPHero .tagline { max-width: 48rem; }
+html[lang="ar"] .vp-doc :where(blockquote) { border-radius: 10px 0 0 10px; }
+.VPFooter { border-top: 1px solid var(--vp-c-border); }
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--rukn-gold);
+  outline-offset: 3px;
+}
 @media (prefers-reduced-motion: reduce) {
-  .VPHome .VPFeature { transition: none; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 @media (max-width: 640px) {
   .VPHome .VPHero .text { max-width: 100%; }
