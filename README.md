@@ -55,6 +55,10 @@ The command-line runner accepts one UTF-8 source file. See the [documentation si
 
 Self-hosting is a long-term research goal, not a current feature or a substitute for a stable specification.
 
+## Branch policy
+
+Keep only `main` and `dev` as persistent branches. Develop and run quality gates on `dev`, then promote to `main` after checks pass. Do not create long-lived feature branches; the cleanup workflow removes redundant branches once their content is integrated.
+
 ## Contributing and security
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Security limitations and reporting guidance are in [SECURITY.md](SECURITY.md). Language changes should include tests and updates to the specification and translated documentation.
