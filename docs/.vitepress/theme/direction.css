@@ -168,3 +168,59 @@ html[dir="rtl"] .VPLocalNav .menu {
     max-width: min(var(--vp-layout-max-width), calc(100vw - 96px));
   }
 }
+
+
+/* The page column itself reserves space for the sidebar. VitePress 1.x does
+   this with padding-left, independently of the sidebar's fixed position. */
+@media (min-width: 960px) {
+  html[dir="rtl"] .VPContent.has-sidebar {
+    padding-right: var(--vp-sidebar-width);
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 1440px) {
+  html[dir="rtl"] .VPContent.has-sidebar {
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2);
+  }
+}
+
+/* On smaller desktop widths VitePress uses a local navigation bar. Reserve
+   the sidebar column on its right side for Arabic rather than on its left. */
+html[dir="rtl"] .VPLocalNav {
+  right: 0;
+  left: auto;
+}
+
+@media (min-width: 960px) {
+  html[dir="rtl"] .VPLocalNav.has-sidebar {
+    padding-right: var(--vp-sidebar-width);
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 1440px) {
+  html[dir="rtl"] .VPLocalNav.has-sidebar {
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+    padding-left: 0;
+  }
+}
+
+html[dir="rtl"] .VPLocalNav .menu-icon {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* Translate documentation navigation details and pager alignment too. */
+html[dir="rtl"] .VPDocFooter .edit-link-icon {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+html[dir="rtl"] .VPDocFooter .pager-link,
+html[dir="rtl"] .VPDocFooter .pager-link.next {
+  margin-right: auto;
+  margin-left: 0;
+  text-align: start;
+}
