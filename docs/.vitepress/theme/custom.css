@@ -1,0 +1,34 @@
+:root {
+  --vp-c-brand-1: #23664b;
+  --vp-c-brand-2: #194e39;
+  --vp-c-brand-3: #123b2b;
+  --vp-c-brand-soft: rgba(35, 102, 75, 0.12);
+  --vp-font-family-base: Inter, "Noto Sans Arabic", "Noto Sans", system-ui, sans-serif;
+  --vp-font-family-mono: "JetBrains Mono", "Cascadia Code", ui-monospace, monospace;
+  --vp-home-hero-name-color: #174b35;
+  --vp-home-hero-name-background: linear-gradient(120deg, #174b35 20%, #4f8b62 90%);
+}
+.dark {
+  --vp-c-brand-1: #8fcca4;
+  --vp-c-brand-2: #a7dfb6;
+  --vp-c-brand-3: #c4ebce;
+  --vp-c-brand-soft: rgba(143, 204, 164, 0.13);
+  --vp-home-hero-name-color: #c4ebce;
+  --vp-home-hero-name-background: linear-gradient(120deg, #c4ebce 20%, #80c99a 90%);
+}
+.VPNavBarTitle .title { font-weight: 760; letter-spacing: -0.025em; }
+.VPHome .VPHero .name { letter-spacing: -0.045em; }
+.VPHome .VPHero .text { max-width: 17ch; line-height: 1.12; }
+.VPHome .VPHero .tagline { max-width: 48rem; line-height: 1.75; }
+.VPFeature { border-radius: 14px; }
+.vp-doc h1, .vp-doc h2, .vp-doc h3 { letter-spacing: -0.025em; }
+.vp-doc table { display: table; width: 100%; }
+.vp-doc :where(pre, code) { font-variant-ligatures: none; }
+.vp-doc [dir="rtl"] { text-align: right; }
+html[lang="ar"] body { font-family: "Noto Sans Arabic", Tahoma, system-ui, sans-serif; }
+html[lang="ar"] .vp-doc, html[lang="ar"] .VPDoc { line-height: 1.9; }
+html[lang="ar"] .vp-doc pre, html[lang="ar"] .vp-doc code, html[lang="ar"] .vp-code-group { direction: ltr; text-align: left; }
+@media (max-width: 640px) {
+  .VPHome .VPHero .text { max-width: 100%; }
+  .vp-doc table { display: block; overflow-x: auto; }
+}
