@@ -509,7 +509,10 @@ impl Interpreter {
                 let value = self.evaluate(initializer)?;
                 self.environment.insert(name.lexeme.clone(), value);
             }
-            Stmt::Print { expression } => self.output.push(self.evaluate(expression)?.to_string()),
+            Stmt::Print { expression } => {
+                let value = self.evaluate(expression)?.to_string();
+                self.output.push(value);
+            }
             Stmt::Expression(expression) => {
                 self.evaluate(expression)?;
             }
