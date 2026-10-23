@@ -1,0 +1,170 @@
+/*
+ * Rukn UI compatibility layer for VitePress 1.6.x.
+ *
+ * VitePress 1.6.4 uses physical left/right offsets in several theme components.
+ * Changing <html dir> alone therefore does not mirror the sidebar and navbar.
+ * These targeted overrides port logical-direction behavior without pulling an
+ * alpha version of the site generator into the published documentation.
+ */
+
+/* The documentation sidebar: slide in from the inline-start edge. */
+html[dir="rtl"] .VPSidebar {
+  right: 0;
+  left: auto;
+  direction: rtl;
+  text-align: start;
+  transform: translateX(100%);
+}
+
+html[dir="rtl"] .VPSidebar.open {
+  transform: translateX(0);
+}
+
+html[dir="rtl"] .VPSidebar .curtain {
+  right: 0;
+  left: auto;
+}
+
+@media (min-width: 960px) {
+  html[dir="rtl"] .VPSidebar {
+    right: 0;
+    left: auto;
+    padding-right: 32px;
+    padding-left: 32px;
+    transform: translateX(0);
+  }
+
+  html[dir="rtl"] .VPSidebar .curtain {
+    right: 0;
+    left: auto;
+  }
+
+  /* The VitePress 1.x title is absolutely pinned to the physical left. */
+  html[dir="rtl"] .VPNavBar.has-sidebar .container > .title {
+    right: 0;
+    left: auto;
+    padding-right: 32px;
+    padding-left: 32px;
+    text-align: start;
+  }
+
+  html[dir="rtl"] .VPNavBar.has-sidebar .container > .content {
+    padding-right: var(--vp-sidebar-width);
+    padding-left: 32px;
+  }
+
+  html[dir="rtl"] .VPNavBar.has-sidebar .divider {
+    padding-right: var(--vp-sidebar-width);
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 1440px) {
+  html[dir="rtl"] .VPSidebar {
+    padding-right: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2));
+    padding-left: 32px;
+  }
+
+  html[dir="rtl"] .VPNavBar.has-sidebar .container > .title {
+    right: 0;
+    left: auto;
+    padding-right: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2));
+    padding-left: 32px;
+    width: calc((100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px);
+  }
+
+  html[dir="rtl"] .VPNavBar.has-sidebar .container > .content {
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px);
+  }
+
+  html[dir="rtl"] .VPNavBar.has-sidebar .divider {
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+    padding-left: 0;
+  }
+}
+
+/* Mirror sidebar item details, including active markers and disclosure carets. */
+html[dir="rtl"] .VPSidebar .nav {
+  direction: rtl;
+  text-align: start;
+}
+
+html[dir="rtl"] .VPSidebarItem .indicator {
+  right: -17px;
+  left: auto;
+}
+
+html[dir="rtl"] .VPSidebarItem.level-1 .items,
+html[dir="rtl"] .VPSidebarItem.level-2 .items,
+html[dir="rtl"] .VPSidebarItem.level-3 .items,
+html[dir="rtl"] .VPSidebarItem.level-4 .items,
+html[dir="rtl"] .VPSidebarItem.level-5 .items {
+  padding-right: 16px;
+  padding-left: 0;
+  border-right: 1px solid var(--vp-c-divider);
+  border-left: 0;
+}
+
+html[dir="rtl"] .VPSidebarItem .caret {
+  margin-right: 0;
+  margin-left: -7px;
+}
+
+html[dir="rtl"] .VPSidebarItem.collapsed .caret-icon {
+  transform: rotate(180deg);
+}
+
+/* Keep the live wordmark spacing natural when the logo is on the right. */
+html[dir="rtl"] .VPNavBarTitle .logo {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+/* Mobile navigation follows the locale direction as well. */
+html[dir="rtl"] .VPNavScreen,
+html[dir="rtl"] .VPNavScreen .container,
+html[dir="rtl"] .VPLocalNav,
+html[dir="rtl"] .VPLocalNav .menu {
+  direction: rtl;
+  text-align: start;
+}
+
+/* Mirror the on-page outline to the left of the Arabic reading column. */
+@media (min-width: 1280px) {
+  html[dir="rtl"] .VPDoc.has-sidebar > .container {
+    direction: rtl;
+  }
+
+  html[dir="rtl"] .VPDoc.has-aside .aside {
+    padding-right: 32px;
+    padding-left: 0;
+  }
+}
+
+/* Avoid constraining the complete desktop documentation layout to 1180px.
+   The reading column remains measure-limited; the outer layout can use the
+   VitePress max-width so the article and outline do not crowd the sidebar. */
+@media (min-width: 1440px) {
+  .VPDoc.has-sidebar > .container {
+    max-width: var(--vp-layout-max-width);
+  }
+
+  .VPHome .VPHero .container,
+  .VPHome .VPFeatures {
+    max-width: var(--vp-layout-max-width);
+    margin-inline: auto;
+  }
+}
+
+/* Prevent feature cards and hero columns from stretching into ultra-wide lines. */
+@media (min-width: 1920px) {
+  .VPHome .VPHero .text,
+  .VPHome .VPHero .tagline {
+    max-width: min(100%, 60rem);
+  }
+
+  .VPHome .VPFeatures {
+    max-width: min(var(--vp-layout-max-width), calc(100vw - 96px));
+  }
+}
