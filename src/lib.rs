@@ -556,7 +556,7 @@ impl Interpreter {
             (K::Plus, Value::String(a), Value::String(b)) => Ok(Value::String(a + &b)),
             (K::Minus, Value::Number(a), Value::Number(b)) => Ok(Value::Number(a - b)),
             (K::Star, Value::Number(a), Value::Number(b)) => Ok(Value::Number(a * b)),
-            (K::Slash, Value::Number(_), Value::Number(b)) if b == 0.0 => {
+            (K::Slash, Value::Number(_), Value::Number(0.0)) => {
                 Err(LangError::at("القسمة على صفر غير مسموحة", op))
             }
             (K::Slash, Value::Number(a), Value::Number(b)) => Ok(Value::Number(a / b)),
