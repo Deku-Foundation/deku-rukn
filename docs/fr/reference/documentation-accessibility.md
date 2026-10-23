@@ -23,6 +23,21 @@ Cette page consigne le socle pratique d’accessibilité du site Rukn. Il s’ag
 - Respect de la préférence de réduction des animations et adaptations aux petits écrans.
 - Aucun téléchargement de police externe requis ; les polices système servent de repli.
 
+## Contraste des surfaces et des boutons
+
+Le mode sombre utilise des surfaces graphite neutres, légèrement teintées de vert, au lieu de colorer chaque panneau en vert. Le bouton principal définit un texte sombre sur un fond menthe clair ; les boutons secondaires utilisent une surface neutre.
+
+| Paire | Rapport de contraste calculé | Seuil WCAG 2.2 pour le texte |
+| --- | ---: | ---: |
+| Texte principal #f3f5f2 sur #121713 | 16,55:1 | 4,5:1 |
+| Texte secondaire #cbd4cc sur #121713 | 11,95:1 | 4,5:1 |
+| Lien accent #bfe6a6 sur #121713 | 13,03:1 | 4,5:1 |
+| Texte du bouton sombre #132018 sur #bfe6a6 | 12,09:1 | 4,5:1 |
+| Texte clair #17261e sur #f5f7f2 | 14,61:1 | 4,5:1 |
+| Texte du bouton clair #ffffff sur #18563a | 8,64:1 | 4,5:1 |
+
+Les rapports sont calculés à partir des couleurs solides. Ils ne prouvent pas que chaque état rendu, token syntaxique, image ou indicateur de focus a passé un audit d’accessibilité complet.
+
 ## Liste de vérification manuelle
 
 - [ ] Mesurer le contraste du texte, des liens et du code dans les deux thèmes avec un outil spécialisé.

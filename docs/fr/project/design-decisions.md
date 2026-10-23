@@ -19,7 +19,7 @@ Un langage nécessite un registre de décisions, pas seulement une feuille de ro
 | ID | Sujet | État | Preuves nécessaires |
 | --- | --- | --- | --- |
 | RUKN-DR-0001 | Profil d’identifiants Unicode et normalisation | Base XID implémentée ; normalisation ouverte | `unicode-ident` verrouillé et tests arabes ; politique de normalisation/confusables et migration encore ouvertes |
-| RUKN-DR-0002 | Confusables et contrôles bidirectionnels | Recherche ouverte | Modèle de menace, exemples éditeur/terminal, analyse des faux positifs |
+| RUKN-DR-0002 | Politique des confusables et contrôles bidirectionnels | Recherche ouverte ; les points de code rejetés sont affichés | Modèle de menace, chaînes/commentaires, exemples éditeur/terminal et faux positifs |
 | RUKN-DR-0003 | Interpréteur d’arbre, VM bytecode ou backend natif | Différé | Sémantique stable, corpus commun, benchmarks reproductibles |
 | RUKN-DR-0004 | Amorçage et auto-hébergement | Différé | Parseur stable, bibliothèque standard, tests du compilateur et amorçage reproductible |
 

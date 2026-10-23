@@ -124,6 +124,15 @@ export default defineConfig({
       title: 'ركن',
       description: 'لغة برمجة عربية أولًا قيد التجربة، مبنية باستخدام Rust.',
       themeConfig: {
+        darkModeSwitchLabel: 'المظهر',
+        lightModeSwitchTitle: 'التبديل إلى المظهر الفاتح',
+        darkModeSwitchTitle: 'التبديل إلى المظهر الداكن',
+        sidebarMenuLabel: 'قائمة التوثيق',
+        returnToTopLabel: 'العودة إلى الأعلى',
+        langMenuLabel: 'تغيير اللغة',
+        navMenuLabel: 'التنقل الرئيسي',
+        mobileMenuLabel: 'القائمة',
+        skipToContentLabel: 'تخطي إلى المحتوى',
         outline: { label: 'في هذه الصفحة', level: [2, 3] },
         nav: [
           { text: 'الدليل', link: '/ar/guide/getting-started' },
@@ -149,6 +158,15 @@ export default defineConfig({
       title: 'Rukn',
       description: 'Un langage de programmation arabe expérimental, développé en Rust.',
       themeConfig: {
+        darkModeSwitchLabel: 'Apparence',
+        lightModeSwitchTitle: 'Passer au thème clair',
+        darkModeSwitchTitle: 'Passer au thème sombre',
+        sidebarMenuLabel: 'Navigation de la documentation',
+        returnToTopLabel: 'Retour en haut',
+        langMenuLabel: 'Changer de langue',
+        navMenuLabel: 'Navigation principale',
+        mobileMenuLabel: 'Menu',
+        skipToContentLabel: 'Aller au contenu',
         outline: { label: 'Sur cette page', level: [2, 3] },
         nav: [
           { text: 'Guide', link: '/fr/guide/getting-started' },

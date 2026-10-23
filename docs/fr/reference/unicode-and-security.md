@@ -17,6 +17,7 @@ Pour un langage conçu avec l’arabe au premier plan, Unicode fait partie de la
 - Les chiffres d’un littéral sont convertis en chiffres ASCII avant l’analyse numérique.
 - Les marques combinantes prises en charge peuvent suivre le premier caractère ; les diacritiques arabes peuvent donc apparaître dans un identifiant.
 - L’orthographe des noms est conservée. Aucune normalisation ou alerte de confusables n’est actuellement appliquée.
+- Si le lexer rejette un caractère hors des chaînes et commentaires, le diagnostic donne son point de code `U+XXXX` et sa forme échappée. Cela ne recherche pas les contrôles bidirectionnels dans les commentaires ou valeurs de chaîne.
 - Les caractères XID suivent les données Unicode intégrées à la dépendance verrouillée ; toute mise à jour exige des tests de conformité et une revue de compatibilité.
 
 C’est une base lexicale plus cohérente, mais pas un profil de sécurité Unicode complet. La normalisation, les confusables, le mélange de scripts et les contrôles invisibles restent des sujets ouverts.

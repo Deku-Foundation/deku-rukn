@@ -147,7 +147,13 @@ impl Lexer {
                 '"' | '«' => tokens.push(self.string(ch)?),
                 c if is_digit(c) => tokens.push(self.number()),
                 c if is_identifier_start(c) => tokens.push(self.identifier()),
-                _ => return Err(self.error_at_current(format!("محرف غير مدعوم: {ch}"))),
+                _ => {
+                    let escaped = ch.escape_default().to_string();
+                    return Err(self.error_at_current(format!(
+                        "محرف Unicode غير مدعوم: U+{:04X} ({escaped})",
+                        ch as u32
+                    )));
+                }
             }
             if tokens.len() > MAX_TOKENS {
                 return Err(self
@@ -699,7 +705,7 @@ mod tests {
     #[test]
     fn rejects_a_combining_mark_at_identifier_start() {
         let error = run("اطبع(َاسم)؛").unwrap_err();
-        assert!(error.message.contains("محرف غير مدعوم"));
+        assert!(error.message.contains("غير مدعوم"));
     }
     #[test]
     fn respects_precedence_and_parentheses() {
@@ -720,12 +726,7 @@ mod tests {
     }
     #[test]
     fn invalid_characters_and_unclosed_strings_are_errors() {
-        assert!(
-            run("اطبع(@)؛")
-                .unwrap_err()
-                .message
-                .contains("محرف غير مدعوم")
-        );
+        assert!(run("اطبع(@)؛").unwrap_err().message.contains("غير مدعوم"));
         assert!(run("اطبع(\"نص)؛").unwrap_err().message.contains("غير مغلق"));
     }
     #[test]
@@ -761,6 +762,21 @@ mod tests {
         let source = format!("اطبع({left} * {right})؛");
         let error = run(&source).unwrap_err();
         assert!(error.message.contains("غير محدود"));
+    }
+    #[test]
+    fn rejected_unicode_controls_are_visible_in_diagnostics() {
+        // U+202E is RIGHT-TO-LEFT OVERRIDE, an invisible bidirectional control.
+        let error = run("دع الاسم = \u{202E}1؛").unwrap_err();
+        assert!(
+            error.message.contains("U+202E"),
+            "diagnostic should show the code point: {}",
+            error.message
+        );
+        assert!(
+            error.message.to_ascii_lowercase().contains("\\u{202e}"),
+            "diagnostic should show an escaped representation: {}",
+            error.message
+        );
     }
     #[test]
     fn empty_program_is_valid() {
