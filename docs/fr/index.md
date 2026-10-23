@@ -1,36 +1,47 @@
 ---
-title: Rukn — un langage de programmation arabe
-description: Découvrez le langage expérimental Rukn et son interpréteur écrit en Rust.
+layout: home
+title: Rukn — langage de programmation arabe
+description: Découvrez Rukn, un langage de programmation arabe expérimental implémenté en Rust.
+hero:
+  name: Rukn · ركن
+  text: Programmer d’abord en arabe
+  tagline: Une expérience linguistique compacte, avec des mots-clés arabes, une sémantique explicite et un interpréteur écrit en Rust.
+  actions:
+    - theme: brand
+      text: Exécuter un premier programme
+      link: /fr/guide/getting-started
+    - theme: alt
+      text: Lire la spécification
+      link: /fr/reference/specification
+    - theme: alt
+      text: العربية
+      link: /ar/
+features:
+  - title: Syntaxe arabe en priorité
+    details: Mots-clés arabes, identifiants Unicode et chiffres ASCII, arabo-indiens ou persans.
+    link: /fr/guide/language
+    linkText: Explorer le langage
+  - title: Noyau réduit et explicite
+    details: Un interpréteur d’arbre en Rust avec nombres, chaînes, booléens, variables, opérateurs et diagnostics clairs.
+    link: /fr/reference/architecture
+    linkText: Comprendre l’interpréteur
+  - title: La recherche avant les promesses
+    details: Les capacités existantes, les questions ouvertes et les propositions futures sont documentées séparément.
+    link: /fr/project/design-decisions
+    linkText: Lire les décisions
 ---
 
-# Programmer devrait pouvoir se lire naturellement en arabe.
+## Un programme complet
 
-Rukn (ركن) est un langage de programmation expérimental conçu avec l’arabe comme langue de première classe. La première implémentation est un petit interpréteur écrit en Rust. L’objectif initial est volontairement limité : une syntaxe explicite, des erreurs compréhensibles et des tests pour chaque fonctionnalité implémentée.
-
-[Exécuter votre premier programme](/fr/guide/getting-started){.VPButton .medium .alt}
-[Lire la spécification du langage](/fr/reference/specification){.VPButton .medium}
-
-## Fonctionnalités disponibles
-
-- Mots-clés arabes et identifiants Unicode.
-- Chiffres arabo-indiens, persans et ASCII.
-- Nombres, chaînes, booléens et valeur de type nul.
-- Variables, opérations arithmétiques, comparaisons et égalité.
-- Parenthèses, instructions terminées par un point-virgule et diagnostics arabes.
-- Bibliothèque Rust, exécutable en ligne de commande et tests unitaires.
-
-## Fonctionnalités absentes
-
-Les fonctions, boucles, types définis par l’utilisateur, modules, gestionnaire de paquets, machine virtuelle à bytecode, compilateur natif, intégration IDE et auto-hébergement ne sont pas encore implémentés. Ce sont des étapes futures, pas des capacités actuelles.
-
-## Premier programme
+Cet exemple correspond à `examples/hello.rukn`, également vérifié par l’intégration continue.
 
 ```rukn
-# examples/hello.rukn
+# أول برنامج بلغة ركن
 دع الاسم = «العالم»؛
 اطبع(«مرحبًا يا » + الاسم)؛
 دع الناتج = ٦ * ٧؛
 اطبع(الناتج)؛
+اطبع(صحيح == خطأ)؛
 ```
 
 Résultat attendu :
@@ -38,16 +49,13 @@ Résultat attendu :
 ```text
 مرحبًا يا العالم
 42
+خطأ
 ```
-
-## Principes de conception
-
-1. **L’arabe d’abord, sans exclusivité.** Les mots-clés et messages sont arabes ; les chiffres ASCII et les opérateurs usuels restent pris en charge.
-2. **Une grammaire réduite avant une longue liste de fonctionnalités.** La spécification et les tests guident le développement.
-3. **Des erreurs utiles.** Les diagnostics indiquent la ligne, la colonne et la cause.
-4. **Une sémantique explicite.** La première version n’effectue pas de conversion implicite de types.
-5. **Un développement public.** Les fonctionnalités réalisées sont distinguées des propositions.
 
 ## État du projet
 
-**Expérimental, avant l’alpha.** Rukn ne convient pas à la production ; la syntaxe pourra évoluer avant la spécification 1.0.
+**Expérimental · pré-alpha · non destiné à la production.**
+
+Rukn n’implémente pas encore les fonctions, les boucles, les modules, les collections, un gestionnaire de paquets, une VM bytecode, la compilation native, l’intégration IDE ou l’auto-hébergement. Ce sont des objectifs futurs, pas des fonctionnalités disponibles.
+
+Les priorités immédiates sont une spécification précise, des diagnostics fiables, une politique des identifiants Unicode, des tests de non-régression et une construction reproductible du site.

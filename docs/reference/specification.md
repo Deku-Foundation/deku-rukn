@@ -44,8 +44,21 @@ The print parentheses are optional in the implementation, but if an opening pare
 - Equality compares values and their variants.
 - A variable lookup for an unknown name is an error.
 - Division by positive or negative zero is an error.
+- Non-finite numeric results are rejected with a language diagnostic.
 - The interpreter evaluates statements in source order and collects print output.
+
+## Implemented resource limits
+
+The current implementation applies these guardrails:
+
+| Resource | Current limit |
+| --- | ---: |
+| Source size | 1,048,576 bytes (1 MiB) |
+| Lexer tokens | 16,384 |
+| Parser nesting | 64 levels |
+
+Inputs exceeding these bounds are rejected with a language error. These values are implementation limits and may change before a stable language release. They are not a formal sandbox and do not guarantee isolation against every denial-of-service scenario.
 
 ## Known gaps
 
-The grammar is not yet generated from a formal parser definition. There is no Unicode normalization, confusable-identifier policy, block scope, immutable binding model, static type checker, resource budget, bytecode, or specification compatibility suite. These are open design topics before a stable language release.
+The grammar is not yet generated from a formal parser definition. Unicode normalization, a confusable-identifier policy, lexical block scopes, immutable bindings, a static type checker, bytecode, and a machine-readable language conformance suite remain open work before a stable language release.
