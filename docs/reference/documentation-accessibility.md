@@ -23,6 +23,21 @@ This page records the practical accessibility baseline for the Rukn documentatio
 - Reduced-motion support and narrow-screen adjustments.
 - No external font download is required; system fonts are used as fallbacks.
 
+## Surface and button contrast policy
+
+Dark mode now uses neutral charcoal surfaces with a restrained green accent, rather than green for every panel. Brand buttons explicitly pair dark text with a light mint background; secondary buttons use a neutral surface.
+
+| Pair | Calculated contrast ratio | WCAG 2.2 text threshold |
+| --- | ---: | ---: |
+| Dark body text #f3f5f2 on #121713 | 16.55:1 | 4.5:1 |
+| Dark secondary text #cbd4cc on #121713 | 11.95:1 | 4.5:1 |
+| Dark accent link #bfe6a6 on #121713 | 13.03:1 | 4.5:1 |
+| Dark primary-button text #132018 on #bfe6a6 | 12.09:1 | 4.5:1 |
+| Light body text #17261e on #f5f7f2 | 14.61:1 | 4.5:1 |
+| Light primary-button text #ffffff on #18563a | 8.64:1 | 4.5:1 |
+
+Ratios are calculated from solid color tokens. This does not prove every rendered state, syntax token, image, focus indicator, or user-selected display setting has passed an accessibility audit.
+
 ## Manual review checklist
 
 - [ ] Check body, secondary, link, inline-code and code-block contrast in both themes with a contrast analyser.
