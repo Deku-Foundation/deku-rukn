@@ -19,7 +19,8 @@ Milestones are evidence-based, not time promises. A feature is complete only whe
 
 - [x] Bound source size, token count and parser nesting; reject non-finite numeric results.
 - [ ] Add parser fuzzing and a machine-readable corpus of invalid programs.
-- [ ] Define a versioned Unicode identifier profile, normalization, and confusable-character policy.
+- [x] Adopt a pinned Unicode XID_Start / XID_Continue lexical baseline with underscore tailoring and Arabic/Persian regression tests.
+- [ ] Decide identifier normalization, mixed-script/confusable warnings and bidirectional-control diagnostics, with a compatibility corpus.
 - [ ] Add conditions, blocks and lexical scopes after semantics are reviewed.
 - [ ] Specify number semantics and error codes for tooling.
 - [ ] Stabilize structured diagnostics for editor integration.

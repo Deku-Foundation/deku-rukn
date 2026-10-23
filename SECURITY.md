@@ -14,6 +14,7 @@ Please avoid public issue reports for exploitable vulnerabilities. Until a dedic
 
 - The language has no file, network or process APIs.
 - The CLI reads the source file explicitly supplied by the user.
-- Source size, token count, parser nesting and execution limits are not implemented yet.
-- Recursive parsing and evaluation can exhaust the process stack on deeply nested input.
+- The interpreter enforces a 1 MiB UTF-8 source limit, a 16,384-token limit, a parser-nesting limit of 64 levels, and an evaluation-depth limit of 64 levels.
+- These limits are defensive guardrails, not a sandbox. They do not isolate the interpreter from the host process or guarantee that every resource-exhaustion path is impossible.
+- Deeply nested or oversized input should return a language diagnostic; keep the limits and their regression tests in sync.
 - The interpreter is not a security sandbox and should not be embedded as one.

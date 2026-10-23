@@ -67,3 +67,19 @@ Undefined variables, malformed strings, unsupported characters, division by zero
 ## Not part of the language yet
 
 Control flow, functions, closures, collections, user-defined types, modules, error handling syntax, a formal module system and a stable ABI are not implemented. See the specification and roadmap.
+
+
+## Unicode identifiers
+
+Identifiers use the Unicode `XID_Start` and `XID_Continue` properties from the pinned `unicode-ident 1.0.27` crate, with underscore (`_`) deliberately allowed at either position. This is the lexical baseline described by [Unicode Standard Annex #31](https://www.unicode.org/reports/tr31/).
+
+Arabic and Persian letters are supported, as are combining marks when the XID profile permits them after the first character:
+
+```rukn
+دع عَلم = ٧؛
+اطبع(عَلم)؛
+دع پ = ۳؛
+اطبع(پ)؛
+```
+
+Identifier text is **not normalized**. Canonically or visually similar spellings are not guaranteed to resolve to the same name. The normalization, confusable-warning, and invisible bidirectional-control policies remain open research; see [Unicode and identifier security](/reference/unicode-and-security). Updating the Unicode identifier data is a language-behavior change and must include conformance tests.

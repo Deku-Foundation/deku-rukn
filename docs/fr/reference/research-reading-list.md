@@ -11,13 +11,15 @@ description: Normes primaires et références d’ingénierie pour un langage de
 
 | Source | Sujet | État dans Rukn |
 | --- | --- | --- |
-| [UAX #31 — Unicode Identifiers and Syntax](https://www.unicode.org/reports/tr31/) | Propriétés de début/continuation des identifiants et profils | Base de recherche ; le lexer utilise actuellement les propriétés de caractères de Rust sans profil UAX #31 déclaré |
+| [UAX #31 — Unicode Identifiers and Syntax](https://www.unicode.org/reports/tr31/) | Propriétés de début/continuation des identifiants et profils | Référence normative ; Rukn utilise `unicode-ident 1.0.27` pour XID, avec le souligné comme adaptation |
 | [UAX #15 — Unicode Normalization Forms](https://www.unicode.org/reports/tr15/) | NFC/NFKC et équivalence | Question ouverte ; les identifiants ne sont pas normalisés |
 | [UTS #39 — Unicode Security Mechanisms](https://www.unicode.org/reports/tr39/) | Détection de confusables et mélange de scripts | Question ouverte ; aucun détecteur spécialisé n’existe |
 | [UAX #9 — Unicode Bidirectional Algorithm](https://www.unicode.org/reports/tr9/) | Affichage correct des textes LTR/RTL mixtes | Important pour le code source, les diagnostics, la documentation et les futurs éditeurs |
 | [UTS #55 — Unicode Source Code Handling](https://www.unicode.org/reports/tr55/) | Recommandations Unicode pour le code source | Référence recommandée avant la stabilisation des identifiants et diagnostics |
 
 Les publications Unicode 18.0 actuelles comprennent UAX #31 révision 45 (1 septembre 2026), UAX #15 révision 58 (12 août 2026), UTS #39 révision 34 (27 août 2026) et UAX #9 révision 52 (1 septembre 2026). Utilisez les liens « dernière version » ci-dessus plutôt que des tableaux copiés depuis d’anciens articles. Ces versions ont été vérifiées le 23 octobre 2026.
+
+Rukn utilise [unicode-ident 1.0.27](https://docs.rs/unicode-ident/1.0.27/unicode_ident/) pour classer les identifiants XID ; cette version est verrouillée dans `Cargo.lock`. La mise à jour de cette dépendance peut modifier les noms acceptés et doit donc être traitée comme un changement de spécification avec tests de conformité. La normalisation NFC/NFKC n’est pas implémentée.
 
 ### Questions à résoudre
 
@@ -32,6 +34,7 @@ Utilisez des paires de programmes valides/invalides et un corpus de conformité 
 ## 2. Sémantique du langage et implémentation Rust
 
 - [The Rust Reference](https://doc.rust-lang.org/reference/) — référence du langage Rust utilisé pour l’implémentation.
+- [Annonce Rust 1.99.1](https://blog.rust-lang.org/2026/10/15/Rust-1.99.1/) — version stable courante au 23 octobre 2026 ; la CI suit volontairement le canal stable et vérifie chaque commit.
 - [The Rust Book](https://doc.rust-lang.org/book/) — ownership, erreurs, tests et structure de projet.
 - [The Cargo Book](https://doc.rust-lang.org/cargo/) — dépendances, workspaces, lockfiles et builds reproductibles.
 - [Rust Compiler Development Guide](https://rustc-dev-guide.rust-lang.org/) — architecture de compilateur, diagnostics et tests.
@@ -39,6 +42,8 @@ Utilisez des paires de programmes valides/invalides et un corpus de conformité 
 - [Cranelift](https://cranelift.dev/) — alternative de génération de code à évaluer si la compilation native devient justifiée.
 
 Rukn utilise actuellement un lexer écrit à la main, un parseur récursif descendant et un évaluateur d’arbre. Ne choisissez pas LLVM, Cranelift ou une VM bytecode avant de disposer d’une sémantique et d’un corpus de correction permettant une comparaison équitable.
+
+**Revue des bibliothèques de parsing (non adoptées) :** [winnow 1.0.4](https://docs.rs/winnow/latest/winnow/) offre une boîte à outils de parsing flexible. [Chumsky 0.13.0](https://docs.rs/chumsky/latest/chumsky/) propose des combinateurs et de la récupération d’erreurs ; son dépôt GitHub a été archivé après le déplacement du projet vers Codeberg. Pour la grammaire actuelle, le parseur récursif maison est plus simple à auditer. Réévaluer une migration si la complexité ou les coûts de maintenance la justifient.
 
 ## 3. Tests, fuzzing et performance
 

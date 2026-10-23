@@ -5,25 +5,27 @@ description: Recherche sur les identifiants arabes, la normalisation, les confus
 
 # Unicode et sécurité des identifiants
 
-**Statut : note de recherche. Cette page n’adopte pas de nouvelle politique des identifiants.**
+**Statut : base lexicale implémentée et questions de sécurité ouvertes. La conformité complète à UAX #31 n’est pas revendiquée.**
 
-Pour un langage conçu avec l’arabe au premier plan, Unicode fait partie de la conception du langage. Le lexer accepte actuellement les caractères alphabétiques selon la propriété de Rust `char::is_alphabetic` au début d’un identifiant, puis les caractères alphabétiques ou numériques, avec le soulignement. La version actuelle ne définit pas de normalisation, de détection des confusables visuels ni de politique spécifique aux contrôles bidirectionnels.
+Pour un langage conçu avec l’arabe au premier plan, Unicode fait partie de la conception du langage. Rukn utilise maintenant la dépendance verrouillée `unicode-ident 1.0.27` pour les propriétés `XID_Start` et `XID_Continue`, avec le soulignement autorisé volontairement aux deux positions. Cela fournit une base lexicale conforme à l’approche UAX #31 ; normalisation, confusables visuels et diagnostics dédiés aux contrôles bidirectionnels restent à étudier.
 
 ## État actuel
 
 - Les sources utilisent UTF-8.
-- Un identifiant commence par un soulignement ou un caractère alphabétique selon Rust ; les caractères numériques sont aussi permis ensuite.
+- Un identifiant commence par le souligné ou un caractère `XID_Start`, puis utilise `XID_Continue` ou le souligné via `unicode-ident 1.0.27` verrouillé.
 - Les littéraux numériques acceptent les chiffres ASCII, arabo-indiens (٠–٩) et orientaux (۰–۹).
 - Les chiffres d’un littéral sont convertis en chiffres ASCII avant l’analyse numérique.
-- Le lexer n’emploie pas encore le profil `XID_Start` / `XID_Continue` et ne normalise pas les noms d’identifiants.
+- Les marques combinantes prises en charge peuvent suivre le premier caractère ; les diacritiques arabes peuvent donc apparaître dans un identifiant.
+- L’orthographe des noms est conservée. Aucune normalisation ou alerte de confusables n’est actuellement appliquée.
+- Les caractères XID suivent les données Unicode intégrées à la dépendance verrouillée ; toute mise à jour exige des tests de conformité et une revue de compatibilité.
 
-Il s’agit d’un prototype, pas d’une spécification Unicode complète.
+C’est une base lexicale plus cohérente, mais pas un profil de sécurité Unicode complet. La normalisation, les confusables, le mélange de scripts et les contrôles invisibles restent des sujets ouverts.
 
 ## Axes de recherche
 
 ### Profil des identifiants
 
-[UAX #31](https://www.unicode.org/reports/tr31/) présente des propriétés recommandées pour les identifiants. Rukn devrait évaluer un profil fondé sur `XID_Start` et `XID_Continue`, avec une règle documentée pour le soulignement. Les tests doivent inclure les marques arabes, les diacritiques, les caractères persans, les variantes de yāʾ/kāf, les caractères hors du plan multilingue de base et les points de code non pris en charge.
+[UAX #31](https://www.unicode.org/reports/tr31/) présente des propriétés recommandées pour les identifiants. Rukn a adopté `XID_Start` et `XID_Continue` comme base lexicale actuelle, avec une règle explicite pour le soulignement et une implémentation verrouillée. Les tests doivent inclure les marques arabes, les diacritiques, les caractères persans, les variantes de yāʾ/kāf, les caractères hors du plan multilingue de base et les points de code non pris en charge.
 
 ### Normalisation
 
