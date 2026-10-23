@@ -15,6 +15,7 @@ const enSidebar = [
   { text: 'Engineering and research', items: [
     { text: 'Unicode and security', link: '/reference/unicode-and-security' },
     { text: 'Testing strategy', link: '/reference/testing-strategy' },
+    { text: 'Documentation accessibility', link: '/reference/documentation-accessibility' },
     { text: 'Research reading list', link: '/reference/research-reading-list' },
     { text: 'Design decisions', link: '/project/design-decisions' },
   ] },
@@ -38,6 +39,7 @@ const arSidebar = [
   { text: 'الهندسة والأبحاث', items: [
     { text: 'Unicode والأمان', link: '/ar/reference/unicode-and-security' },
     { text: 'استراتيجية الاختبار', link: '/ar/reference/testing-strategy' },
+    { text: 'إتاحة التوثيق ووضوح القراءة', link: '/ar/reference/documentation-accessibility' },
     { text: 'قائمة المراجع البحثية', link: '/ar/reference/research-reading-list' },
     { text: 'قرارات التصميم', link: '/ar/project/design-decisions' },
   ] },
@@ -61,6 +63,7 @@ const frSidebar = [
   { text: 'Ingénierie et recherche', items: [
     { text: 'Unicode et sécurité', link: '/fr/reference/unicode-and-security' },
     { text: 'Stratégie de test', link: '/fr/reference/testing-strategy' },
+    { text: 'Accessibilité de la documentation', link: '/fr/reference/documentation-accessibility' },
     { text: 'Bibliographie technique', link: '/fr/reference/research-reading-list' },
     { text: 'Décisions de conception', link: '/fr/project/design-decisions' },
   ] },
