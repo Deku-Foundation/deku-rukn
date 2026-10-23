@@ -17,6 +17,7 @@ Arabic-first programming makes Unicode behavior part of the language design, not
 - Digits in numeric literals are normalized to ASCII before parsing.
 - XID continuation allows supported combining marks after the first character, so Arabic diacritics may appear inside identifiers.
 - Identifier spelling is preserved as written. Names are not normalized, and visually confusable identifiers are not currently flagged.
+- If the lexer rejects a character outside strings and comments, the diagnostic includes its `U+XXXX` code point and escaped form. This does not inspect bidirectional controls inside comments or string values.
 - Accepted XID characters follow the data bundled with the pinned dependency; update that dependency only with identifier conformance tests and a compatibility review.
 
 This is a more consistent lexical baseline, but not a complete Unicode security profile. Identifier normalization, confusable detection, mixed-script policy, and invisible-control handling remain open.

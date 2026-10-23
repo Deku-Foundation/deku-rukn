@@ -705,7 +705,7 @@ mod tests {
     #[test]
     fn rejects_a_combining_mark_at_identifier_start() {
         let error = run("اطبع(َاسم)؛").unwrap_err();
-        assert!(error.message.contains("محرف غير مدعوم"));
+        assert!(error.message.contains("غير مدعوم"));
     }
     #[test]
     fn respects_precedence_and_parentheses() {
@@ -730,7 +730,7 @@ mod tests {
             run("اطبع(@)؛")
                 .unwrap_err()
                 .message
-                .contains("محرف غير مدعوم")
+                .contains("غير مدعوم")
         );
         assert!(run("اطبع(\"نص)؛").unwrap_err().message.contains("غير مغلق"));
     }
