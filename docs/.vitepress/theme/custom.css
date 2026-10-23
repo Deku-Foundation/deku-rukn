@@ -124,7 +124,7 @@ html[lang="ar"] .vp-doc :where(th) { text-align:start; }
 .dark .VPSidebarItem .text { color:var(--vp-c-text-2); }
 .dark .VPSidebarItem.is-active > .item .text,
 .dark .VPSidebarItem .link.active .text { color:var(--vp-c-brand-1); }
-.dark .DocSearch-Button,.dark .VPNavBarSearch . DocSearch-Button {
+.dark .DocSearch-Button,.dark .VPNavBarSearch .DocSearch-Button {
   color:var(--vp-c-text-2); background-color:var(--vp-c-bg-alt); border:1px solid var(--vp-c-border);
 }
 .dark input,.dark select,.dark textarea {
