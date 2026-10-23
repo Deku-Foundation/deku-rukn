@@ -7,7 +7,8 @@ hero:
   text: Programmer d’abord en arabe
   tagline: Une expérience linguistique compacte, avec des mots-clés arabes, une sémantique explicite et un interpréteur écrit en Rust.
   image:
-    src: /rukn-hero.svg
+    light: /rukn-hero.svg
+    dark: /rukn-hero-dark.svg
     alt: Le symbole Rukn à côté d'un exemple en arabe et de sa sortie attendue.
   actions:
     - theme: brand
