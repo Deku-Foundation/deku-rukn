@@ -2,6 +2,11 @@
 use std::collections::HashMap;
 use std::fmt;
 
+const MAX_SOURCE_BYTES: usize = 1_048_576;
+const MAX_TOKENS: usize = 16_384;
+// Keep recursion well below typical thread stack limits; this is a safety bound, not a language feature.
+const MAX_NESTING: usize = 64;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LangError {
     pub message: String,
@@ -143,6 +148,10 @@ impl Lexer {
                 c if is_identifier_start(c) => tokens.push(self.identifier()),
                 _ => return Err(self.error_at_current(format!("محرف غير مدعوم: {ch}"))),
             }
+            if tokens.len() > MAX_TOKENS {
+                return Err(self
+                    .error_at_current(format!("تجاوز البرنامج الحد الأقصى للرموز ({MAX_TOKENS})")));
+            }
         }
         tokens.push(Token {
             kind: TokenKind::Eof,
@@ -239,6 +248,16 @@ impl Lexer {
         }
     }
 }
+fn finite_number(value: f64, operator: &Token) -> Result<Value, LangError> {
+    if value.is_finite() {
+        Ok(Value::Number(value))
+    } else {
+        Err(LangError::at(
+            "نتج عن العملية عدد غير محدود؛ تجاوزت القيمة نطاق الأعداد المدعوم",
+            operator,
+        ))
+    }
+}
 fn is_digit(ch: char) -> bool {
     ch.is_ascii_digit() || ('٠'..='٩').contains(&ch) || ('۰'..='۹').contains(&ch)
 }
@@ -283,10 +302,39 @@ enum Stmt {
 struct Parser {
     tokens: Vec<Token>,
     current: usize,
+    nesting: usize,
 }
 impl Parser {
     fn new(tokens: Vec<Token>) -> Self {
-        Self { tokens, current: 0 }
+        Self {
+            tokens,
+            current: 0,
+            nesting: 0,
+        }
+    }
+    fn enter_nesting(&mut self, token: &Token) -> Result<(), LangError> {
+        if self.nesting >= MAX_NESTING {
+            return Err(LangError::at(
+                format!("تجاوز البرنامج الحد الأقصى للتداخل ({MAX_NESTING})"),
+                token,
+            ));
+        }
+        self.nesting += 1;
+        Ok(())
+    }
+    fn nested_expression(&mut self) -> Result<Expr, LangError> {
+        let token = self.peek().clone();
+        self.enter_nesting(&token)?;
+        let result = self.expression();
+        self.nesting -= 1;
+        result
+    }
+    fn nested_unary(&mut self) -> Result<Expr, LangError> {
+        let token = self.peek().clone();
+        self.enter_nesting(&token)?;
+        let result = self.unary();
+        self.nesting -= 1;
+        result
     }
     fn parse(&mut self) -> Result<Vec<Stmt>, LangError> {
         let mut statements = Vec::new();
@@ -379,7 +427,7 @@ impl Parser {
     fn unary(&mut self) -> Result<Expr, LangError> {
         if self.matches_any(&[TokenKind::Bang, TokenKind::Minus]) {
             let operator = self.previous().clone();
-            let right = self.unary()?;
+            let right = self.nested_unary()?;
             return Ok(Expr::Unary {
                 operator,
                 right: Box::new(right),
@@ -423,7 +471,7 @@ impl Parser {
             return Ok(Expr::Variable(self.previous().clone()));
         }
         if self.matches(TokenKind::LeftParen) {
-            let expr = self.expression()?;
+            let expr = self.nested_expression()?;
             self.consume(TokenKind::RightParen, "توقعت «)» بعد التعبير")?;
             return Ok(Expr::Grouping(Box::new(expr)));
         }
@@ -489,12 +537,14 @@ impl fmt::Display for Value {
 struct Interpreter {
     environment: HashMap<String, Value>,
     output: Vec<String>,
+    evaluation_depth: usize,
 }
 impl Interpreter {
     fn new() -> Self {
         Self {
             environment: HashMap::new(),
             output: Vec::new(),
+            evaluation_depth: 0,
         }
     }
     fn interpret(mut self, statements: &[Stmt]) -> Result<Vec<String>, LangError> {
@@ -520,6 +570,30 @@ impl Interpreter {
         Ok(())
     }
     fn evaluate(&mut self, expr: &Expr) -> Result<Value, LangError> {
+        if self.evaluation_depth >= MAX_NESTING {
+            let token = match expr {
+                Expr::Variable(token) => Some(token),
+                Expr::Unary { operator, .. } | Expr::Binary { operator, .. } => Some(operator),
+                Expr::Literal(_) | Expr::Grouping(_) => None,
+            };
+            return Err(match token {
+                Some(token) => LangError::at(
+                    format!("تجاوز التنفيذ الحد الأقصى لعمق التعبير ({MAX_NESTING})"),
+                    token,
+                ),
+                None => LangError {
+                    message: format!("تجاوز التنفيذ الحد الأقصى لعمق التعبير ({MAX_NESTING})"),
+                    line: 1,
+                    column: 1,
+                },
+            });
+        }
+        self.evaluation_depth += 1;
+        let result = self.evaluate_inner(expr);
+        self.evaluation_depth -= 1;
+        result
+    }
+    fn evaluate_inner(&mut self, expr: &Expr) -> Result<Value, LangError> {
         match expr {
             Expr::Literal(value) => Ok(value.clone()),
             Expr::Variable(name) => self
@@ -552,14 +626,14 @@ impl Interpreter {
     fn binary(&self, left: Value, op: &Token, right: Value) -> Result<Value, LangError> {
         use TokenKind as K;
         match (op.kind, left, right) {
-            (K::Plus, Value::Number(a), Value::Number(b)) => Ok(Value::Number(a + b)),
+            (K::Plus, Value::Number(a), Value::Number(b)) => finite_number(a + b, op),
             (K::Plus, Value::String(a), Value::String(b)) => Ok(Value::String(a + &b)),
-            (K::Minus, Value::Number(a), Value::Number(b)) => Ok(Value::Number(a - b)),
-            (K::Star, Value::Number(a), Value::Number(b)) => Ok(Value::Number(a * b)),
+            (K::Minus, Value::Number(a), Value::Number(b)) => finite_number(a - b, op),
+            (K::Star, Value::Number(a), Value::Number(b)) => finite_number(a * b, op),
             (K::Slash, Value::Number(_), Value::Number(0.0)) => {
                 Err(LangError::at("القسمة على صفر غير مسموحة", op))
             }
-            (K::Slash, Value::Number(a), Value::Number(b)) => Ok(Value::Number(a / b)),
+            (K::Slash, Value::Number(a), Value::Number(b)) => finite_number(a / b, op),
             (K::EqualEqual, a, b) => Ok(Value::Bool(a == b)),
             (K::BangEqual, a, b) => Ok(Value::Bool(a != b)),
             (K::Greater, Value::Number(a), Value::Number(b)) => Ok(Value::Bool(a > b)),
@@ -580,6 +654,13 @@ impl Interpreter {
 
 /// Parse and evaluate a Rukn program, returning lines emitted by the print statement.
 pub fn run(source: &str) -> Result<Vec<String>, LangError> {
+    if source.len() > MAX_SOURCE_BYTES {
+        return Err(LangError {
+            message: format!("تجاوز حجم المصدر الحد الأقصى ({MAX_SOURCE_BYTES} بايت)"),
+            line: 1,
+            column: 1,
+        });
+    }
     let tokens = Lexer::new(source).scan()?;
     let statements = Parser::new(tokens).parse()?;
     Interpreter::new().interpret(&statements)
@@ -587,7 +668,7 @@ pub fn run(source: &str) -> Result<Vec<String>, LangError> {
 
 #[cfg(test)]
 mod tests {
-    use super::run;
+    use super::{MAX_NESTING, MAX_SOURCE_BYTES, run};
 
     #[test]
     fn arabic_program_and_digits() {
@@ -626,6 +707,35 @@ mod tests {
                 .contains("محرف غير مدعوم")
         );
         assert!(run("اطبع(\"نص)؛").unwrap_err().message.contains("غير مغلق"));
+    }
+    #[test]
+    fn oversized_source_is_rejected_before_lexing() {
+        let source = " ".repeat(MAX_SOURCE_BYTES + 1);
+        let error = run(&source).unwrap_err();
+        assert!(error.message.contains("حجم المصدر"));
+    }
+    #[test]
+    fn deeply_nested_parentheses_are_rejected() {
+        let source = format!(
+            "اطبع({}1{})؛",
+            "(".repeat(MAX_NESTING + 1),
+            ")".repeat(MAX_NESTING + 1)
+        );
+        let error = run(&source).unwrap_err();
+        assert!(!error.message.trim().is_empty());
+        assert!(error.line > 0);
+        assert!(error.column > 0);
+    }
+    #[test]
+    fn long_left_associative_expression_is_bounded() {
+        let source = format!("اطبع({}1)؛", "1+".repeat(MAX_NESTING + 20));
+        let error = run(&source).unwrap_err();
+        assert!(error.message.contains("عمق التعبير"));
+    }
+    #[test]
+    fn numeric_overflow_is_a_language_error() {
+        let error = run("اطبع(1e308 * 1e308)؛").unwrap_err();
+        assert!(error.message.contains("غير محدود") || error.message.contains("توقعت"));
     }
     #[test]
     fn empty_program_is_valid() {
