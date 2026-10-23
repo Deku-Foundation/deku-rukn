@@ -23,7 +23,9 @@ fn main() -> ExitCode {
 
     match rukn::run(&source) {
         Ok(output) => {
-            for line in output { println!("{line}"); }
+            for line in output {
+                println!("{line}");
+            }
             ExitCode::SUCCESS
         }
         Err(error) => {
