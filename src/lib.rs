@@ -335,7 +335,7 @@ mod tests {
     fn undefined_variables_have_source_location() {
         let error = run("اطبع(غير_معرف)؛").unwrap_err();
         assert!(error.message.contains("غير معرّف"));
-        assert_eq!((error.line, error.column), (1, 7));
+        assert_eq!((error.line, error.column), (1, 6));
     }
     #[test]
     fn division_by_zero_is_an_error() { assert!(run("اطبع(8 / 0)؛").unwrap_err().message.contains("صفر")); }
