@@ -45,5 +45,11 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+      - name: Export npm lockfile for reproducible dependency installation
+        run: |
+          echo RUKN_LOCK_BEGIN
+          base64 -w0 package-lock.json
+          echo
+          echo RUKN_LOCK_END
       - name: Build documentation
         run: npm run build
