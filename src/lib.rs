@@ -667,7 +667,7 @@ pub fn run(source: &str) -> Result<Vec<String>, LangError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{run, MAX_NESTING, MAX_SOURCE_BYTES};
+    use super::{MAX_NESTING, MAX_SOURCE_BYTES, run};
 
     #[test]
     fn arabic_program_and_digits() {
