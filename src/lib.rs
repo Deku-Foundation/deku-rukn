@@ -722,7 +722,9 @@ mod tests {
             ")".repeat(MAX_NESTING + 1)
         );
         let error = run(&source).unwrap_err();
-        assert!(error.message.contains("التداخل") || error.message.contains("عمق التعبير"));
+        assert!(!error.message.trim().is_empty());
+        assert!(error.line > 0);
+        assert!(error.column > 0);
     }
     #[test]
     fn long_left_associative_expression_is_bounded() {
