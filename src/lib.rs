@@ -148,7 +148,8 @@ impl Lexer {
                 _ => return Err(self.error_at_current(format!("محرف غير مدعوم: {ch}"))),
             }
             if tokens.len() > MAX_TOKENS {
-                return Err(self.error_at_current(format!("تجاوز البرنامج الحد الأقصى للرموز ({MAX_TOKENS})")));
+                return Err(self
+                    .error_at_current(format!("تجاوز البرنامج الحد الأقصى للرموز ({MAX_TOKENS})")));
             }
         }
         tokens.push(Token {
@@ -250,7 +251,10 @@ fn finite_number(value: f64, operator: &Token) -> Result<Value, LangError> {
     if value.is_finite() {
         Ok(Value::Number(value))
     } else {
-        Err(LangError::at("نتج عن العملية عدد غير محدود؛ تجاوزت القيمة نطاق الأعداد المدعوم", operator))
+        Err(LangError::at(
+            "نتج عن العملية عدد غير محدود؛ تجاوزت القيمة نطاق الأعداد المدعوم",
+            operator,
+        ))
     }
 }
 fn is_digit(ch: char) -> bool {
@@ -301,11 +305,18 @@ struct Parser {
 }
 impl Parser {
     fn new(tokens: Vec<Token>) -> Self {
-        Self { tokens, current: 0, nesting: 0 }
+        Self {
+            tokens,
+            current: 0,
+            nesting: 0,
+        }
     }
     fn enter_nesting(&mut self, token: &Token) -> Result<(), LangError> {
         if self.nesting >= MAX_NESTING {
-            return Err(LangError::at(format!("تجاوز البرنامج الحد الأقصى للتداخل ({MAX_NESTING})"), token));
+            return Err(LangError::at(
+                format!("تجاوز البرنامج الحد الأقصى للتداخل ({MAX_NESTING})"),
+                token,
+            ));
         }
         self.nesting += 1;
         Ok(())
@@ -565,8 +576,15 @@ impl Interpreter {
                 Expr::Literal(_) | Expr::Grouping(_) => None,
             };
             return Err(match token {
-                Some(token) => LangError::at(format!("تجاوز التنفيذ الحد الأقصى لعمق التعبير ({MAX_NESTING})"), token),
-                None => LangError { message: format!("تجاوز التنفيذ الحد الأقصى لعمق التعبير ({MAX_NESTING})"), line: 1, column: 1 },
+                Some(token) => LangError::at(
+                    format!("تجاوز التنفيذ الحد الأقصى لعمق التعبير ({MAX_NESTING})"),
+                    token,
+                ),
+                None => LangError {
+                    message: format!("تجاوز التنفيذ الحد الأقصى لعمق التعبير ({MAX_NESTING})"),
+                    line: 1,
+                    column: 1,
+                },
             });
         }
         self.evaluation_depth += 1;
@@ -636,7 +654,11 @@ impl Interpreter {
 /// Parse and evaluate a Rukn program, returning lines emitted by the print statement.
 pub fn run(source: &str) -> Result<Vec<String>, LangError> {
     if source.len() > MAX_SOURCE_BYTES {
-        return Err(LangError { message: format!("تجاوز حجم المصدر الحد الأقصى ({MAX_SOURCE_BYTES} بايت)"), line: 1, column: 1 });
+        return Err(LangError {
+            message: format!("تجاوز حجم المصدر الحد الأقصى ({MAX_SOURCE_BYTES} بايت)"),
+            line: 1,
+            column: 1,
+        });
     }
     let tokens = Lexer::new(source).scan()?;
     let statements = Parser::new(tokens).parse()?;
@@ -693,7 +715,11 @@ mod tests {
     }
     #[test]
     fn deeply_nested_parentheses_are_rejected() {
-        let source = format!("اطبع({}1{})؛", "(".repeat(MAX_NESTING + 1), ")".repeat(MAX_NESTING + 1));
+        let source = format!(
+            "اطبع({}1{})؛",
+            "(".repeat(MAX_NESTING + 1),
+            ")".repeat(MAX_NESTING + 1)
+        );
         let error = run(&source).unwrap_err();
         assert!(error.message.contains("التداخل"));
     }
