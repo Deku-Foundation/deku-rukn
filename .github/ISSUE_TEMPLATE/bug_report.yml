@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a reproducible defect in the interpreter or documentation.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "Check existing issues first. Do not include secrets or private data."
+  - type: input
+    id: version
+    attributes:
+      label: Commit or version
+      description: Paste the commit SHA or release version.
+    validations:
+      required: true
+  - type: textarea
+    id: program
+    attributes:
+      label: Minimal Rukn source
+      description: Include the smallest source program that reproduces the problem.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and diagnostics
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS and Rust version
+    validations:
+      required: true
