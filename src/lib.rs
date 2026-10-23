@@ -726,12 +726,7 @@ mod tests {
     }
     #[test]
     fn invalid_characters_and_unclosed_strings_are_errors() {
-        assert!(
-            run("اطبع(@)؛")
-                .unwrap_err()
-                .message
-                .contains("غير مدعوم")
-        );
+        assert!(run("اطبع(@)؛").unwrap_err().message.contains("غير مدعوم"));
         assert!(run("اطبع(\"نص)؛").unwrap_err().message.contains("غير مغلق"));
     }
     #[test]
