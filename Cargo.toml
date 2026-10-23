@@ -1,0 +1,23 @@
+[package]
+name = "rukn"
+version = "0.1.0"
+edition = "2024"
+description = "An experimental Arabic-first programming language and interpreter"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Deku-Foundation/deku-rukn"
+readme = "README.md"
+
+[[bin]]
+name = "rukn"
+path = "src/main.rs"
+
+[lib]
+name = "rukn"
+path = "src/lib.rs"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = "warn"
+pedantic = "warn"
