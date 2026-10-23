@@ -104,3 +104,36 @@ html[lang="ar"] .vp-doc :where(th) { text-align:start; }
   .vp-doc table { display:block; max-width:100%; overflow-x:auto; }
 }
 @media (min-width:1440px) { .VPDoc .container { max-width:1180px; } }
+
+/* Explicit component-level states guard against theme defaults overriding tokens. */
+.VPButton.brand { color:#fff; background-color:#18563a; border-color:#18563a; }
+.VPButton.brand:hover { color:#fff; background-color:#27734f; border-color:#27734f; }
+.VPButton.alt { color:var(--vp-c-text-1); background-color:var(--vp-c-bg-soft); border-color:var(--vp-c-border); }
+.VPButton.alt:hover { color:var(--vp-c-text-1); background-color:var(--vp-c-bg-alt); border-color:var(--vp-c-brand-2); }
+.dark .VPButton.brand,.dark .VPButton.brand:hover,.dark .VPButton.brand:active {
+  color:#132018!important; background-color:#bfe6a6!important; border-color:#bfe6a6!important;
+}
+.dark .VPButton.alt,.dark .VPButton.alt:hover {
+  color:#f3f5f2; background-color:#232b26; border-color:#3b473f;
+}
+.dark .VPNavBar,.dark .VPNavBar .content,.dark .VPNavBar .divider,
+.dark .VPLocalNav,.dark .VPSidebar,.dark .VPLocalNav .menu {
+  background-color:var(--vp-c-bg);
+}
+.dark .VPSidebarItem.level-0 .text { color:var(--vp-c-text-1); }
+.dark .VPSidebarItem .text { color:var(--vp-c-text-2); }
+.dark .VPSidebarItem.is-active > .item .text,
+.dark .VPSidebarItem .link.active .text { color:var(--vp-c-brand-1); }
+.dark .DocSearch-Button,.dark .VPNavBarSearch .DocSearch-Button {
+  color:var(--vp-c-text-2); background-color:var(--vp-c-bg-alt); border:1px solid var(--vp-c-border);
+}
+.dark input,.dark select,.dark textarea {
+  color:var(--vp-c-text-1); background-color:var(--vp-c-bg-elv); border-color:var(--vp-c-border);
+}
+.dark .vp-doc hr { border-color:var(--vp-c-border); }
+.dark .vp-doc :not(pre) > code { border-color:#3b473f; }
+.VPImage.image-src { max-width:100%; }
+@media (max-width:768px) {
+  .VPHome .VPHero .image-container { margin-top:1.5rem; }
+  .VPHome .VPHero .actions { flex-wrap:wrap; }
+}
