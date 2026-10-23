@@ -4,7 +4,8 @@ use std::fmt;
 
 const MAX_SOURCE_BYTES: usize = 1_048_576;
 const MAX_TOKENS: usize = 16_384;
-const MAX_NESTING: usize = 256;
+// Keep recursion well below typical thread stack limits; this is a safety bound, not a language feature.
+const MAX_NESTING: usize = 64;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LangError {
