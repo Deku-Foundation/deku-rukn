@@ -79,6 +79,7 @@ export default defineConfig({
   title: 'Rukn — ركن',
   description: 'An experimental Arabic-first programming language, implemented in Rust.',
   lang: 'en',
+  dir: 'ltr',
   cleanUrls: true,
   lastUpdated: true,
   sitemap: { hostname: 'https://deku-foundation.github.io/deku-rukn/' },
@@ -155,6 +156,7 @@ export default defineConfig({
     fr: {
       label: 'Français',
       lang: 'fr',
+      dir: 'ltr',
       title: 'Rukn',
       description: 'Un langage de programmation arabe expérimental, développé en Rust.',
       themeConfig: {
