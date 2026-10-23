@@ -2,7 +2,7 @@ name: Safely remove redundant branches
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   workflow_dispatch:
     inputs:
       branch:
@@ -54,7 +54,7 @@ jobs:
               echo "Branch moved during inspection; preserving: $branch"
               continue
             fi
-            if ! git diff --quiet origin/main refs/remotes/origin/cleanup-target; then
+            if ! git diff --quiet origin/main refs/remotes/origin/cleanup-target -- . ':(exclude).github/workflows/cleanup-redundant-branch.yml'; then
               echo "Preserving branch with unique content: $branch"
               continue
             fi
