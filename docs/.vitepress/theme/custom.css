@@ -45,7 +45,7 @@ html { text-rendering:optimizeLegibility; }
 body { font-size:16px; }
 .VPNavBarTitle .title { font-weight:760; letter-spacing:-.015em; unicode-bidi:isolate; }
 .VPNavBarTitle .logo { border-radius:8px; }
-.VPHome .VPHero .name { letter-spacing:-.025em; line-height:1.3; }
+.VPHome .VPHero .name { letter-spacing:0; line-height:1.3; }
 .VPHome .VPHero .text { max-width:19ch; line-height:1.2; font-weight:760; }
 .VPHome .VPHero .tagline { max-width:54rem; line-height:1.8; color:var(--vp-c-text-2); }
 .VPHome .VPHero .actions { gap:.75rem; }
@@ -136,4 +136,68 @@ html[lang="ar"] .vp-doc :where(th) { text-align:start; }
 @media (max-width:768px) {
   .VPHome .VPHero .image-container { margin-top:1.5rem; }
   .VPHome .VPHero .actions { flex-wrap:wrap; }
+}
+
+/* Direction-aware refinements: use semantic document direction, not language-name heuristics. */
+[dir="rtl"] .VPHome .VPHero.has-image .container { text-align: start; }
+[dir="rtl"] .VPHome .VPHero .main { min-width: 0; text-align: start; }
+[dir="rtl"] .VPHome .VPHero .heading { align-items: flex-start; }
+[dir="rtl"] .VPHome .VPHero .name,
+[dir="rtl"] .VPHome .VPHero .text {
+  direction: rtl; unicode-bidi: plaintext; letter-spacing: 0;
+  max-width: 100%; text-align: start;
+}
+[dir="rtl"] .VPHome .VPHero .tagline {
+  margin-inline: 0; max-width: 42rem; text-align: start; line-height: 1.95;
+}
+[dir="rtl"] .VPHome .VPHero .actions { direction: rtl; justify-content: flex-start; gap: .25rem; }
+[dir="rtl"] .VPHome .VPFeature,
+[dir="rtl"] .VPHome .VPFeature .title,
+[dir="rtl"] .VPHome .VPFeature .details { text-align: start; }
+[dir="rtl"] .VPNavBarTitle .title { letter-spacing: 0; unicode-bidi: isolate; }
+[dir="rtl"] .vp-doc { text-align: start; }
+[dir="rtl"] .vp-doc p,
+[dir="rtl"] .vp-doc li,
+[dir="rtl"] .vp-doc td,
+[dir="rtl"] .vp-doc th { text-align: start; overflow-wrap: anywhere; }
+[dir="rtl"] .vp-doc h1,
+[dir="rtl"] .vp-doc h2,
+[dir="rtl"] .vp-doc h3,
+[dir="rtl"] .vp-doc h4 { letter-spacing: 0; text-wrap: pretty; }
+[dir="rtl"] .vp-doc blockquote {
+  border-inline-start: 4px solid var(--vp-c-brand-2);
+  border-radius: 10px 0 0 10px; padding-inline: 1rem;
+}
+[dir="rtl"] .vp-doc :not(pre) > code {
+  direction: ltr; unicode-bidi: isolate; white-space: normal;
+}
+[dir="rtl"] .vp-doc pre,
+[dir="rtl"] .vp-doc pre code,
+[dir="rtl"] .vp-doc div[class*="language-"] { direction: ltr; text-align: left; }
+[dir="rtl"] .vp-doc table { text-align: start; direction: rtl; }
+[dir="rtl"] .VPFooter { text-align: start; }
+
+/* Keep the mark and the live HTML wordmark stable across locales and themes. */
+.VPNavBarTitle .logo { width: 28px; height: 28px; object-fit: contain; flex: 0 0 auto; }
+.VPNavBarTitle .title { line-height: 1.5; overflow-wrap: normal; }
+.VPHome .VPHero .name { overflow-wrap: anywhere; text-wrap: balance; }
+.VPHome .VPHero .text { text-wrap: balance; }
+.VPHome .VPHero .tagline { text-wrap: pretty; }
+.VPHome .VPHero .image-container { max-width: 100%; }
+.VPHome .VPHero .image-src {
+  display: block; width: auto; height: auto; object-fit: contain;
+  border: 1px solid var(--rukn-border); border-radius: 18px;
+  box-shadow: 0 20px 48px rgba(18, 55, 42, .10);
+}
+.dark .VPHome .VPHero .image-src { box-shadow: 0 20px 48px rgba(0, 0, 0, .22); }
+.VPHome .VPFeature { min-width: 0; }
+.VPHome .VPFeature .details { overflow-wrap: anywhere; }
+@media (max-width: 959px) {
+  [dir="rtl"] .VPHome .VPHero .heading { align-items: center; }
+  [dir="rtl"] .VPHome .VPHero .tagline { margin-inline: auto; text-align: center; }
+  [dir="rtl"] .VPHome .VPHero .actions { justify-content: center; }
+}
+@media (max-width: 640px) {
+  .VPHome .VPHero .image-src { border-radius: 14px; }
+  .VPHome .VPFeature { padding-inline: 1rem; }
 }

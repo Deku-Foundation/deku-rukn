@@ -16,6 +16,7 @@ Pour un langage conçu avec l’arabe au premier plan, Unicode fait partie de la
 - Les littéraux numériques acceptent les chiffres ASCII, arabo-indiens (٠–٩) et orientaux (۰–۹).
 - Les chiffres d’un littéral sont convertis en chiffres ASCII avant l’analyse numérique.
 - Les marques combinantes prises en charge peuvent suivre le premier caractère ; les diacritiques arabes peuvent donc apparaître dans un identifiant.
+- La suite de non-régression couvre aussi un caractère `XID_Start` hors du plan multilingue de base (`U+10400`), suivi de caractères arabes. Cela vérifie le traitement des points de code sans prétendre que tout caractère Unicode est un identifiant valide.
 - L’orthographe des noms est conservée. Aucune normalisation ou alerte de confusables n’est actuellement appliquée.
 - Si le lexer rejette un caractère hors des chaînes et commentaires, le diagnostic donne son point de code `U+XXXX` et sa forme échappée. Cela ne recherche pas les contrôles bidirectionnels dans les commentaires ou valeurs de chaîne.
 - Les caractères XID suivent les données Unicode intégrées à la dépendance verrouillée ; toute mise à jour exige des tests de conformité et une revue de compatibilité.

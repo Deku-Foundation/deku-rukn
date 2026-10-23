@@ -696,6 +696,13 @@ mod tests {
         assert_eq!(run(source).unwrap(), ["7", "3"]);
     }
     #[test]
+    fn accepts_supplementary_plane_unicode_identifiers() {
+        // U+10400 (DESERET CAPITAL LETTER LONG I) is an XID_Start character.
+        // This guards the scanner against accidental BMP-only identifier logic.
+        let source = "دع 𐐀اسم = ٨؛ اطبع(𐐀اسم)؛";
+        assert_eq!(run(source).unwrap(), ["8"]);
+    }
+    #[test]
     fn accepts_all_documented_digit_families() {
         assert_eq!(
             run("اطبع(123)؛ اطبع(١٢٣)؛ اطبع(۱۲۳)؛").unwrap(),

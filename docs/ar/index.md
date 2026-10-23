@@ -7,7 +7,8 @@ hero:
   text: لغة برمجة عربية أولًا
   tagline: تجربة لغوية صغيرة وواضحة؛ كلماتها المفتاحية عربية، ودلالاتها صريحة، وتنفيذها الأولي مفسّر مكتوب بلغة Rust.
   image:
-    src: /rukn-hero.svg
+    light: /rukn-hero.svg
+    dark: /rukn-hero-dark.svg
     alt: علامة ركن بجانب مثال بلغة ركن ومخرجاته المتوقعة.
   actions:
     - theme: brand

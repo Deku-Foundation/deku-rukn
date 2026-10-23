@@ -16,6 +16,7 @@ Arabic-first programming makes Unicode behavior part of the language design, not
 - ASCII digits, Arabic-Indic digits (٠–٩), and Eastern Arabic-Indic digits (۰–۹) are accepted in numeric literals.
 - Digits in numeric literals are normalized to ASCII before parsing.
 - XID continuation allows supported combining marks after the first character, so Arabic diacritics may appear inside identifiers.
+- The regression suite also exercises a supplementary-plane `XID_Start` character (`U+10400`) followed by Arabic identifier characters. This guards code-point handling without claiming that every Unicode character is a valid identifier.
 - Identifier spelling is preserved as written. Names are not normalized, and visually confusable identifiers are not currently flagged.
 - If the lexer rejects a character outside strings and comments, the diagnostic includes its `U+XXXX` code point and escaped form. This does not inspect bidirectional controls inside comments or string values.
 - Accepted XID characters follow the data bundled with the pinned dependency; update that dependency only with identifier conformance tests and a compatibility review.

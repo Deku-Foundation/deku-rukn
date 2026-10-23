@@ -83,7 +83,7 @@ export default defineConfig({
   lastUpdated: true,
   sitemap: { hostname: 'https://deku-foundation.github.io/deku-rukn/' },
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/deku-rukn/rukn-mark.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/rukn-mark.svg' }],
     ['meta', { name: 'theme-color', content: '#12372a' }],
     ['meta', { name: 'color-scheme', content: 'light dark' }],
     ['meta', { property: 'og:site_name', content: 'Rukn — ركن' }],
