@@ -5,7 +5,7 @@ description: Primary standards and engineering references for developing Rukn as
 
 # Research reading list
 
-**Reviewed: 23 October 2026.** This is a curated starting point, not a claim that Rukn conforms to every linked standard. Prefer primary standards and official project documentation over summaries. Record the version and access date when a technical decision depends on a source.
+**Reviewed: 24 October 2026.** This is a curated starting point, not a claim that Rukn conforms to every linked standard. Prefer primary standards and official project documentation over summaries. Record the version and access date when a technical decision depends on a source.
 
 ## 1. Arabic text, identifiers and Unicode security
 
@@ -51,6 +51,8 @@ Rukn currently uses a hand-written lexer, recursive-descent parser and tree-walk
 
 - [Rust Compiler Development Guide: Fuzzing](https://rustc-dev-guide.rust-lang.org/fuzzing.html) — practical guidance on finding and minimizing compiler failures.
 - [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz) and the [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html) — a route to fuzzing Rust parsing and evaluation boundaries.
+
+As checked on 24 October 2026, the latest tagged cargo-fuzz release is [0.13.2](https://github.com/rust-fuzz/cargo-fuzz/releases/tag/0.13.2), published 9 June 2026. Rukn pins that version in its optional smoke workflow; re-check upstream before upgrading.
 - [Criterion.rs](https://github.com/criterion-rs/criterion.rs) — statistical microbenchmarking for Rust.
 - [Rust testing documentation](https://doc.rust-lang.org/book/ch11-00-testing.html) — unit, integration and documentation test foundations.
 
@@ -62,7 +64,7 @@ Suggested sequence:
 4. Benchmark only with correctness checked against that corpus.
 5. Record source workloads, hardware, compiler version, commands and variance for every published comparison.
 
-Fuzzing and benchmarks are not current completed Rukn features unless the repository later adds and continuously runs them.
+The bounded end-to-end fuzz smoke target is now active in CI. Parser-specific fuzzing, a formal conformance corpus and reproducible benchmark gates remain future work.
 
 ## 4. Editor and tooling interoperability
 
