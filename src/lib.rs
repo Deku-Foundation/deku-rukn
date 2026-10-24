@@ -52,6 +52,8 @@ enum TokenKind {
     GreaterEqual,
     Less,
     LessEqual,
+    And,
+    Or,
     Identifier,
     Number,
     String,
@@ -243,6 +245,8 @@ impl Lexer {
             "صحيح" => TokenKind::True,
             "خطأ" => TokenKind::False,
             "لاشيء" => TokenKind::Nil,
+            "و" => TokenKind::And,
+            "أو" => TokenKind::Or,
             _ => TokenKind::Identifier,
         };
         self.token(kind)
@@ -296,6 +300,11 @@ enum Expr {
         right: Box<Expr>,
     },
     Binary {
+        left: Box<Expr>,
+        operator: Token,
+        right: Box<Expr>,
+    },
+    Logical {
         left: Box<Expr>,
         operator: Token,
         right: Box<Expr>,
@@ -374,7 +383,33 @@ impl Parser {
         Ok(Stmt::Expression(expression))
     }
     fn expression(&mut self) -> Result<Expr, LangError> {
-        self.equality()
+        self.logical_or()
+    }
+    fn logical_or(&mut self) -> Result<Expr, LangError> {
+        let mut expr = self.logical_and()?;
+        while self.matches(TokenKind::Or) {
+            let operator = self.previous().clone();
+            let right = self.logical_and()?;
+            expr = Expr::Logical {
+                left: Box::new(expr),
+                operator,
+                right: Box::new(right),
+            };
+        }
+        Ok(expr)
+    }
+    fn logical_and(&mut self) -> Result<Expr, LangError> {
+        let mut expr = self.equality()?;
+        while self.matches(TokenKind::And) {
+            let operator = self.previous().clone();
+            let right = self.equality()?;
+            expr = Expr::Logical {
+                left: Box::new(expr),
+                operator,
+                right: Box::new(right),
+            };
+        }
+        Ok(expr)
     }
     fn equality(&mut self) -> Result<Expr, LangError> {
         let mut expr = self.comparison()?;
@@ -582,7 +617,9 @@ impl Interpreter {
         if self.evaluation_depth >= MAX_NESTING {
             let token = match expr {
                 Expr::Variable(token) => Some(token),
-                Expr::Unary { operator, .. } | Expr::Binary { operator, .. } => Some(operator),
+                Expr::Unary { operator, .. }
+                | Expr::Binary { operator, .. }
+                | Expr::Logical { operator, .. } => Some(operator),
                 Expr::Literal(_) | Expr::Grouping(_) => None,
             };
             return Err(match token {
@@ -629,6 +666,30 @@ impl Interpreter {
                 let left = self.evaluate(left)?;
                 let right = self.evaluate(right)?;
                 self.binary(left, operator, right)
+            }
+            Expr::Logical {
+                left,
+                operator,
+                right,
+            } => {
+                let left = self.evaluate(left)?;
+                match (operator.kind, left) {
+                    (TokenKind::Or, Value::Bool(true)) => Ok(Value::Bool(true)),
+                    (TokenKind::And, Value::Bool(false)) => Ok(Value::Bool(false)),
+                    (TokenKind::Or, Value::Bool(false)) | (TokenKind::And, Value::Bool(true)) => {
+                        match self.evaluate(right)? {
+                            Value::Bool(value) => Ok(Value::Bool(value)),
+                            _ => Err(LangError::at(
+                                format!("يتطلب العامل «{}» قيمتين منطقيتين", operator.lexeme),
+                                operator,
+                            )),
+                        }
+                    }
+                    _ => Err(LangError::at(
+                        format!("يتطلب العامل «{}» قيمتين منطقيتين", operator.lexeme),
+                        operator,
+                    )),
+                }
             }
         }
     }
@@ -721,6 +782,34 @@ mod tests {
             ["14", "20"]
         );
     }
+    #[test]
+    fn logical_operators_short_circuit_and_require_booleans() {
+        assert_eq!(
+            run("اطبع(خطأ و (١ / ٠ == ٠))؛ اطبع(صحيح أو (١ / ٠ == ٠))؛").unwrap(),
+            ["خطأ", "صحيح"]
+        );
+        assert_eq!(
+            run("اطبع(خطأ و ١)؛ اطبع(صحيح أو ١)؛").unwrap(),
+            ["خطأ", "صحيح"]
+        );
+
+        let error = run("اطبع(١ و صحيح)؛").unwrap_err();
+        assert!(error.message.contains("قيمتين منطقيتين"));
+        let right_error = run("اطبع(صحيح و ١)؛").unwrap_err();
+        assert!(right_error.message.contains("قيمتين منطقيتين"));
+        assert!(error.line > 0);
+        assert!(error.column > 0);
+    }
+
+    #[test]
+    fn logical_operator_precedence_and_parentheses() {
+        assert_eq!(
+            run("اطبع(صحيح أو خطأ و خطأ)؛ اطبع((صحيح أو خطأ) و خطأ)؛ اطبع(خطأ و صحيح أو صحيح)؛")
+                .unwrap(),
+            ["صحيح", "خطأ", "صحيح"]
+        );
+    }
+
     #[test]
     fn undefined_variables_have_source_location() {
         let error = run("اطبع(غير_معرف)؛").unwrap_err();
