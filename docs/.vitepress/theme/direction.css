@@ -26,6 +26,11 @@ html[dir="rtl"] .VPSidebar.VPSidebar .curtain {
   left: auto;
 }
 
+html[dir="rtl"] .VPNavBar .container,
+html[dir="rtl"] .VPNavBar .content {
+  direction: rtl;
+}
+
 @media (min-width: 960px) {
   html[dir="rtl"] .VPSidebar.VPSidebar {
     right: 0;
