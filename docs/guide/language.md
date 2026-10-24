@@ -16,7 +16,7 @@ Every statement ends with the Arabic semicolon ؛ or the ASCII semicolon ;.
     دع الاسم = «ليلى»؛
     دع السعر = 12.5؛
 
-Numeric literals accept either the ASCII dot or the Arabic decimal separator ٫ (U+066B). Both 12.5 and ١٢٫٥ represent the same value; the separator must be followed by at least one digit.
+Numeric literals accept either the ASCII dot or the Arabic decimal separator ٫ (U+066B). Both 12.5 and ١٢٫٥ represent the same value; the separator must be followed by at least one digit. Use one digit family throughout a number: ASCII, Arabic-Indic (٠١٢٣), or Eastern Arabic-Indic (۰۱۲۳). Mixing families inside one numeric literal is an error.
 
 A binding can be reassigned by declaring the same name again in the same scope; lexical scopes and immutable bindings are not implemented yet.
 
