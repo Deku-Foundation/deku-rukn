@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="680" height="440" viewBox="0 0 680 440" role="img" aria-labelledby="title desc">
   <title id="title">Rukn language identity and syntax — dark theme</title>
   <desc id="desc">The Rukn arch mark and Arabic code example on layered charcoal surfaces with mint and gold accents.</desc>
-  <defs><linearGradient id="surface" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#202923"/><stop offset="1" stop-color="#151b17"/></linearGradient></defs>
-  <rect x="8" y="8" width="664" height="424" rx="28" fill="url(#surface)" stroke="#3b473f" stroke-width="1.5"/>
+  <defs><linearGradient id="surface" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#252a30"/><stop offset="1" stop-color="#171c21"/></linearGradient></defs>
+  <rect x="8" y="8" width="664" height="424" rx="28" fill="url(#surface)" stroke="#3c454b" stroke-width="1.5"/>
   <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" letter-spacing="1.2" fill="#a9b5ac">
     <text x="36" y="42">DEKU FOUNDATION / LANGUAGE RESEARCH</text><text x="644" y="42" text-anchor="end" fill="#bfe6a6">RUKN · PRE-ALPHA</text>
   </g>
   <g transform="translate(36 92)">
-    <rect width="148" height="148" rx="32" fill="#0b271d" stroke="#303a33" stroke-width="1.5"/>
+    <rect width="148" height="148" rx="32" fill="#0b271d" stroke="#30383e" stroke-width="1.5"/>
     <path d="M36 104V63C36 41 52 25 74 25H79C101 25 117 41 117 63V70" fill="none" stroke="#bfe6a6" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M54 97V80C54 69 62 62 73 62H99" fill="none" stroke="#f0f7ea" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M28 117H120" fill="none" stroke="#f0f7ea" stroke-width="6" stroke-linecap="round"/><path d="M96 96H116V85" fill="none" stroke="#7dbb81" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="112" cy="33" r="5" fill="#d5af66"/>
@@ -15,13 +15,13 @@
     <text x="74" y="200" text-anchor="middle" fill="#bfe6a6" font-size="10" letter-spacing="2">ARABIC FIRST</text>
   </g>
   <g transform="translate(218 82)">
-    <rect width="426" height="268" rx="16" fill="#1d2520" stroke="#3b473f" stroke-width="1.5"/><path d="M0 48H426" stroke="#303a33"/>
+    <rect width="426" height="268" rx="16" fill="#1e2429" stroke="#3c454b" stroke-width="1.5"/><path d="M0 48H426" stroke="#30383e"/>
     <circle cx="22" cy="24" r="4" fill="#d5af66"/><circle cx="36" cy="24" r="4" fill="#7dbb81"/><circle cx="50" cy="24" r="4" fill="#65776a"/>
     <text x="404" y="28" text-anchor="end" fill="#a9b5ac" font-family="ui-monospace,monospace" font-size="10">hello.rukn</text>
     <g font-family="Noto Sans Arabic, Tahoma, sans-serif" font-size="17" fill="#f3f5f2">
       <text x="394" y="86" text-anchor="end">دع الاسم = «العالم»؛</text><text x="394" y="122" text-anchor="end">اطبع(«مرحبًا يا » + الاسم)؛</text><text x="394" y="158" text-anchor="end">اطبع(٦ * ٧)؛</text>
     </g>
-    <rect x="18" y="185" width="390" height="64" rx="10" fill="#232b26" stroke="#3b473f"/>
+    <rect x="18" y="185" width="390" height="64" rx="10" fill="#242a30" stroke="#3c454b"/>
     <text x="34" y="205" fill="#a9b5ac" font-family="ui-monospace,monospace" font-size="9" letter-spacing="1">OUTPUT</text>
     <text x="34" y="226" fill="#bfe6a6" font-family="ui-monospace,monospace" font-size="13">مرحبًا يا العالم</text><text x="34" y="242" fill="#bfe6a6" font-family="ui-monospace,monospace" font-size="13">42</text>
   </g>

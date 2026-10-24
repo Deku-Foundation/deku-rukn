@@ -26,9 +26,28 @@ html[dir="rtl"] .VPSidebar.VPSidebar .curtain {
   left: auto;
 }
 
-html[dir="rtl"] .VPNavBar .container,
-html[dir="rtl"] .VPNavBar .content {
+/* Keep the outer flex frame stable; mirror only the navbar's contents.
+   Flipping the outer .container reverses the title/content frame and can push
+   the RTL top bar outside its reserved column. */
+html[dir="rtl"] .VPNavBar .container {
+  direction: ltr;
+}
+
+/* The landing page has no sidebar title column to pin the mark on the right.
+   Preserve RTL order there while keeping the documentation frame LTR-stable. */
+html[dir="rtl"] .VPNavBar.home .container {
   direction: rtl;
+}
+
+html[dir="rtl"] .VPNavBar .container > .title,
+html[dir="rtl"] .VPNavBarTitle .title {
+  direction: rtl;
+}
+
+html[dir="rtl"] .VPNavBar .container > .content,
+html[dir="rtl"] .VPNavBar .content-body {
+  direction: rtl;
+  min-width: 0;
 }
 
 @media (min-width: 960px) {
