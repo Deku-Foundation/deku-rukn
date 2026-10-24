@@ -11,8 +11,8 @@ for (const page of htmlPages) {
   const html = await readFile(page.path, 'utf8')
   assert.match(html, new RegExp('<html[^>]*\\blang="' + page.lang + '"'), page.name + ': lang attribute')
   assert.match(html, new RegExp('<html[^>]*\\bdir="' + page.dir + '"'), page.name + ': dir attribute')
-  assert.match(html, /name="viewport"/, page.name + ': viewport metadata')
-  assert.match(html, /rukn-hero(?:-dark)?\\.svg/, page.name + ': hero artwork reference')
+  assert.ok(html.includes('name="viewport"'), page.name + ': viewport metadata')
+  assert.ok(html.includes('rukn-hero.svg') || html.includes('rukn-hero-dark.svg'), page.name + ': hero artwork reference')
   assert.ok(html.includes(page.marker), page.name + ': localized hero copy')
 }
 
@@ -22,10 +22,10 @@ for (const asset of ['rukn-hero.svg', 'rukn-hero-dark.svg']) {
 
 const themeCss = await readFile(new URL('../.vitepress/theme/custom.css', import.meta.url), 'utf8')
 const directionCss = await readFile(new URL('../.vitepress/theme/direction.css', import.meta.url), 'utf8')
-assert.match(themeCss, /grid-template-columns:\\s*minmax\\(0,\\s*1\\.05fr\\)\\s+minmax\\(0,\\s*\\.95fr\\)/, 'hero uses bounded desktop columns')
-assert.match(themeCss, /max-width:\\s*min\\(100%,\\s*450px\\)/, 'hero artwork is width-constrained')
-assert.doesNotMatch(themeCss, /max-width:\\s*min\\(100%,\\s*60rem\\)/, 'hero text must not escape its column')
-assert.match(directionCss, /html\\[dir="rtl"\\]\\s+\\.VPSidebar\\.VPSidebar/, 'RTL sidebar override must outrank scoped component styles')
-assert.match(directionCss, /html\\[dir="rtl"\\]\\s+\\.VPContent\\.has-sidebar/, 'RTL content column must reserve space on the inline-start side')
+assert.ok(themeCss.includes('grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);'), 'hero uses bounded desktop columns')
+assert.ok(themeCss.includes('max-width: min(100%, 450px);'), 'hero artwork is width-constrained')
+assert.ok(!themeCss.includes('max-width: min(100%, 60rem)'), 'hero text must not escape its column')
+assert.ok(directionCss.includes('html[dir="rtl"] .VPSidebar.VPSidebar'), 'RTL sidebar override must outrank scoped component styles')
+assert.ok(directionCss.includes('html[dir="rtl"] .VPContent.has-sidebar'), 'RTL content column must reserve space on the inline-start side')
 
 console.log('UI contract passed: English, Arabic, French, responsive hero constraints, and RTL layout overrides.')
