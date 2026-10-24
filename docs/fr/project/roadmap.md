@@ -18,7 +18,8 @@ Les étapes reposent sur des preuves, pas sur des dates promises. Une fonctionna
 ## M1 — Noyau du langage
 
 - [x] Limites de taille source, de jetons et de profondeur syntaxique ; rejet des résultats numériques non finis.
-- [ ] Fuzzing du parseur et corpus machine-readable de programmes invalides.
+- [x] Ajouter une cible de fuzzing de bout en bout, bornée et hebdomadaire, pour l’API publique de l’interpréteur.
+- [ ] Ajouter le fuzzing ciblé du parseur et un corpus machine-readable de programmes invalides.
 - [x] Adopter un profil lexical `XID_Start` / `XID_Continue` verrouillé, avec adaptation du souligné et tests de régression arabes/persans.
 - [ ] Décider la normalisation des identifiants, les avertissements de scripts mélangés/confusables et les diagnostics des contrôles bidirectionnels, avec un corpus de compatibilité.
 - [ ] Conditions, blocs et portées après revue sémantique.

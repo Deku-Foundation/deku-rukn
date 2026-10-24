@@ -5,7 +5,7 @@ description: Plan pratique pour tester le lexer, le parseur, l’évaluateur, la
 
 # Stratégie de test et de conformité
 
-**Statut : plan d’ingénierie.** Les tests unitaires et les contrôles CI actuels constituent la base. Le fuzzing, le corpus formel de conformité et les seuils de benchmark restent des travaux futurs tant qu’ils ne sont pas implémentés et exécutés dans CI.
+**Statut : base d’ingénierie avec cible de fuzzing bornée.** Les tests unitaires et les contrôles CI standard restent les validations principales. Un workflow distinct lance une campagne libFuzzer de 60 secondes pour les pull requests qui modifient le code source ou le répertoire fuzz, chaque semaine et manuellement. Un corpus formel, des campagnes longues et des seuils de benchmark restent à réaliser.
 
 ## Couches de test
 
@@ -32,11 +32,11 @@ Un corpus lisible par machine associant source, stdout attendu, catégorie d’e
 
 ## Plan de fuzzing
 
-Le projet [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz) et le [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html) fournissent une voie pour utiliser libFuzzer avec Rust. Une cible Rukn proposée devrait appeler l’API publique d’analyse ou d’exécution avec du texte UTF-8 arbitraire, puis vérifier les paniques, blocages et contournements des limites.
+Le projet [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz) et le [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html) décrivent l’usage de libFuzzer avec Rust. Rukn possède maintenant une cible de bout en bout dans `fuzz/fuzz_targets/run_source.rs` : elle transforme des octets arbitraires en UTF-8 valide en remplaçant les séquences invalides, puis appelle l’API publique `rukn::run`. Un diagnostic du langage est un résultat valide ; une panique ou un signalement sanitizer est un échec. Cette cible teste l’API d’interprétation, pas la lecture CLI de fichiers non UTF-8, couverte par des tests unitaires séparés.
 
 Séparation recommandée : une cible lexer, une cible parseur pour les imbrications et délimiteurs manquants, une cible de bout en bout, puis des tests permanents pour chaque cas de défaillance réduit.
 
-Le fuzzing n’est pas encore une capacité déclarée comme achevée. Il nécessite un harnais revu, des graines reproductibles et une exécution automatisée. `cargo-fuzz` exige Rust nightly et des outils sanitizer pris en charge ; un workflow distinct peut être ajouté en premier.
+Le workflow `Fuzz smoke` épingle `cargo-fuzz 0.13.2` et exécute `cargo +nightly fuzz run run_source -- -max_total_time=60 -timeout=5 -max_len=16384`. Il se déclenche sur les pull requests touchant le code source ou les fichiers fuzz, chaque semaine et manuellement. La durée bornée maîtrise le coût CI ; elle ne constitue pas une preuve de sécurité et ne remplace pas les campagnes plus longues. Chaque panique minimisée ou résultat incorrect doit devenir un test de non-régression ; une cible parseur distincte et un corpus de conformité restent à ajouter.
 
 ## Benchmarks et recherche sur le compilateur
 
