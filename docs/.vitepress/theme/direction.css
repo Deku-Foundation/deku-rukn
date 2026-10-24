@@ -33,6 +33,12 @@ html[dir="rtl"] .VPNavBar .container {
   direction: ltr;
 }
 
+/* The landing page has no sidebar title column to pin the mark on the right.
+   Preserve RTL order there while keeping the documentation frame LTR-stable. */
+html[dir="rtl"] .VPNavBar.home .container {
+  direction: rtl;
+}
+
 html[dir="rtl"] .VPNavBar .container > .title,
 html[dir="rtl"] .VPNavBarTitle .title {
   direction: rtl;
