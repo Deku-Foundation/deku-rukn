@@ -35,7 +35,8 @@ assert.ok(themeCss.includes('--vp-c-bg: #111418;'), 'dark canvas uses a neutral 
 assert.ok(darkHero.includes('#252a30') && !darkHero.includes('#202923'), 'dark illustration uses neutral charcoal surfaces')
 assert.ok(directionCss.includes('html[dir="rtl"] .VPSidebar.VPSidebar'), 'RTL sidebar override must outrank scoped component styles')
 assert.ok(directionCss.includes('html[dir="rtl"] .VPContent.has-sidebar'), 'RTL content column must reserve space on the inline-start side')
-assert.ok(directionCss.includes('html[dir="rtl"] .VPNavBar .container {\n  direction: ltr;'), 'RTL navbar outer frame stays stable')
+assert.ok(directionCss.includes('html[dir="rtl"] .VPNavBar .container {\n  direction: ltr;'), 'RTL documentation navbar outer frame stays stable')
+assert.ok(directionCss.includes('html[dir="rtl"] .VPNavBar.home .container {\n  direction: rtl;'), 'RTL homepage brand stays on the right')
 assert.ok((await readFile(new URL('../.vitepress/config.mts', import.meta.url), 'utf8')).includes("{ text: 'Project', items: ["), 'long top-level nav entries are grouped')
 
 console.log('UI contract passed: locale direction, theme artwork visibility, dark palette, buttons, homepage code, and RTL navigation.')
