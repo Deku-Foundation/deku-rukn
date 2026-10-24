@@ -22,6 +22,7 @@ A programming language needs a decision record, not just a roadmap. This page tr
 | RUKN-DR-0002 | Confusables and bidirectional-control policy | Open research; rejected-character code points are shown | Threat model, strings/comments, terminal/editor examples, false-positive review |
 | RUKN-DR-0003 | Tree-walk interpreter, bytecode VM, or native backend | Deferred | Stable semantics, common conformance suite, reproducible benchmarks |
 | RUKN-DR-0004 | Bootstrap and self-hosting | Deferred | Stable parser, standard library, compiler tests, reproducible bootstrap |
+| RUKN-DR-0005 | Arabic logical operators | Implemented baseline in draft 0.2; reserved words are pre-alpha compatibility choices | Boolean-only operands, left associativity, precedence and short-circuit regression tests |
 
 These entries are research topics, not approvals to implement a specific option.
 

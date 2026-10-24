@@ -46,6 +46,7 @@ The same example lives in `examples/hello.rukn` and is exercised by CI.
 دع الناتج = ٦ * ٧؛
 اطبع(الناتج)؛
 اطبع(صحيح == خطأ)؛
+اطبع(صحيح أو خطأ)؛
 ```
 
 Expected output:
@@ -54,6 +55,7 @@ Expected output:
 مرحبًا يا العالم
 42
 خطأ
+صحيح
 ```
 
 ## Project status
