@@ -5,7 +5,7 @@ description: The current grammar, values and semantics of Rukn.
 
 # Rukn language specification
 
-**Status: draft, version 0.1.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
+**Status: draft, version 0.2.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
 
 ## Lexical rules
 
@@ -13,7 +13,7 @@ description: The current grammar, values and semantics of Rukn.
 - Identifiers begin with underscore or a Unicode XID_Start character; later characters may be underscore or Unicode XID_Continue characters, using the pinned `unicode-ident 1.0.27` dependency (UAX #31). This permits supported combining marks after the first character.
 - Identifiers are not normalized; visually confusable detection and bidirectional-control diagnostics are not implemented.
 - Scientific notation is not part of the current numeric-literal grammar.
-- Reserved words: دع, اطبع, صحيح, خطأ, لاشيء.
+- Reserved words: دع, اطبع, صحيح, خطأ, لاشيء, و, أو.
 - Number literals accept ASCII, Arabic-Indic and Eastern Arabic-Indic digits. The decimal point is ASCII dot.
 - String literals use paired ASCII double quotes or Arabic guillemets: "text" or «نص». Newlines inside a string are rejected.
 - Comments begin with # and end at the line break.
@@ -27,7 +27,9 @@ description: The current grammar, values and semantics of Rukn.
     print_statement = "اطبع" [ "(" ] expression [ ")" ] terminator ;
     expression_statement = expression terminator ;
     terminator   = "؛" | ";" ;
-    expression   = equality ;
+    expression   = logical_or ;
+    logical_or   = logical_and { "أو" logical_and } ;
+    logical_and  = equality { "و" equality } ;
     equality     = comparison { ("==" | "!=") comparison } ;
     comparison   = term { (">" | ">=" | "<" | "<=") term } ;
     term         = factor { ("+" | "-") factor } ;
@@ -44,6 +46,7 @@ The print parentheses are optional in the implementation, but if an opening pare
 - Plus accepts two numbers or two strings; it does not coerce types.
 - Comparison operators accept numbers only.
 - Equality compares values and their variants.
+- The operators و and أو require boolean operands, use left associativity, and short-circuit (the right operand is evaluated only when needed).
 - A variable lookup for an unknown name is an error.
 - Division by positive or negative zero is an error.
 - Non-finite numeric results are rejected with a language diagnostic.
