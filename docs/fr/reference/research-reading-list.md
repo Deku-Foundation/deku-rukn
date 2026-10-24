@@ -62,7 +62,7 @@ Séquence suggérée :
 4. Ne mesurer les performances qu’en validant d’abord la correction contre le corpus.
 5. Publier charges, matériel, version du compilateur, commandes et variance de chaque comparaison.
 
-Le fuzzing et les benchmarks ne sont pas des capacités achevées tant qu’ils ne sont pas ajoutés et exécutés régulièrement dans le dépôt.
+La cible de fuzzing de bout en bout, bornée, est maintenant active en CI. Le fuzzing ciblé du parseur, un corpus formel de conformité et des benchmarks reproductibles restent à réaliser.
 
 ## 4. Éditeurs et interopérabilité
 
