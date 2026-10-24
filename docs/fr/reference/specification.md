@@ -5,7 +5,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 
 # Spécification du langage Rukn
 
-**État : brouillon 0.1.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
+**État : brouillon 0.2.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
 
 ## Règles lexicales
 
@@ -13,7 +13,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 - Un identifiant commence par un souligné ou un caractère Unicode `XID_Start`; les caractères suivants utilisent `XID_Continue` ou le souligné, via la dépendance verrouillée `unicode-ident 1.0.27` (UAX #31). Les marques combinantes autorisées peuvent suivre le premier caractère.
 - Les identifiants ne sont pas normalisés ; la détection des confusables et des contrôles bidirectionnels n’est pas implémentée.
 - La notation scientifique ne fait pas partie de la grammaire numérique actuelle.
-- Mots réservés : دع, اطبع, صحيح, خطأ, لاشيء.
+- Mots réservés : دع, اطبع, صحيح, خطأ, لاشيء, و, أو.
 - Les nombres acceptent les chiffres ASCII, arabo-indiens et persans ; le point ASCII sert de séparateur décimal.
 - Les chaînes utilisent des guillemets doubles ou les guillemets arabes «texte». Les retours à la ligne dans une chaîne sont interdits.
 - Les commentaires commencent par #.
@@ -25,7 +25,9 @@ description: Grammaire et sémantique actuelles de Rukn.
     statement    = declaration | print_statement | expression_statement ;
     declaration  = "دع" identifier "=" expression terminator ;
     print_statement = "اطبع" [ "(" ] expression [ ")" ] terminator ;
-    expression   = equality ;
+    expression   = logical_or ;
+    logical_or   = logical_and { "أو" logical_and } ;
+    logical_and  = equality { "و" equality } ;
     equality     = comparison { ("==" | "!=") comparison } ;
     comparison   = term { (">" | ">=" | "<" | "<=") term } ;
     term         = factor { ("+" | "-") factor } ;
@@ -40,6 +42,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 - L’opérateur + accepte deux nombres ou deux chaînes, sans conversion implicite.
 - Les comparaisons exigent deux nombres.
 - L’égalité compare les valeurs et leurs variantes.
+- و et أو exigent deux booléens, sont associatifs à gauche et utilisent le court-circuit (le côté droit n'est évalué que si nécessaire).
 - Une variable inconnue et la division par zéro sont des erreurs.
 - Les résultats numériques non finis produisent un diagnostic.
 - Les instructions sont évaluées dans l’ordre source et la sortie est collectée.
