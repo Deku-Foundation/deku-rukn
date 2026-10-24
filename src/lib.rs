@@ -226,7 +226,7 @@ impl Lexer {
         while is_digit(self.peek()) {
             self.advance();
         }
-        if self.peek() == '.' && is_digit(self.peek_next()) {
+        if matches!(self.peek(), '.' | '٫') && is_digit(self.peek_next()) {
             self.advance();
             while is_digit(self.peek()) {
                 self.advance();
@@ -259,6 +259,51 @@ impl Lexer {
         }
     }
 }
+
+/// Decode string escapes after the lexer has verified the matching delimiters.
+/// Keep this explicit: silently accepting unknown escapes makes typos invisible.
+fn decode_string_literal(token: &Token) -> Result<String, LangError> {
+    let opener = token.lexeme.chars().next().unwrap_or('"');
+    let closer = if opener == '«' { '»' } else { '"' };
+    let body = token
+        .lexeme
+        .strip_prefix(opener)
+        .and_then(|text| text.strip_suffix(closer))
+        .ok_or_else(|| LangError::at("صياغة النص غير صالحة", token))?;
+
+    let mut decoded = String::with_capacity(body.len());
+    let mut chars = body.chars();
+    while let Some(ch) = chars.next() {
+        if ch != '\\' {
+            decoded.push(ch);
+            continue;
+        }
+
+        let escaped = chars
+            .next()
+            .ok_or_else(|| LangError::at("شرطة هروب عكسية غير مكتملة في نهاية النص", token))?;
+        match escaped {
+            'n' => decoded.push('\n'),
+            'r' => decoded.push('\r'),
+            't' => decoded.push('\t'),
+            '\\' => decoded.push('\\'),
+            '"' => decoded.push('"'),
+            '«' => decoded.push('«'),
+            '»' => decoded.push('»'),
+            other => {
+                return Err(LangError::at(
+                    format!(
+                        "تسلسل هروب غير مدعوم: \\{} (المدعوم: \\n و\\r و\\t و\\\\ وعلامات الاقتباس)",
+                        other.escape_default()
+                    ),
+                    token,
+                ));
+            }
+        }
+    }
+    Ok(decoded)
+}
+
 fn finite_number(value: f64, operator: &Token) -> Result<Value, LangError> {
     if value.is_finite() {
         Ok(Value::Number(value))
@@ -277,6 +322,7 @@ fn normalize_digits(text: &str) -> String {
         .map(|ch| match ch {
             '٠'..='٩' => char::from(b'0' + (ch as u32 - '٠' as u32) as u8),
             '۰'..='۹' => char::from(b'0' + (ch as u32 - '۰' as u32) as u8),
+            '٫' => '.',
             _ => ch,
         })
         .collect()
@@ -501,14 +547,7 @@ impl Parser {
         }
         if self.matches(TokenKind::String) {
             let token = self.previous().clone();
-            let opener = token.lexeme.chars().next().unwrap_or('"');
-            let closer = if opener == '«' { '»' } else { '"' };
-            let value = token
-                .lexeme
-                .trim_start_matches(opener)
-                .trim_end_matches(closer)
-                .replace("\\\"", "\"")
-                .replace("\\\\", "\\");
+            let value = decode_string_literal(&token)?;
             return Ok(Expr::Literal(Value::String(value)));
         }
         if self.matches(TokenKind::Identifier) {
@@ -771,6 +810,22 @@ mod tests {
         );
     }
     #[test]
+    fn accepts_ascii_and_arabic_decimal_separators_with_all_digit_families() {
+        assert_eq!(
+            run("اطبع(12.5)؛ اطبع(١٢٫٥)؛ اطبع(۱۲٫۵)؛ اطبع(١٢.٥)؛").unwrap(),
+            ["12.5", "12.5", "12.5", "12.5"]
+        );
+    }
+
+    #[test]
+    fn rejects_repeated_arabic_decimal_separator() {
+        let error = run("اطبع(١٫٢٫٣)؛").unwrap_err();
+        assert!(error.message.contains("غير مدعوم"));
+        assert!(error.line > 0);
+        assert!(error.column > 0);
+    }
+
+    #[test]
     fn rejects_a_combining_mark_at_identifier_start() {
         let error = run("اطبع(َاسم)؛").unwrap_err();
         assert!(error.message.contains("غير مدعوم"));
@@ -874,6 +929,21 @@ mod tests {
             error.message
         );
     }
+    #[test]
+    fn string_escapes_are_decoded_consistently_for_both_delimiters() {
+        assert_eq!(
+            run(r#"اطبع("سطر\nثانٍ\t\\\"")؛ اطبع(«قالت \»نعم\»»)؛"#).unwrap(),
+            ["سطر\nثانٍ\t\\\"", "قالت »نعم»"]
+        );
+    }
+
+    #[test]
+    fn unsupported_string_escape_is_a_language_error() {
+        let error = run(r#"اطبع("خطأ\q")؛"#).unwrap_err();
+        assert!(error.message.contains("تسلسل هروب غير مدعوم"));
+        assert_eq!((error.line, error.column), (1, 6));
+    }
+
     #[test]
     fn empty_program_is_valid() {
         assert!(run("").unwrap().is_empty());

@@ -31,6 +31,8 @@ Rukn uses [unicode-ident 1.0.27](https://docs.rs/unicode-ident/1.0.27/unicode_id
 
 Use valid/invalid program pairs and a versioned conformance corpus. Do not silently normalise user strings as a side effect of normalising identifiers.
 
+The numeric-literal change follows Unicode's documented Arabic decimal punctuation and CLDR's model of locale-sensitive decimal symbols. Rukn accepts U+066B only as a numeric-literal separator; this does not imply locale-sensitive output formatting or acceptance of grouping separators. See [Unicode CLDR, Part 3: Numbers](https://unicode.org/reports/tr35/tr35-numbers.html) and [Unicode Technical Report #25, Unicode Support for Mathematics](https://unicode-org.github.io/unicode-reports/tr25/tr25.html).
+
 ## 2. Language semantics and Rust implementation
 
 - [The Rust Reference](https://doc.rust-lang.org/reference/) — authoritative reference for Rust syntax and language behaviour used by the implementation.

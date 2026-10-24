@@ -5,7 +5,7 @@ description: The current grammar, values and semantics of Rukn.
 
 # Rukn language specification
 
-**Status: draft, version 0.2.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
+**Status: draft, version 0.3.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
 
 ## Lexical rules
 
@@ -14,7 +14,7 @@ description: The current grammar, values and semantics of Rukn.
 - Identifiers are not normalized; visually confusable detection and bidirectional-control diagnostics are not implemented.
 - Scientific notation is not part of the current numeric-literal grammar.
 - Reserved words: دع, اطبع, صحيح, خطأ, لاشيء, و, أو.
-- Number literals accept ASCII, Arabic-Indic and Eastern Arabic-Indic digits. The decimal point is ASCII dot.
+- Number literals accept ASCII, Arabic-Indic and Eastern Arabic-Indic digits. The decimal separator may be the ASCII full stop (`.`) or Arabic decimal separator (`٫`, U+066B); both have the same numeric meaning. A separator must be followed by at least one digit. Repeated separators are invalid.
 - String literals use paired ASCII double quotes or Arabic guillemets: "text" or «نص». Newlines inside a string are rejected.
 - Comments begin with # and end at the line break.
 - Statements end with ؛ or ;.
