@@ -14,7 +14,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 - Les identifiants ne sont pas normalisés ; la détection des confusables et des contrôles bidirectionnels n’est pas implémentée.
 - La notation scientifique ne fait pas partie de la grammaire numérique actuelle.
 - Mots réservés : دع, اطبع, صحيح, خطأ, لاشيء, و, أو.
-- Les nombres acceptent les chiffres ASCII, arabo-indiens et persans ; le point ASCII sert de séparateur décimal.
+- Les nombres acceptent les chiffres ASCII, arabo-indiens et persans. Le point ASCII ou le séparateur décimal arabe ٫ (U+066B) est accepté et doit être suivi d’au moins un chiffre ; les séparateurs répétés sont invalides.
 - Les chaînes utilisent des guillemets doubles ou les guillemets arabes «texte». Les retours à la ligne dans une chaîne sont interdits.
 - Les commentaires commencent par #.
 - Les instructions se terminent par ؛ ou ;.

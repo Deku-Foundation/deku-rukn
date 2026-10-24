@@ -226,7 +226,7 @@ impl Lexer {
         while is_digit(self.peek()) {
             self.advance();
         }
-        if self.peek() == '.' && is_digit(self.peek_next()) {
+        if matches!(self.peek(), '.' | '٫') && is_digit(self.peek_next()) {
             self.advance();
             while is_digit(self.peek()) {
                 self.advance();
@@ -279,9 +279,9 @@ fn decode_string_literal(token: &Token) -> Result<String, LangError> {
             continue;
         }
 
-        let escaped = chars.next().ok_or_else(|| {
-            LangError::at("شرطة هروب عكسية غير مكتملة في نهاية النص", token)
-        })?;
+        let escaped = chars
+            .next()
+            .ok_or_else(|| LangError::at("شرطة هروب عكسية غير مكتملة في نهاية النص", token))?;
         match escaped {
             'n' => decoded.push('\n'),
             'r' => decoded.push('\r'),
@@ -322,6 +322,7 @@ fn normalize_digits(text: &str) -> String {
         .map(|ch| match ch {
             '٠'..='٩' => char::from(b'0' + (ch as u32 - '٠' as u32) as u8),
             '۰'..='۹' => char::from(b'0' + (ch as u32 - '۰' as u32) as u8),
+            '٫' => '.',
             _ => ch,
         })
         .collect()
@@ -808,6 +809,22 @@ mod tests {
             ["123", "123", "123"]
         );
     }
+    #[test]
+    fn accepts_ascii_and_arabic_decimal_separators_with_all_digit_families() {
+        assert_eq!(
+            run("اطبع(12.5)؛ اطبع(١٢٫٥)؛ اطبع(۱۲٫۵)؛ اطبع(١٢.٥)؛").unwrap(),
+            ["12.5", "12.5", "12.5", "12.5"]
+        );
+    }
+
+    #[test]
+    fn rejects_repeated_arabic_decimal_separator() {
+        let error = run("اطبع(١٫٢٫٣)؛").unwrap_err();
+        assert!(error.message.contains("غير مدعوم"));
+        assert!(error.line > 0);
+        assert!(error.column > 0);
+    }
+
     #[test]
     fn rejects_a_combining_mark_at_identifier_start() {
         let error = run("اطبع(َاسم)؛").unwrap_err();
