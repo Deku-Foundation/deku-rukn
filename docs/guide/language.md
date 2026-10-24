@@ -53,7 +53,7 @@ Arabic-Indic digits (٠١٢٣٤٥٦٧٨٩), Eastern Arabic-Indic digits (۰۱۲�
 | و | Logical AND | Two booleans; skips the right operand when the left is خطأ |
 | أو | Logical OR | Two booleans; skips the right operand when the left is صحيح |
 
-Precedence from high to low: unary, multiplication/division, addition/subtraction, comparison, equality, و, then أو. Both logical operators are left-associative and short-circuit: the right operand is evaluated only when needed. They accept booleans only; there is no truthiness conversion. Parentheses override precedence.
+Precedence from high to low: unary, multiplication/division, addition/subtraction, comparison, equality, و, then أو. Both logical operators are left-associative and short-circuit. The left operand must evaluate to a boolean. The right operand is evaluated and must also be boolean only when needed; a skipped right operand is not evaluated or runtime-type-checked. There is no truthiness conversion. Parentheses override precedence.
 
     اطبع(صحيح أو خطأ و خطأ)؛ # صحيح: و has higher precedence than أو
     اطبع(خطأ و (١ / ٠ == ٠))؛ # خطأ; division is skipped
