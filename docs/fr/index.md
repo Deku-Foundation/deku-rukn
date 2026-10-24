@@ -46,6 +46,7 @@ Cet exemple correspond à `examples/hello.rukn`, également vérifié par l’in
 دع الناتج = ٦ * ٧؛
 اطبع(الناتج)؛
 اطبع(صحيح == خطأ)؛
+اطبع(صحيح أو خطأ)؛
 ```
 
 Résultat attendu :
@@ -54,6 +55,7 @@ Résultat attendu :
 مرحبًا يا العالم
 42
 خطأ
+صحيح
 ```
 
 ## État du projet
