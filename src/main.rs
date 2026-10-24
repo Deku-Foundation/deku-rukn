@@ -38,7 +38,8 @@ fn main() -> ExitCode {
 /// Read at most one byte beyond the language source limit before rejecting a file.
 /// This keeps the CLI's memory bound effective before the interpreter receives the source.
 fn read_source(path: &std::ffi::OsStr) -> Result<String, String> {
-    let display_path = Path::new(path).to_string_lossy();
+    let path = Path::new(path);
+    let display_path = path.to_string_lossy();
     let file = File::open(path)
         .map_err(|error| format!("تعذر قراءة الملف {}: {}", display_path, error))?;
     let limit = rukn::MAX_SOURCE_BYTES as u64 + 1;
@@ -112,7 +113,7 @@ mod tests {
     #[test]
     fn rejects_non_utf8_source_files_with_a_clear_error() {
         let path = temporary_path("invalid-utf8");
-        fs::write(&path, [0xFF, 0xFE]).unwrap();
+        fs::write(&path, [0xFF_u8, 0xFE_u8]).unwrap();
 
         let error = read_source(path.as_os_str()).unwrap_err();
 
