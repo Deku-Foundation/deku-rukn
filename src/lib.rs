@@ -360,14 +360,14 @@ fn finite_number(value: f64, operator: &Token) -> Result<Value, LangError> {
 enum DigitFamily {
     Ascii,
     ArabicIndic,
-    EasternArabicIndic,
+    ExtendedArabicIndic,
 }
 
 fn digit_family(ch: char) -> Option<DigitFamily> {
     match ch {
         '0'..='9' => Some(DigitFamily::Ascii),
         '٠'..='٩' => Some(DigitFamily::ArabicIndic),
-        '۰'..='۹' => Some(DigitFamily::EasternArabicIndic),
+        '۰'..='۹' => Some(DigitFamily::ExtendedArabicIndic),
         _ => None,
     }
 }
