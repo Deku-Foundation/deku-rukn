@@ -11,12 +11,14 @@ description: A practical validation plan for the Rukn lexer, parser, evaluator, 
 
 | Layer | What to verify | Representative cases |
 | --- | --- | --- |
-| Lexer | Token kinds, numeral conversion, source locations, invalid characters | Arabic and ASCII semicolons, three digit families, unterminated strings |
+| Lexer and string decoding | Token kinds, numeral conversion, source locations, invalid characters, escape decoding | Arabic and ASCII semicolons, three digit families, unterminated strings, escaped delimiters, unknown escapes |
 | Parser | Precedence, associativity, required terminators, bounded nesting | `2 + 3 * 4`, missing `)`, deeply nested unary expressions |
 | Evaluator | Value semantics and failure behavior | Mixed-type addition, undefined names, division by zero, non-finite arithmetic |
 | CLI | File input, stdout/stderr, exit codes | Missing path, multiple arguments, invalid UTF-8 file contents |
 | Documentation | Pages resolve and snippets remain accurate | Build all three locales; compare the featured example to CI output |
 | Release | Repeatable checks and compatibility notes | Locked dependencies, draft spec review, release checklist |
+
+String delimiter and escape behavior is documented in [String literal behavior](./string-literals.md). The implementation and documentation should change together when the escape grammar changes.
 
 ## Invariants worth testing
 
