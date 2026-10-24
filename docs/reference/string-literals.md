@@ -16,7 +16,7 @@ Rukn accepts either ASCII double quotes or Arabic guillemets:
 اطبع(«أهلًا»)؛
 ```
 
-A string literal must close with the matching delimiter. A physical line break inside a string literal is rejected. The decoded string value may contain a line break through an escape sequence.
+A string literal must close with the matching delimiter. Physical LF (\n) and CR (\r) line breaks inside a string literal are rejected, even after a backslash; use the supported `\n` escape to put a line-feed character in the decoded value. Unterminated strings are reported at end-of-input, and a physical line break is reported at its own position.
 
 ## Escape sequences
 

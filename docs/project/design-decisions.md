@@ -23,6 +23,7 @@ A programming language needs a decision record, not just a roadmap. This page tr
 | RUKN-DR-0003 | Tree-walk interpreter, bytecode VM, or native backend | Deferred | Stable semantics, common conformance suite, reproducible benchmarks |
 | RUKN-DR-0004 | Bootstrap and self-hosting | Deferred | Stable parser, standard library, compiler tests, reproducible bootstrap |
 | RUKN-DR-0005 | Arabic logical operators | Implemented baseline in draft 0.2; reserved words are pre-alpha compatibility choices | Boolean-only operands, left associativity, precedence and short-circuit regression tests |
+| RUKN-DR-0006 | Numeric literal digit-family consistency | Implemented experimental default in draft 0.3; compatibility review remains open | Tests for all supported digit families, decimal separators, exact error locations and a migration note for mixed-family literals |
 
 These entries are research topics, not approvals to implement a specific option.
 
