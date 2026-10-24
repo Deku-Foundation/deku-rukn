@@ -54,20 +54,20 @@
   --vp-c-brand-2: #9bd18d;
   --vp-c-brand-3: #2c6344;
   --vp-c-brand-soft: rgb(191 230 166 / 13%);
-  --vp-c-bg: #121713;
-  --vp-c-bg-alt: #191f1b;
-  --vp-c-bg-elv: #1d2520;
-  --vp-c-bg-soft: #232b26;
+  --vp-c-bg: #111418;
+  --vp-c-bg-alt: #191e23;
+  --vp-c-bg-elv: #1e2429;
+  --vp-c-bg-soft: #242a30;
   --vp-c-text-1: #f3f5f2;
-  --vp-c-text-2: #cbd4cc;
-  --vp-c-text-3: #a9b5ac;
-  --vp-c-divider: #303a33;
-  --vp-c-border: #3b473f;
-  --vp-c-gutter: #252e28;
-  --vp-c-default-1: #3b4540;
-  --vp-c-default-2: #303933;
-  --vp-c-default-3: #242c27;
-  --vp-c-default-soft: rgb(243 245 242 / 7%);
+  --vp-c-text-2: #c7cfd3;
+  --vp-c-text-3: #9ea8ad;
+  --vp-c-divider: #343b41;
+  --vp-c-border: #424b52;
+  --vp-c-gutter: #252c32;
+  --vp-c-default-1: #3c454b;
+  --vp-c-default-2: #30383e;
+  --vp-c-default-3: #252c32;
+  --vp-c-default-soft: rgb(243 245 242 / 6%);
   --vp-button-brand-border: transparent;
   --vp-button-brand-text: #132018;
   --vp-button-brand-bg: #bfe6a6;
@@ -82,10 +82,10 @@
   --vp-code-color: #f3f5f2;
   --vp-code-link-color: #bfe6a6;
   --vp-code-link-hover-color: #d4f0c4;
-  --vp-code-bg: #232d26;
+  --vp-code-bg: #242c32;
   --vp-code-block-color: #cbd4cc;
-  --vp-code-block-bg: #171e19;
-  --vp-code-copy-code-bg: #232b26;
+  --vp-code-block-bg: #181d22;
+  --vp-code-copy-code-bg: #242a30;
   --vp-local-search-highlight-bg: #bfe6a6;
   --vp-local-search-highlight-text: #132018;
   --rukn-border: rgb(207 219 210 / 18%);
@@ -691,5 +691,68 @@ html[dir="rtl"] .vp-doc th {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
+  }
+}
+
+
+/* Dark mode separates brand accents from neutral reading surfaces. */
+.dark body,
+.dark .VPContent,
+.dark .VPDoc,
+.dark .VPHome {
+  background-color: var(--vp-c-bg);
+}
+
+/* VitePress renders both theme variants in the DOM. These more-specific rules
+   deliberately override the theme's scoped display:none rules only where the
+   homepage image sizing rules would otherwise reveal both assets. */
+html:not(.dark) .VPHome .VPHero .image-container .VPImage.dark {
+  display: none !important;
+}
+
+.dark .VPHome .VPHero .image-container .VPImage.light {
+  display: none !important;
+}
+
+html:not(.dark) .VPHome .VPHero .image-container .VPImage.light,
+.dark .VPHome .VPHero .image-container .VPImage.dark {
+  display: block;
+}
+
+/* Buttons use an actual flex alignment box so wrapped labels remain vertically
+   centered instead of sitting at the top of a min-height link. */
+.VPHome .VPHero .action .VPButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  padding-block: .65rem;
+  padding-inline: 1rem;
+  line-height: 1.3;
+}
+
+/* Homepage examples should sit inside the content measure, including on mobile.
+   VitePress normally bleeds code frames to the viewport edges on small screens. */
+.VPHome .vp-doc div[class*="language-"],
+.VPHome .vp-doc .vp-block {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(100%, 74ch);
+  margin-block: 1rem;
+  margin-inline: auto;
+}
+
+@media (max-width: 959px) {
+  html[dir="rtl"] .VPHome .VPHero .heading {
+    align-items: center;
+  }
+
+  html[dir="rtl"] .VPHome .VPHero .tagline {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  html[dir="rtl"] .VPHome .VPHero .actions {
+    justify-content: center;
   }
 }
