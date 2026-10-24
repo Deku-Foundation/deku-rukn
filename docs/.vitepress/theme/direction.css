@@ -1,14 +1,13 @@
 /*
- * Rukn UI compatibility layer for VitePress 1.6.x.
- *
- * VitePress 1.6.4 uses physical left/right offsets in several theme components.
- * Changing <html dir> alone therefore does not mirror the sidebar and navbar.
- * These targeted overrides port logical-direction behavior without pulling an
- * alpha version of the site generator into the published documentation.
+ * RTL compatibility for the project's pinned VitePress 1.6.4 theme.
+ * VitePress components in this version still contain physical left/right
+ * offsets in selected places; keep these overrides narrow and direction-aware.
  */
 
-/* The documentation sidebar: slide in from the inline-start edge. */
-html[dir="rtl"] .VPSidebar {
+/* The sidebar must be physically anchored to the inline-start side in Arabic.
+   Repeated class selectors intentionally outrank the theme's scoped component
+   styles so the result does not depend on CSS injection order. */
+html[dir="rtl"] .VPSidebar.VPSidebar {
   right: 0;
   left: auto;
   direction: rtl;
@@ -16,17 +15,24 @@ html[dir="rtl"] .VPSidebar {
   transform: translateX(100%);
 }
 
-html[dir="rtl"] .VPSidebar.open {
+html[dir="rtl"] .VPSidebar.VPSidebar.open {
+  right: 0;
+  left: auto;
   transform: translateX(0);
 }
 
-html[dir="rtl"] .VPSidebar .curtain {
+html[dir="rtl"] .VPSidebar.VPSidebar .curtain {
   right: 0;
   left: auto;
 }
 
+html[dir="rtl"] .VPNavBar .container,
+html[dir="rtl"] .VPNavBar .content {
+  direction: rtl;
+}
+
 @media (min-width: 960px) {
-  html[dir="rtl"] .VPSidebar {
+  html[dir="rtl"] .VPSidebar.VPSidebar {
     right: 0;
     left: auto;
     padding-right: 32px;
@@ -34,13 +40,12 @@ html[dir="rtl"] .VPSidebar .curtain {
     transform: translateX(0);
   }
 
-  html[dir="rtl"] .VPSidebar .curtain {
+  html[dir="rtl"] .VPSidebar.VPSidebar .curtain {
     right: 0;
     left: auto;
   }
 
-  /* The VitePress 1.x title is absolutely pinned to the physical left. */
-  html[dir="rtl"] .VPNavBar.has-sidebar .container > .title {
+  html[dir="rtl"] .VPNavBar.has-sidebar .container > .title.title {
     right: 0;
     left: auto;
     padding-right: 32px;
@@ -48,7 +53,7 @@ html[dir="rtl"] .VPSidebar .curtain {
     text-align: start;
   }
 
-  html[dir="rtl"] .VPNavBar.has-sidebar .container > .content {
+  html[dir="rtl"] .VPNavBar.has-sidebar .container > .content.content {
     padding-right: var(--vp-sidebar-width);
     padding-left: 32px;
   }
@@ -57,15 +62,25 @@ html[dir="rtl"] .VPSidebar .curtain {
     padding-right: var(--vp-sidebar-width);
     padding-left: 0;
   }
+
+  html[dir="rtl"] .VPNavBar .content-body {
+    justify-content: flex-start;
+    direction: rtl;
+  }
+
+  html[dir="rtl"] .VPContent.has-sidebar {
+    padding-right: var(--vp-sidebar-width);
+    padding-left: 0;
+  }
 }
 
 @media (min-width: 1440px) {
-  html[dir="rtl"] .VPSidebar {
+  html[dir="rtl"] .VPSidebar.VPSidebar {
     padding-right: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2));
     padding-left: 32px;
   }
 
-  html[dir="rtl"] .VPNavBar.has-sidebar .container > .title {
+  html[dir="rtl"] .VPNavBar.has-sidebar .container > .title.title {
     right: 0;
     left: auto;
     padding-right: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2));
@@ -73,7 +88,7 @@ html[dir="rtl"] .VPSidebar .curtain {
     width: calc((100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px);
   }
 
-  html[dir="rtl"] .VPNavBar.has-sidebar .container > .content {
+  html[dir="rtl"] .VPNavBar.has-sidebar .container > .content.content {
     padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
     padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px);
   }
@@ -82,9 +97,14 @@ html[dir="rtl"] .VPSidebar .curtain {
     padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
     padding-left: 0;
   }
+
+  html[dir="rtl"] .VPContent.has-sidebar {
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2);
+  }
 }
 
-/* Mirror sidebar item details, including active markers and disclosure carets. */
+/* Sidebar labels, nested groups, active rules, and disclosure indicators. */
 html[dir="rtl"] .VPSidebar .nav {
   direction: rtl;
   text-align: start;
@@ -115,96 +135,23 @@ html[dir="rtl"] .VPSidebarItem.collapsed .caret-icon {
   transform: rotate(180deg);
 }
 
-/* Keep the live wordmark spacing natural when the logo is on the right. */
-html[dir="rtl"] .VPNavBarTitle .logo {
+html[dir="rtl"] .VPNavBarTitle .logo.logo {
   margin-right: 0;
   margin-left: 8px;
 }
 
-/* Mobile navigation follows the locale direction as well. */
 html[dir="rtl"] .VPNavScreen,
 html[dir="rtl"] .VPNavScreen .container,
 html[dir="rtl"] .VPLocalNav,
+html[dir="rtl"] .VPLocalNav .container,
 html[dir="rtl"] .VPLocalNav .menu {
   direction: rtl;
   text-align: start;
 }
 
-/* Mirror the on-page outline to the left of the Arabic reading column. */
-@media (min-width: 1280px) {
-  html[dir="rtl"] .VPDoc.has-sidebar > .container {
-    direction: rtl;
-  }
-
-  html[dir="rtl"] .VPDoc.has-aside .aside {
-    padding-right: 32px;
-    padding-left: 0;
-  }
-}
-
-/* Avoid constraining the complete desktop documentation layout to 1180px.
-   The reading column remains measure-limited; the outer layout can use the
-   VitePress max-width so the article and outline do not crowd the sidebar. */
-@media (min-width: 1440px) {
-  .VPDoc.has-sidebar > .container {
-    max-width: var(--vp-layout-max-width);
-  }
-
-  .VPHome .VPHero .container,
-  .VPHome .VPFeatures {
-    max-width: var(--vp-layout-max-width);
-    margin-inline: auto;
-  }
-}
-
-/* Prevent feature cards and hero columns from stretching into ultra-wide lines. */
-@media (min-width: 1920px) {
-  .VPHome .VPHero .text,
-  .VPHome .VPHero .tagline {
-    max-width: min(100%, 60rem);
-  }
-
-  .VPHome .VPFeatures {
-    max-width: min(var(--vp-layout-max-width), calc(100vw - 96px));
-  }
-}
-
-
-/* The page column itself reserves space for the sidebar. VitePress 1.x does
-   this with padding-left, independently of the sidebar's fixed position. */
-@media (min-width: 960px) {
-  html[dir="rtl"] .VPContent.has-sidebar {
-    padding-right: var(--vp-sidebar-width);
-    padding-left: 0;
-  }
-}
-
-@media (min-width: 1440px) {
-  html[dir="rtl"] .VPContent.has-sidebar {
-    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
-    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2);
-  }
-}
-
-/* On smaller desktop widths VitePress uses a local navigation bar. Reserve
-   the sidebar column on its right side for Arabic rather than on its left. */
 html[dir="rtl"] .VPLocalNav {
   right: 0;
   left: auto;
-}
-
-@media (min-width: 960px) {
-  html[dir="rtl"] .VPLocalNav.has-sidebar {
-    padding-right: var(--vp-sidebar-width);
-    padding-left: 0;
-  }
-}
-
-@media (min-width: 1440px) {
-  html[dir="rtl"] .VPLocalNav.has-sidebar {
-    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
-    padding-left: 0;
-  }
 }
 
 html[dir="rtl"] .VPLocalNav .menu-icon {
@@ -212,7 +159,44 @@ html[dir="rtl"] .VPLocalNav .menu-icon {
   margin-left: 8px;
 }
 
-/* Translate documentation navigation details and pager alignment too. */
+@media (min-width: 960px) {
+  html[dir="rtl"] .VPLocalNav.has-sidebar {
+    padding-right: var(--vp-sidebar-width);
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 1440px) {
+  html[dir="rtl"] .VPLocalNav.has-sidebar {
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width));
+    padding-left: 0;
+  }
+}
+
+/* At wide widths, keep the article and its outline in mirrored flex order. */
+@media (min-width: 1280px) {
+  html[dir="rtl"] .VPDoc.has-sidebar > .container {
+    direction: rtl;
+  }
+
+  html[dir="rtl"] .VPDoc .aside {
+    padding-right: 32px;
+    padding-left: 0;
+  }
+
+  html[dir="rtl"] .VPDocAsideOutline .content {
+    border-right: 1px solid var(--vp-c-divider);
+    border-left: 0;
+    padding-right: 16px;
+    padding-left: 0;
+  }
+
+  html[dir="rtl"] .VPDocAsideOutline .outline-marker {
+    right: -1px;
+    left: auto;
+  }
+}
+
 html[dir="rtl"] .VPDocFooter .edit-link-icon {
   margin-right: 0;
   margin-left: 8px;
@@ -223,4 +207,11 @@ html[dir="rtl"] .VPDocFooter .pager-link.next {
   margin-right: auto;
   margin-left: 0;
   text-align: start;
+}
+
+html[dir="rtl"] .vp-doc .header-anchor {
+  right: 0;
+  left: auto;
+  margin-right: -0.87em;
+  margin-left: 0;
 }
