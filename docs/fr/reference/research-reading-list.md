@@ -5,7 +5,7 @@ description: Normes primaires et références d’ingénierie pour un langage de
 
 # Bibliographie technique
 
-**Révisée le 23 octobre 2026.** Cette liste est un point de départ sélectionné, pas une affirmation que Rukn est conforme à toutes les normes citées. Privilégiez les normes primaires et la documentation officielle, et consignez version et date d’accès lorsqu’une décision technique en dépend.
+**Révisée le 24 octobre 2026.** Cette liste est un point de départ sélectionné, pas une affirmation que Rukn est conforme à toutes les normes citées. Privilégiez les normes primaires et la documentation officielle, et consignez version et date d’accès lorsqu’une décision technique en dépend.
 
 ## 1. Texte arabe, identifiants et sécurité Unicode
 
@@ -49,6 +49,8 @@ Rukn utilise actuellement un lexer écrit à la main, un parseur récursif desce
 
 - [Rust Compiler Development Guide : Fuzzing](https://rustc-dev-guide.rust-lang.org/fuzzing.html) — détecter et minimiser les défauts de compilateur.
 - [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz) et le [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html) — fuzzing des frontières d’analyse et d’évaluation.
+
+Au 24 octobre 2026, la dernière version taguée de cargo-fuzz est la [0.13.2](https://github.com/rust-fuzz/cargo-fuzz/releases/tag/0.13.2), publiée le 9 juin 2026. Rukn épingle cette version dans son workflow de test optionnel ; vérifier la dernière version amont avant toute mise à niveau.
 - [Criterion.rs](https://github.com/criterion-rs/criterion.rs) — microbenchmarks statistiques pour Rust.
 - [Documentation des tests Rust](https://doc.rust-lang.org/book/ch11-00-testing.html) — tests unitaires, d’intégration et documentation.
 
