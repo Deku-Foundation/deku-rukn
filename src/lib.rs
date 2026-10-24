@@ -279,9 +279,9 @@ fn decode_string_literal(token: &Token) -> Result<String, LangError> {
             continue;
         }
 
-        let escaped = chars.next().ok_or_else(|| {
-            LangError::at("شرطة هروب عكسية غير مكتملة في نهاية النص", token)
-        })?;
+        let escaped = chars
+            .next()
+            .ok_or_else(|| LangError::at("شرطة هروب عكسية غير مكتملة في نهاية النص", token))?;
         match escaped {
             'n' => decoded.push('\n'),
             'r' => decoded.push('\r'),
