@@ -232,7 +232,7 @@ main,
   display: none;
 }
 
-.VPHome .VPHero .image-src {
+.VPHome .VPHero .image-container .image-src {
   position: relative;
   inset: auto;
   display: block;
