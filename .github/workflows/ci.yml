@@ -49,3 +49,5 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Build documentation
         run: npm run build
+      - name: Check localized UI contract
+        run: npm run check:ui
