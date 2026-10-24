@@ -676,8 +676,7 @@ impl Interpreter {
                 match (operator.kind, left) {
                     (TokenKind::Or, Value::Bool(true)) => Ok(Value::Bool(true)),
                     (TokenKind::And, Value::Bool(false)) => Ok(Value::Bool(false)),
-                    (TokenKind::Or, Value::Bool(false))
-                    | (TokenKind::And, Value::Bool(true)) => {
+                    (TokenKind::Or, Value::Bool(false)) | (TokenKind::And, Value::Bool(true)) => {
                         match self.evaluate(right)? {
                             Value::Bool(value) => Ok(Value::Bool(value)),
                             _ => Err(LangError::at(
@@ -799,7 +798,8 @@ mod tests {
     #[test]
     fn logical_operator_precedence_and_parentheses() {
         assert_eq!(
-            run("اطبع(صحيح أو خطأ و خطأ)؛ اطبع((صحيح أو خطأ) و خطأ)؛ اطبع(خطأ و صحيح أو صحيح)؛").unwrap(),
+            run("اطبع(صحيح أو خطأ و خطأ)؛ اطبع((صحيح أو خطأ) و خطأ)؛ اطبع(خطأ و صحيح أو صحيح)؛")
+                .unwrap(),
             ["صحيح", "خطأ", "صحيح"]
         );
     }
