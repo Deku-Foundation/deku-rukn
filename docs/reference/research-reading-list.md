@@ -64,7 +64,7 @@ Suggested sequence:
 4. Benchmark only with correctness checked against that corpus.
 5. Record source workloads, hardware, compiler version, commands and variance for every published comparison.
 
-Fuzzing and benchmarks are not current completed Rukn features unless the repository later adds and continuously runs them.
+The bounded end-to-end fuzz smoke target is now active in CI. Parser-specific fuzzing, a formal conformance corpus and reproducible benchmark gates remain future work.
 
 ## 4. Editor and tooling interoperability
 
