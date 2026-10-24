@@ -14,7 +14,7 @@ Cette page décrit le comportement implémenté, pas toute la vision à long ter
     اطبع(الاسم)؛
     اطبع(السعر * 2)؛
 
-Chaque instruction se termine par ؛ ou ;. Les chiffres ASCII, arabo-indiens et persans sont acceptés. Le séparateur décimal est le point ASCII ; le séparateur arabe ٫ n’est pas encore pris en charge.
+Chaque instruction se termine par ؛ ou ;. Les chiffres ASCII, arabo-indiens et persans sont acceptés. Le séparateur décimal peut être le point ASCII ou le séparateur arabe ٫ (U+066B) ; il doit être suivi d’au moins un chiffre.
 
 ## Valeurs
 
