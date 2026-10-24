@@ -33,8 +33,13 @@ Chaque instruction se termine par ؛ ou ;. Les chiffres ASCII, arabo-indiens et 
 - <, <=, >, >= : comparaison numérique.
 - ==, != : égalité et inégalité.
 - ! : négation booléenne.
+- و : ET logique, exige deux booléens ; si le côté gauche vaut خطأ, le côté droit n'est pas évalué.
+- أو : OU logique, exige deux booléens ; si le côté gauche vaut صحيح, le côté droit n'est pas évalué.
 
-La priorité décroît dans cet ordre : négation, multiplication/division, addition/soustraction, comparaison, égalité. Les parenthèses changent la priorité.
+La priorité décroît dans cet ordre : négation, multiplication/division, addition/soustraction, comparaison, égalité, و, puis أو. Les opérateurs logiques sont associatifs à gauche et utilisent l'évaluation en court-circuit ; aucune conversion implicite en booléen n'existe. Les parenthèses changent la priorité.
+
+    اطبع(صحيح أو خطأ و خطأ)؛ # صحيح : و est prioritaire sur أو
+    اطبع(خطأ و (١ / ٠ == ٠))؛ # خطأ ; la division n'est pas évaluée
 
 ## Commentaires et erreurs
 
