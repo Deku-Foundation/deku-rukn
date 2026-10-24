@@ -5,7 +5,7 @@ description: A practical validation plan for the Rukn lexer, parser, evaluator, 
 
 # Testing and conformance strategy
 
-**Status: engineering plan.** The existing unit tests and CI checks are the baseline; fuzzing, a formal conformance corpus, and benchmark gates are future work until they are implemented and run in CI.
+**Status: engineering baseline with a bounded fuzz smoke target.** Unit tests and the standard CI gates remain the primary correctness checks. A separate workflow runs a 60-second libFuzzer campaign for pull requests that touch source or fuzz files, weekly, and by manual dispatch. A machine-readable conformance corpus, longer fuzz campaigns, and benchmark gates remain future work.
 
 ## Test layers
 
@@ -35,7 +35,7 @@ A useful next step is a machine-readable corpus of source files paired with expe
 
 ## Fuzzing plan
 
-The Rust ecosystem's [cargo-fuzz project](https://github.com/rust-fuzz/cargo-fuzz) and [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html) provide a route to fuzzing Rust code with libFuzzer. A proposed Rukn fuzz target should call the public parse/run boundary using arbitrary UTF-8 input and check for panics, hangs within a controlled fuzzing run, and resource-limit bypasses.
+The [cargo-fuzz project](https://github.com/rust-fuzz/cargo-fuzz) and [Rust Fuzz Book](https://rust-fuzz.github.io/book/cargo-fuzz.html) document libFuzzer-based testing for Rust. Rukn now has an end-to-end target in `fuzz/fuzz_targets/run_source.rs`: it maps arbitrary bytes to valid UTF-8 with replacement for invalid sequences, then calls the public `rukn::run` API. A language diagnostic is a valid outcome; a panic or sanitizer finding is a failure. This target exercises the interpreter API, not the CLI's raw invalid-UTF-8 file path, which has separate unit tests.
 
 Suggested separation:
 
@@ -44,7 +44,7 @@ Suggested separation:
 3. End-to-end target: call the public interpreter and treat structured diagnostics as valid outcomes.
 4. Regression corpus: every minimized crash or incorrect result becomes a permanent test.
 
-Fuzzing is not yet listed as a completed capability. It needs a separately reviewed harness, reproducible seeds, and an automated schedule before it is described as active CI coverage. `cargo-fuzz` requires nightly Rust and supported sanitizer tooling; it can initially run as a dedicated optional workflow.
+The dedicated `Fuzz smoke` workflow pins `cargo-fuzz 0.13.2` and runs `cargo +nightly fuzz run run_source -- -max_total_time=60 -timeout=5 -max_len=16384`. It runs on source/fuzz pull requests, weekly, and by manual dispatch. The bounded run keeps CI cost predictable; it is not a security proof and does not replace longer campaigns. Keep every minimized crash or incorrect result as a permanent regression test, and expand toward a separate parser target and a machine-readable conformance corpus.
 
 ## Benchmarks and compiler research
 
