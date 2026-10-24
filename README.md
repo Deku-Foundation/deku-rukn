@@ -30,6 +30,7 @@ Not implemented yet: functions, loops, modules, collections, a package manager, 
 دع الناتج = ٦ * ٧؛
 اطبع(الناتج)؛
 اطبع(صحيح == خطأ)؛
+اطبع(صحيح أو خطأ)؛
 ```
 
 Expected output:
@@ -38,6 +39,7 @@ Expected output:
 مرحبًا يا العالم
 42
 خطأ
+صحيح
 ```
 
 ## Design principles
