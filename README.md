@@ -44,7 +44,7 @@ Expected output:
 
 ## Design principles
 
-- **Arabic-first syntax:** Arabic keywords, Unicode identifiers and Arabic-Indic numerals.
+- **Arabic-first syntax:** Arabic keywords, Unicode identifiers and Arabic-Indic numerals; each numeric literal uses one digit family consistently.
 - **Explicit semantics:** no implicit conversion between strings and numbers.
 - **Unicode-aware engineering:** identifier rules are tested against a documented profile; normalization and visual-confusable policy remain explicit research questions.
 - **Evidence-led development:** language behavior is specified and tested, while proposed features are labelled as proposals.
