@@ -23,7 +23,7 @@ for (const asset of ['rukn-hero.svg', 'rukn-hero-dark.svg']) {
 const themeCss = await readFile(new URL('../.vitepress/theme/custom.css', import.meta.url), 'utf8')
 const directionCss = await readFile(new URL('../.vitepress/theme/direction.css', import.meta.url), 'utf8')
 assert.ok(themeCss.includes('grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);'), 'hero uses bounded desktop columns')
-assert.ok(themeCss.includes('max-width: min(100%, 450px);'), 'hero artwork is width-constrained')
+assert.ok(themeCss.includes('width: min(100%, 450px);'), 'hero artwork is width-constrained')
 assert.ok(!themeCss.includes('max-width: min(100%, 60rem)'), 'hero text must not escape its column')
 assert.ok(directionCss.includes('html[dir="rtl"] .VPSidebar.VPSidebar'), 'RTL sidebar override must outrank scoped component styles')
 assert.ok(directionCss.includes('html[dir="rtl"] .VPContent.has-sidebar'), 'RTL content column must reserve space on the inline-start side')
