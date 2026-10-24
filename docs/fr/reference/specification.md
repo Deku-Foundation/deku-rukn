@@ -5,7 +5,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 
 # Spécification du langage Rukn
 
-**État : brouillon 0.2.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
+**État : brouillon 0.3.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
 
 ## Règles lexicales
 
@@ -14,8 +14,8 @@ description: Grammaire et sémantique actuelles de Rukn.
 - Les identifiants ne sont pas normalisés ; la détection des confusables et des contrôles bidirectionnels n’est pas implémentée.
 - La notation scientifique ne fait pas partie de la grammaire numérique actuelle.
 - Mots réservés : دع, اطبع, صحيح, خطأ, لاشيء, و, أو.
-- Les nombres acceptent les chiffres ASCII, arabo-indiens et persans. Le point ASCII ou le séparateur décimal arabe ٫ (U+066B) est accepté et doit être suivi d’au moins un chiffre ; les séparateurs répétés sont invalides.
-- Les chaînes utilisent des guillemets doubles ou les guillemets arabes «texte». Les retours à la ligne dans une chaîne sont interdits.
+- Les nombres acceptent les chiffres ASCII, arabo-indiens et persans. Le point ASCII ou le séparateur décimal arabe ٫ (U+066B) est accepté et doit être suivi d’au moins un chiffre ; les séparateurs répétés sont invalides. Tous les chiffres d’un même littéral doivent appartenir à la même famille ; un mélange est rejeté au premier chiffre incompatible.
+- Les chaînes utilisent des guillemets doubles ou les guillemets arabes «texte». Les retours de ligne physiques LF et CR sont interdits dans une chaîne, y compris après une barre oblique inverse.
 - Les commentaires commencent par #.
 - Les instructions se terminent par ؛ ou ;.
 

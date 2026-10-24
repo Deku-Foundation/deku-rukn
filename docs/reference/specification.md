@@ -14,8 +14,8 @@ description: The current grammar, values and semantics of Rukn.
 - Identifiers are not normalized; visually confusable detection and bidirectional-control diagnostics are not implemented.
 - Scientific notation is not part of the current numeric-literal grammar.
 - Reserved words: دع, اطبع, صحيح, خطأ, لاشيء, و, أو.
-- Number literals accept ASCII, Arabic-Indic and Eastern Arabic-Indic digits. The decimal separator may be the ASCII full stop (`.`) or Arabic decimal separator (`٫`, U+066B); both have the same numeric meaning. A separator must be followed by at least one digit. Repeated separators are invalid.
-- String literals use paired ASCII double quotes or Arabic guillemets: "text" or «نص». Newlines inside a string are rejected.
+- Number literals accept ASCII, Arabic-Indic and Extended Arabic-Indic (Persian) digits. The decimal separator may be the ASCII full stop (`.`) or Arabic decimal separator (`٫`, U+066B); both have the same numeric meaning. A separator must be followed by at least one digit. Repeated separators are invalid. Every digit in one numeric literal must come from the same digit family; mixing families is rejected at the first mismatching digit.
+- String literals use paired ASCII double quotes or Arabic guillemets: "text" or «نص». Physical LF and CR line breaks inside a string are rejected, including after a backslash.
 - Comments begin with # and end at the line break.
 - Statements end with ؛ or ;.
 

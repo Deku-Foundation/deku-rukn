@@ -81,6 +81,7 @@ struct Lexer {
     column: usize,
     token_line: usize,
     token_column: usize,
+    previous_was_carriage_return: bool,
 }
 impl Lexer {
     fn new(source: &str) -> Self {
@@ -92,6 +93,7 @@ impl Lexer {
             column: 1,
             token_line: 1,
             token_column: 1,
+            previous_was_carriage_return: false,
         }
     }
     fn scan(mut self) -> Result<Vec<Token>, LangError> {
@@ -142,25 +144,26 @@ impl Lexer {
                     tokens.push(self.token(k));
                 }
                 '#' => {
-                    while self.peek() != '\n' && !self.is_at_end() {
+                    while !matches!(self.peek(), '\n' | '\r') && !self.is_at_end() {
                         self.advance();
                     }
                 }
                 ' ' | '\r' | '\t' | '\n' => {}
                 '"' | '«' => tokens.push(self.string(ch)?),
-                c if is_digit(c) => tokens.push(self.number()),
+                c if is_digit(c) => tokens.push(self.number()?),
                 c if is_identifier_start(c) => tokens.push(self.identifier()),
                 _ => {
                     let escaped = ch.escape_default().to_string();
-                    return Err(self.error_at_current(format!(
+                    return Err(self.error_at_token_start(format!(
                         "محرف Unicode غير مدعوم: U+{:04X} ({escaped})",
                         ch as u32
                     )));
                 }
             }
             if tokens.len() > MAX_TOKENS {
-                return Err(self
-                    .error_at_current(format!("تجاوز البرنامج الحد الأقصى للرموز ({MAX_TOKENS})")));
+                return Err(self.error_at_token_start(format!(
+                    "تجاوز البرنامج الحد الأقصى للرموز ({MAX_TOKENS})"
+                )));
             }
         }
         tokens.push(Token {
@@ -177,11 +180,19 @@ impl Lexer {
     fn advance(&mut self) -> char {
         let ch = self.chars[self.current];
         self.current += 1;
-        if ch == '\n' {
+        if ch == '\r' {
             self.line += 1;
             self.column = 1;
+            self.previous_was_carriage_return = true;
+        } else if ch == '\n' {
+            if !self.previous_was_carriage_return {
+                self.line += 1;
+            }
+            self.column = 1;
+            self.previous_was_carriage_return = false;
         } else {
             self.column += 1;
+            self.previous_was_carriage_return = false;
         }
         ch
     }
@@ -209,31 +220,53 @@ impl Lexer {
     fn string(&mut self, opener: char) -> Result<Token, LangError> {
         let closer = if opener == '«' { '»' } else { '"' };
         while !self.is_at_end() && self.peek() != closer {
-            if self.peek() == '\n' {
-                return Err(self.error_at_current("لا يُسمح بسطر جديد داخل النص".into()));
+            if matches!(self.peek(), '\n' | '\r') {
+                return Err(self.error_at_cursor("لا يُسمح بسطر جديد داخل النص"));
             }
-            if self.peek() == '\\' && self.peek_next() != '\0' {
+
+            if self.peek() == '\\' {
+                self.advance();
+                if matches!(self.peek(), '\n' | '\r') {
+                    return Err(self.error_at_cursor("لا يُسمح بسطر جديد داخل النص"));
+                }
+                if !self.is_at_end() {
+                    self.advance();
+                }
+            } else {
                 self.advance();
             }
-            self.advance();
         }
         if self.is_at_end() {
-            return Err(self.error_at_current("نص غير مغلق".into()));
+            return Err(self.error_at_cursor("نص غير مغلق"));
         }
         self.advance();
         Ok(self.token(TokenKind::String))
     }
-    fn number(&mut self) -> Token {
-        while is_digit(self.peek()) {
+    fn number(&mut self) -> Result<Token, LangError> {
+        let family = match digit_family(self.chars[self.start]) {
+            Some(family) => family,
+            None => {
+                return Err(self.error_at_token_start("بداية عدد غير صالحة".into()));
+            }
+        };
+
+        while let Some(next_family) = digit_family(self.peek()) {
+            if next_family != family {
+                return Err(self.error_at_cursor("لا يجوز خلط مجموعات الأرقام داخل العدد الواحد"));
+            }
             self.advance();
         }
+
         if matches!(self.peek(), '.' | '٫') && is_digit(self.peek_next()) {
             self.advance();
-            while is_digit(self.peek()) {
+            while let Some(next_family) = digit_family(self.peek()) {
+                if next_family != family {
+                    return Err(self.error_at_cursor("لا يجوز خلط مجموعات الأرقام داخل العدد الواحد"));
+                }
                 self.advance();
             }
         }
-        self.token(TokenKind::Number)
+        Ok(self.token(TokenKind::Number))
     }
     fn identifier(&mut self) -> Token {
         while is_identifier_continue(self.peek()) {
@@ -252,11 +285,18 @@ impl Lexer {
         };
         self.token(kind)
     }
-    fn error_at_current(&self, message: String) -> LangError {
+    fn error_at_token_start(&self, message: String) -> LangError {
         LangError {
             message,
             line: self.token_line,
             column: self.token_column,
+        }
+    }
+    fn error_at_cursor(&self, message: impl Into<String>) -> LangError {
+        LangError {
+            message: message.into(),
+            line: self.line,
+            column: self.column,
         }
     }
 }
@@ -315,8 +355,24 @@ fn finite_number(value: f64, operator: &Token) -> Result<Value, LangError> {
         ))
     }
 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum DigitFamily {
+    Ascii,
+    ArabicIndic,
+    ExtendedArabicIndic,
+}
+
+fn digit_family(ch: char) -> Option<DigitFamily> {
+    match ch {
+        '0'..='9' => Some(DigitFamily::Ascii),
+        '٠'..='٩' => Some(DigitFamily::ArabicIndic),
+        '۰'..='۹' => Some(DigitFamily::ExtendedArabicIndic),
+        _ => None,
+    }
+}
+
 fn is_digit(ch: char) -> bool {
-    ch.is_ascii_digit() || ('٠'..='٩').contains(&ch) || ('۰'..='۹').contains(&ch)
+    digit_family(ch).is_some()
 }
 fn normalize_digits(text: &str) -> String {
     text.chars()
@@ -819,6 +875,28 @@ mod tests {
     }
 
     #[test]
+    fn rejects_mixed_digit_families_inside_one_numeric_literal() {
+        for (source, expected_column) in [
+            ("اطبع(1٢)؛", 7),
+            ("اطبع(١2)؛", 7),
+            ("اطبع(۱۲٫٣)؛", 9),
+            ("اطبع(12.٥)؛", 9),
+        ] {
+            let error = run(source).unwrap_err();
+            assert!(
+                error.message.contains("خلط مجموعات الأرقام"),
+                "unexpected diagnostic for {source:?}: {}",
+                error.message
+            );
+            assert_eq!(
+                (error.line, error.column),
+                (1, expected_column),
+                "{source:?}"
+            );
+        }
+    }
+
+    #[test]
     fn rejects_repeated_arabic_decimal_separator() {
         let error = run("اطبع(١٫٢٫٣)؛").unwrap_err();
         assert!(error.message.contains("غير مدعوم"));
@@ -864,6 +942,19 @@ mod tests {
                 .unwrap(),
             ["صحيح", "خطأ", "صحيح"]
         );
+    }
+
+    #[test]
+    fn reports_locations_after_lf_crlf_and_bare_cr_line_endings() {
+        for source in [
+            "# comment\nاطبع(غير_معرف)؛",
+            "# comment\r\nاطبع(غير_معرف)؛",
+            "# comment\rاطبع(غير_معرف)؛",
+        ] {
+            let error = run(source).unwrap_err();
+            assert!(error.message.contains("غير معرّف"), "{source:?}");
+            assert_eq!((error.line, error.column), (2, 6), "{source:?}");
+        }
     }
 
     #[test]
@@ -936,6 +1027,31 @@ mod tests {
             run(r#"اطبع("سطر\nثانٍ\t\\\"")؛ اطبع(«قالت \»نعم\»»)؛"#).unwrap(),
             ["سطر\nثانٍ\t\\\"", "قالت »نعم»"]
         );
+    }
+
+    #[test]
+    fn rejects_physical_line_breaks_in_strings_at_the_break_position() {
+        for (source, expected_location) in [
+            ("اطبع(\"سطر\rثانٍ\")؛", (1, 10)),
+            ("اطبع(\"سطر\nثانٍ\")؛", (1, 10)),
+            ("اطبع(\"سطر\\\nثانٍ\")؛", (1, 11)),
+            ("اطبع(\"سطر\\\rثانٍ\")؛", (1, 11)),
+        ] {
+            let error = run(source).unwrap_err();
+            assert!(
+                error.message.contains("سطر جديد"),
+                "{source:?}: {}",
+                error.message
+            );
+            assert_eq!((error.line, error.column), expected_location, "{source:?}");
+        }
+    }
+
+    #[test]
+    fn unterminated_strings_point_to_end_of_input() {
+        let error = run("اطبع(\"نص").unwrap_err();
+        assert!(error.message.contains("غير مغلق"));
+        assert_eq!((error.line, error.column), (1, 9));
     }
 
     #[test]
