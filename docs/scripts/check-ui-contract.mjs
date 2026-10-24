@@ -22,10 +22,20 @@ for (const asset of ['rukn-hero.svg', 'rukn-hero-dark.svg']) {
 
 const themeCss = await readFile(new URL('../.vitepress/theme/custom.css', import.meta.url), 'utf8')
 const directionCss = await readFile(new URL('../.vitepress/theme/direction.css', import.meta.url), 'utf8')
+const darkHero = await readFile(new URL('../public/rukn-hero-dark.svg', import.meta.url), 'utf8')
+
 assert.ok(themeCss.includes('grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);'), 'hero uses bounded desktop columns')
 assert.ok(themeCss.includes('width: min(100%, 450px);'), 'hero artwork is width-constrained')
 assert.ok(!themeCss.includes('max-width: min(100%, 60rem)'), 'hero text must not escape its column')
+assert.ok(themeCss.includes('.dark .VPHome .VPHero .image-container .VPImage.light'), 'light hero artwork is hidden in dark mode')
+assert.ok(themeCss.includes('html:not(.dark) .VPHome .VPHero .image-container .VPImage.dark'), 'dark hero artwork is hidden in light mode')
+assert.ok(themeCss.includes('align-items: center;'), 'hero buttons and controls have explicit center alignment')
+assert.ok(themeCss.includes('max-width: min(100%, 74ch);'), 'homepage code examples use a centered reading measure')
+assert.ok(themeCss.includes('--vp-c-bg: #111418;'), 'dark canvas uses a neutral charcoal, not a green cast')
+assert.ok(darkHero.includes('#252a30') && !darkHero.includes('#202923'), 'dark illustration uses neutral charcoal surfaces')
 assert.ok(directionCss.includes('html[dir="rtl"] .VPSidebar.VPSidebar'), 'RTL sidebar override must outrank scoped component styles')
 assert.ok(directionCss.includes('html[dir="rtl"] .VPContent.has-sidebar'), 'RTL content column must reserve space on the inline-start side')
+assert.ok(directionCss.includes('html[dir="rtl"] .VPNavBar .container {\n  direction: ltr;'), 'RTL navbar outer frame stays stable')
+assert.ok((await readFile(new URL('../.vitepress/config.mts', import.meta.url), 'utf8')).includes("{ text: 'Project', items: ["), 'long top-level nav entries are grouped')
 
-console.log('UI contract passed: English, Arabic, French, responsive hero constraints, and RTL layout overrides.')
+console.log('UI contract passed: locale direction, theme artwork visibility, dark palette, buttons, homepage code, and RTL navigation.')
