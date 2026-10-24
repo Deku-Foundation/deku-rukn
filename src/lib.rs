@@ -3,7 +3,8 @@ use std::collections::HashMap;
 use std::fmt;
 use unicode_ident::{is_xid_continue, is_xid_start};
 
-const MAX_SOURCE_BYTES: usize = 1_048_576;
+/// Maximum source size in UTF-8 bytes accepted by the interpreter and CLI.
+pub const MAX_SOURCE_BYTES: usize = 1_048_576;
 const MAX_TOKENS: usize = 16_384;
 // Keep recursion well below typical thread stack limits; this is a safety bound, not a language feature.
 const MAX_NESTING: usize = 64;
