@@ -50,8 +50,13 @@ Arabic-Indic digits (٠١٢٣٤٥٦٧٨٩), Eastern Arabic-Indic digits (۰۱۲�
 | - | Subtraction | Two numbers |
 | <, <=, >, >= | Numeric comparison | Two numbers |
 | ==, != | Equality / inequality | Any two values |
+| و | Logical AND | Two booleans; skips the right operand when the left is خطأ |
+| أو | Logical OR | Two booleans; skips the right operand when the left is صحيح |
 
-Precedence from high to low: unary, multiplication/division, addition/subtraction, comparison, equality. Parentheses override precedence.
+Precedence from high to low: unary, multiplication/division, addition/subtraction, comparison, equality, و, then أو. Both logical operators are left-associative and short-circuit: the right operand is evaluated only when needed. They accept booleans only; there is no truthiness conversion. Parentheses override precedence.
+
+    اطبع(صحيح أو خطأ و خطأ)؛ # صحيح: و has higher precedence than أو
+    اطبع(خطأ و (١ / ٠ == ٠))؛ # خطأ; division is skipped
 
 ## Comments
 
