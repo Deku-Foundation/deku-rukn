@@ -35,3 +35,11 @@ jobs:
         run: cargo +nightly fuzz build run_source
       - name: Run bounded libFuzzer campaign
         run: cargo +nightly fuzz run run_source -- -max_total_time=60 -timeout=5 -max_len=16384 -print_final_stats=1
+      - name: Upload crashing inputs
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rukn-fuzz-artifacts
+          path: fuzz/artifacts/
+          if-no-files-found: ignore
+          retention-days: 14
