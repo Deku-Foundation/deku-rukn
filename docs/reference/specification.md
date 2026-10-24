@@ -46,7 +46,7 @@ The print parentheses are optional in the implementation, but if an opening pare
 - Plus accepts two numbers or two strings; it does not coerce types.
 - Comparison operators accept numbers only.
 - Equality compares values and their variants.
-- The operators و and أو require boolean operands, use left associativity, and short-circuit (the right operand is evaluated only when needed).
+- The operators و and أو are left-associative and short-circuit. The left operand must evaluate to a boolean. The right operand is evaluated and must also be boolean only when needed; a skipped right operand is neither evaluated nor runtime-type-checked. No truthiness conversion is performed.
 - A variable lookup for an unknown name is an error.
 - Division by positive or negative zero is an error.
 - Non-finite numeric results are rejected with a language diagnostic.
