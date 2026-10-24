@@ -161,8 +161,9 @@ impl Lexer {
                 }
             }
             if tokens.len() > MAX_TOKENS {
-                return Err(self
-                    .error_at_token_start(format!("تجاوز البرنامج الحد الأقصى للرموز ({MAX_TOKENS})")));
+                return Err(self.error_at_token_start(format!(
+                    "تجاوز البرنامج الحد الأقصى للرموز ({MAX_TOKENS})"
+                )));
             }
         }
         tokens.push(Token {
@@ -260,9 +261,7 @@ impl Lexer {
             self.advance();
             while let Some(next_family) = digit_family(self.peek()) {
                 if next_family != family {
-                    return Err(self.error_at_cursor(
-                        "لا يجوز خلط مجموعات الأرقام داخل العدد الواحد",
-                    ));
+                    return Err(self.error_at_cursor("لا يجوز خلط مجموعات الأرقام داخل العدد الواحد"));
                 }
                 self.advance();
             }
@@ -889,7 +888,11 @@ mod tests {
                 "unexpected diagnostic for {source:?}: {}",
                 error.message
             );
-            assert_eq!((error.line, error.column), (1, expected_column), "{source:?}");
+            assert_eq!(
+                (error.line, error.column),
+                (1, expected_column),
+                "{source:?}"
+            );
         }
     }
 
@@ -1035,7 +1038,11 @@ mod tests {
             ("اطبع(\"سطر\\\rثانٍ\")؛", (1, 11)),
         ] {
             let error = run(source).unwrap_err();
-            assert!(error.message.contains("سطر جديد"), "{source:?}: {}", error.message);
+            assert!(
+                error.message.contains("سطر جديد"),
+                "{source:?}: {}",
+                error.message
+            );
             assert_eq!((error.line, error.column), expected_location, "{source:?}");
         }
     }
