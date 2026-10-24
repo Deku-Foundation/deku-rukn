@@ -788,9 +788,15 @@ mod tests {
             run("اطبع(خطأ و (١ / ٠ == ٠))؛ اطبع(صحيح أو (١ / ٠ == ٠))؛").unwrap(),
             ["خطأ", "صحيح"]
         );
+        assert_eq!(
+            run("اطبع(خطأ و ١)؛ اطبع(صحيح أو ١)؛").unwrap(),
+            ["خطأ", "صحيح"]
+        );
 
         let error = run("اطبع(١ و صحيح)؛").unwrap_err();
         assert!(error.message.contains("قيمتين منطقيتين"));
+        let right_error = run("اطبع(صحيح و ١)؛").unwrap_err();
+        assert!(right_error.message.contains("قيمتين منطقيتين"));
         assert!(error.line > 0);
         assert!(error.column > 0);
     }
