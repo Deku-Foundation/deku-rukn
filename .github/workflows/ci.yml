@@ -30,7 +30,7 @@ jobs:
       - name: Verify example program
         run: |
           cargo run --locked -- examples/hello.rukn > /tmp/rukn-output.txt
-          diff -u <(printf 'مرحبًا يا العالم\n42\nخطأ\n') /tmp/rukn-output.txt
+          diff -u <(printf 'مرحبًا يا العالم\n42\nخطأ\nصحيح\n') /tmp/rukn-output.txt
 
   docs:
     name: Documentation site
