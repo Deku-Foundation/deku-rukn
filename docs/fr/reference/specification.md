@@ -42,7 +42,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 - L’opérateur + accepte deux nombres ou deux chaînes, sans conversion implicite.
 - Les comparaisons exigent deux nombres.
 - L’égalité compare les valeurs et leurs variantes.
-- و et أو exigent deux booléens, sont associatifs à gauche et utilisent le court-circuit (le côté droit n'est évalué que si nécessaire).
+- و et أو sont associatifs à gauche et utilisent le court-circuit. L'opérande gauche doit produire un booléen. L'opérande droit n'est évalué — et son type n'est vérifié à l'exécution — que si nécessaire ; un opérande ignoré n'est ni évalué ni vérifié. Aucune conversion implicite en booléen n'est effectuée.
 - Une variable inconnue et la division par zéro sont des erreurs.
 - Les résultats numériques non finis produisent un diagnostic.
 - Les instructions sont évaluées dans l’ordre source et la sortie est collectée.
