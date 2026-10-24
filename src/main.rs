@@ -58,12 +58,8 @@ fn read_source(path: &std::ffi::OsStr) -> Result<String, String> {
         ));
     }
 
-    String::from_utf8(bytes).map_err(|error| {
-        format!(
-            "ملف المصدر ليس UTF-8 صالحًا: {}: {}",
-            display_path, error
-        )
-    })
+    String::from_utf8(bytes)
+        .map_err(|error| format!("ملف المصدر ليس UTF-8 صالحًا: {}: {}", display_path, error))
 }
 
 #[cfg(test)]
@@ -72,11 +68,7 @@ mod tests {
     use std::{fs, io::Write, path::PathBuf};
 
     fn temporary_path(label: &str) -> PathBuf {
-        std::env::temp_dir().join(format!(
-            "rukn-cli-{}-{}.rukn",
-            std::process::id(),
-            label
-        ))
+        std::env::temp_dir().join(format!("rukn-cli-{}-{}.rukn", std::process::id(), label))
     }
 
     #[test]
@@ -87,6 +79,17 @@ mod tests {
         let source = read_source(path.as_os_str()).unwrap();
 
         assert_eq!(source, "اطبع(١)؛");
+        fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn accepts_source_files_at_the_size_limit() {
+        let path = temporary_path("at-limit");
+        fs::write(&path, vec![b' '; rukn::MAX_SOURCE_BYTES]).unwrap();
+
+        let source = read_source(path.as_os_str()).unwrap();
+
+        assert_eq!(source.len(), rukn::MAX_SOURCE_BYTES);
         fs::remove_file(path).unwrap();
     }
 
