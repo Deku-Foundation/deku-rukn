@@ -22,10 +22,10 @@ Sortie collectée ou erreur localisée
 ## Composants
 
 - **Lexer :** ponctuation, identifiants, nombres, chaînes, commentaires et mots-clés arabes.
-- **Parseur :** précédence, affectation, blocs entre accolades, conditions et boucles while par descente récursive ; profondeur des blocs bornée.
-- **Évaluateur :** exécution dans l’ordre source avec environnements lexicaux imbriqués. Les blocs créent une portée ; l’affectation met à jour la liaison existante la plus proche. Les conditions de `إذا` et `بينما` doivent être booléennes, avec un budget par exécution pour les évaluations de conditions while. Les types incompatibles et résultats numériques non finis produisent un diagnostic.
+- **Parseur :** précédence, affectation, blocs, conditions, boucles while bornées, déclarations de fonctions nommées, appels et retours par descente récursive. Les fonctions imbriquées sont rejetées ; nombre de paramètres/arguments et imbrication sont bornés.
+- **Évaluateur :** exécution dans l’ordre source avec environnements lexicaux imbriqués. Les fonctions nommées utilisent une table globale et un environnement neuf de paramètres/variables locales ; elles ne capturent pas les variables de l’appelant. Les retours se propagent dans les blocs et conditions ; la récursion est limitée à 128 appels actifs et à 64 arguments par appel. Les conditions de `إذا` et `بينما` doivent être booléennes, avec un budget d’évaluations de boucle par exécution.
 - **CLI :** lit un fichier UTF-8, écrit les résultats sur stdout et les erreurs sur stderr avec un code de sortie non nul.
-- **Tests :** caractères arabes, conversion des chiffres, précédence, erreurs de types, noms inconnus, sources mal formées et limites de ressources.
+- **Tests :** caractères arabes, chiffres, précédence, erreurs de types, noms/affectations inconnus, portées, conditions, boucles, appels nommés, retours, limite de récursion, sources mal formées et limites de ressources.
 
 ## Limites de ressources implémentées
 
@@ -45,6 +45,6 @@ Rust apporte des types énumérés pour les jetons et valeurs, une gestion expli
 
 ## Questions ouvertes
 
-Normalisation Unicode, diacritiques arabes, identifiants confondables, mots réservés, types et mutations, portées, fonctions, modules, format de paquets, stabilité de la bibliothèque, interpréteur ou VM bytecode ou backend natif, ABI/FFI et amorçage du compilateur.
+Normalisation Unicode, diacritiques arabes, identifiants confondables, types et mutabilité, fonctions de première classe/fermetures, modules, format de paquets, bibliothèque standard, interpréteur ou VM bytecode ou backend natif, ABI/FFI et amorçage du compilateur.
 
 L’auto-hébergement ne doit être étudié qu’après stabilisation de la grammaire, de la bibliothèque standard, des diagnostics, du corpus de conformité et du processus d’amorçage.
