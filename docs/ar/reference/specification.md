@@ -24,7 +24,7 @@ description: القواعد الحالية للغة ركن ودلالاتها.
     program      = { statement } ;
     statement    = declaration | print_statement | expression_statement ;
     declaration  = "دع" identifier "=" expression terminator ;
-    print_statement = "اطبع" [ "(" ] expression [ ")" ] terminator ;
+    print_statement = "اطبع" ( "(" expression ")" | expression ) terminator ;
     expression   = logical_or ;
     logical_or   = logical_and { "أو" logical_and } ;
     logical_and  = equality { "و" equality } ;
