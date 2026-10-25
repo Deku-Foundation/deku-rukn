@@ -1812,10 +1812,8 @@ mod tests {
         let duplicate_parameter = run("دالة تكرار(أ, أ) { أرجع أ؛ }").unwrap_err();
         assert!(duplicate_parameter.message.contains("معامل مكرر"));
 
-        let duplicate_function = run(
-            "دالة حساب() { أرجع ١؛ } دالة حساب() { أرجع ٢؛ }",
-        )
-        .unwrap_err();
+        let duplicate_function =
+            run("دالة حساب() { أرجع ١؛ } دالة حساب() { أرجع ٢؛ }").unwrap_err();
         assert!(duplicate_function.message.contains("تعريف دالة مكرر"));
 
         let nested_definition = run("{ دالة محلية() { أرجع ١؛ } }").unwrap_err();
