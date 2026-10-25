@@ -95,7 +95,10 @@ enum TokenKind {
 #[derive(Debug, Clone)]
 struct Token {
     kind: TokenKind,
+    /// Canonical spelling used for keyword matching and identifier lookup.
     lexeme: String,
+    /// Exact spelling as it appeared in source, for diagnostics and source tools.
+    source_lexeme: String,
     line: usize,
     column: usize,
 }
@@ -201,6 +204,7 @@ impl Lexer {
         tokens.push(Token {
             kind: TokenKind::Eof,
             lexeme: String::new(),
+            source_lexeme: String::new(),
             line: self.line,
             column: self.column,
         });
@@ -242,9 +246,11 @@ impl Lexer {
         true
     }
     fn token(&self, kind: TokenKind) -> Token {
+        let lexeme: String = self.chars[self.start..self.current].iter().collect();
         Token {
             kind,
-            lexeme: self.chars[self.start..self.current].iter().collect(),
+            source_lexeme: lexeme.clone(),
+            lexeme,
             line: self.token_line,
             column: self.token_column,
         }
@@ -326,6 +332,7 @@ impl Lexer {
         Token {
             kind,
             lexeme: text,
+            source_lexeme: source_text,
             line: self.token_line,
             column: self.token_column,
         }
