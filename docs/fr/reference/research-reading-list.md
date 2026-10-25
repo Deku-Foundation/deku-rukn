@@ -5,21 +5,21 @@ description: Normes primaires et références d’ingénierie pour un langage de
 
 # Bibliographie technique
 
-**Révisée le 24 octobre 2026.** Cette liste est un point de départ sélectionné, pas une affirmation que Rukn est conforme à toutes les normes citées. Privilégiez les normes primaires et la documentation officielle, et consignez version et date d’accès lorsqu’une décision technique en dépend.
+**Révisée le 25 octobre 2026.** Cette liste est un point de départ sélectionné, pas une affirmation que Rukn est conforme à toutes les normes citées. Privilégiez les normes primaires et la documentation officielle, et consignez version et date d’accès lorsqu’une décision technique en dépend.
 
-## 1. Texte arabe, identifiants et sécurité Unicode
+## 1. Langue arabe, identifiants et sécurité Unicode
 
 | Source | Sujet | État dans Rukn |
 | --- | --- | --- |
-| [UAX #31 — Unicode Identifiers and Syntax](https://www.unicode.org/reports/tr31/) | Propriétés de début/continuation des identifiants et profils | Référence normative ; Rukn utilise `unicode-ident 1.0.27` pour XID, avec le souligné comme adaptation |
-| [UAX #15 — Unicode Normalization Forms](https://www.unicode.org/reports/tr15/) | NFC/NFKC et équivalence | Question ouverte ; les identifiants ne sont pas normalisés |
+| [UAX #31 — Unicode Identifiers and Syntax](https://www.unicode.org/reports/tr31/) | Propriétés des identifiants, profils et normalisation | Référence normative ; Rukn utilise `unicode-ident 1.0.27` et normalise les jetons d’identifiant en NFC avec `unicode-normalization 0.1.25` |
+| [UAX #15 — Unicode Normalization Forms](https://www.unicode.org/reports/tr15/) | NFC/NFKC et équivalence | NFC des identifiants implémentée et testée ; chaînes littérales/commentaires préservés, NFKC non utilisé |
 | [UTS #39 — Unicode Security Mechanisms](https://www.unicode.org/reports/tr39/) | Détection de confusables et mélange de scripts | Question ouverte ; aucun détecteur spécialisé n’existe |
 | [UAX #9 — Unicode Bidirectional Algorithm](https://www.unicode.org/reports/tr9/) | Affichage correct des textes LTR/RTL mixtes | Important pour le code source, les diagnostics, la documentation et les futurs éditeurs |
 | [UTS #55 — Unicode Source Code Handling](https://www.unicode.org/reports/tr55/) | Recommandations Unicode pour le code source | Référence recommandée avant la stabilisation des identifiants et diagnostics |
 
 Les publications Unicode 18.0 actuelles comprennent UAX #31 révision 45 (1 septembre 2026), UAX #15 révision 58 (12 août 2026), UTS #39 révision 34 (27 août 2026) et UAX #9 révision 52 (1 septembre 2026). Utilisez les liens « dernière version » ci-dessus plutôt que des tableaux copiés depuis d’anciens articles. Ces versions ont été vérifiées le 23 octobre 2026.
 
-Rukn utilise [unicode-ident 1.0.27](https://docs.rs/unicode-ident/1.0.27/unicode_ident/) pour classer les identifiants XID ; cette version est verrouillée dans `Cargo.lock`. La mise à jour de cette dépendance peut modifier les noms acceptés et doit donc être traitée comme un changement de spécification avec tests de conformité. La normalisation NFC/NFKC n’est pas implémentée.
+Rukn utilise la version verrouillée [unicode-ident 1.0.27](https://docs.rs/unicode-ident/1.0.27/unicode_ident/) pour XID et [unicode-normalization 0.1.25](https://docs.rs/crate/unicode-normalization/0.1.25) pour NFC. Les deux versions figurent dans `Cargo.lock`. La normalisation intervient avant la reconnaissance des mots-clés/la résolution des noms ; les chaînes littérales et commentaires restent inchangés. Toute mise à jour exige des tests de conformité et une revue de compatibilité.
 
 ### Questions à résoudre
 
@@ -30,6 +30,16 @@ Rukn utilise [unicode-ident 1.0.27](https://docs.rs/unicode-ident/1.0.27/unicode
 5. Comment rendre visibles les contrôles bidirectionnels invisibles dans les éditeurs, diagnostics de terminal et revues de code ?
 
 Utilisez des paires de programmes valides/invalides et un corpus de conformité versionné. Ne normalisez pas silencieusement les chaînes utilisateur comme effet secondaire de la normalisation des identifiants.
+
+### Recherche sur les langages de programmation arabes et la localisation
+
+- [ARABLAN: Design of an Arabic Programming Language (1995)](https://www.sciencedirect.com/science/article/pii/0096055195000062) — conception historique d’un langage arabe, principalement pédagogique.
+- [Designing and Implementing an Arabic Programming Language for Teaching Pupils (2019)](https://doi.org/10.35741/issn.0258-2724.54.3.11) — décrit l’analyse lexicale, syntaxique et sémantique puis la traduction du code arabe vers C++ ; précédent utile, pas preuve d’une chaîne native auto-hébergée.
+- [Arabic Programming Language Evolution—A Survey (2018)](https://www.academia.edu/39953345/Arabic_Programming_Language_Evolution-A_Survey) — synthèse secondaire ; vérifier les sources primaires pour les détails.
+- [Learning to Code in Localized Programming Languages (ACM Learning @ Scale 2017)](https://doi.org/10.1145/3051457.3051464) — étude de plus de 15 000 utilisateurs de Scratch dans cinq pays favorable à la localisation en contexte d’apprentissage ; elle ne prouve pas une supériorité des compilateurs ou binaires grâce à la syntaxe arabe seule.
+- [PWCT2, langage visuel auto-hébergé bilingue (prépublication 2025)](https://arxiv.org/abs/2509.20426) — cas d’étude moderne, pas un benchmark reproduit indépendamment.
+
+Les limites de ces sources et leurs implications sont détaillées dans la [conception d’auto-hébergement](/fr/project/self-hosting-design).
 
 ## 2. Sémantique du langage et implémentation Rust
 
