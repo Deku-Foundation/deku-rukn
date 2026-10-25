@@ -23,7 +23,8 @@ Milestones are evidence-based, not time promises. A feature is complete only whe
 - [x] Add a machine-readable CLI conformance corpus for valid and invalid programs, expected output/error fragment, and exit status.
 - [x] Adopt a pinned Unicode XID_Start / XID_Continue lexical baseline with underscore tailoring and Arabic/Persian regression tests.
 - [ ] Decide identifier normalization, mixed-script/confusable warnings and bidirectional-control diagnostics, with a compatibility corpus.
-- [ ] Add conditions, blocks and lexical scopes after semantics are reviewed.
+- [x] Add boolean conditionals, blocks, lexical scopes and assignment with regression tests.
+- [x] Add a bounded while loop with explicit boolean conditions and a per-run condition-evaluation budget.
 - [ ] Specify number semantics and error codes for tooling.
 - [ ] Stabilize structured diagnostics for editor integration.
 
@@ -32,7 +33,7 @@ Milestones are evidence-based, not time promises. A feature is complete only whe
 - [ ] Functions, parameters and return values.
 - [ ] Collections and iteration.
 - [ ] Modules, imports and a dependency model.
-- [ ] Explicit error propagation and runtime behavior for future loops.
+- [ ] Explicit error propagation and semantics for additional loop forms.
 - [ ] A standard library with documented stability levels.
 
 ## M3 — Tooling
