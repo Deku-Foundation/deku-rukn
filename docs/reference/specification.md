@@ -24,7 +24,7 @@ description: The current grammar, values and semantics of Rukn.
     program      = { statement } ;
     statement    = declaration | print_statement | expression_statement ;
     declaration  = "دع" identifier "=" expression terminator ;
-    print_statement = "اطبع" [ "(" ] expression [ ")" ] terminator ;
+    print_statement = "اطبع" ( "(" expression ")" | expression ) terminator ;
     expression_statement = expression terminator ;
     terminator   = "؛" | ";" ;
     expression   = logical_or ;
