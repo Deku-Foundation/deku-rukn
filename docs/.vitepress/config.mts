@@ -22,6 +22,7 @@ const enSidebar = [
   { text: 'Project', items: [
     { text: 'Visual identity', link: '/project/visual-identity' },
     { text: 'Roadmap', link: '/project/roadmap' },
+    { text: 'Compiler bootstrap', link: '/project/compiler-bootstrap' },
     { text: 'Contributing', link: '/project/contributing' },
   ] },
 ]
@@ -46,6 +47,7 @@ const arSidebar = [
   { text: 'المشروع', items: [
     { text: 'الهوية البصرية', link: '/ar/project/visual-identity' },
     { text: 'خارطة الطريق', link: '/ar/project/roadmap' },
+    { text: 'إقلاع المترجم', link: '/ar/project/compiler-bootstrap' },
     { text: 'المساهمة', link: '/ar/project/contributing' },
   ] },
 ]
@@ -70,6 +72,7 @@ const frSidebar = [
   { text: 'Projet', items: [
     { text: 'Identité visuelle', link: '/fr/project/visual-identity' },
     { text: 'Feuille de route', link: '/fr/project/roadmap' },
+    { text: 'Amorçage du compilateur', link: '/fr/project/compiler-bootstrap' },
     { text: 'Contribuer', link: '/fr/project/contributing' },
   ] },
 ]
