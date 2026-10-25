@@ -62,6 +62,6 @@ Résultat attendu :
 
 **Expérimental · pré-alpha · non destiné à la production.**
 
-Rukn n’implémente pas encore les fonctions, les boucles, les modules, les collections, un gestionnaire de paquets, une VM bytecode, la compilation native, l’intégration IDE ou l’auto-hébergement. Ce sont des objectifs futurs, pas des fonctionnalités disponibles.
+Rukn prend maintenant en charge l’affectation, les blocs à portée lexicale, les conditions booléennes et une boucle `بينما` bornée. Les fonctions, fermetures, modules, collections, gestionnaire de paquets, VM bytecode, compilation native, intégration IDE et auto-hébergement restent des objectifs futurs.
 
 Les priorités immédiates sont une spécification précise, des diagnostics fiables, une politique des identifiants Unicode, des tests de non-régression et une construction reproductible du site.
