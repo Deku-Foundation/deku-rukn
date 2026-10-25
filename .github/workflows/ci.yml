@@ -35,6 +35,10 @@ jobs:
         run: |
           cargo run --locked -- examples/functions.rukn > /tmp/rukn-functions-output.txt
           diff -u <(printf '42\n120\n5\n9\n') /tmp/rukn-functions-output.txt
+      - name: Verify immutable list example
+        run: |
+          cargo run --locked -- examples/lists.rukn > /tmp/rukn-lists-output.txt
+          diff -u <(printf '1\n3\n4\n5\n') /tmp/rukn-lists-output.txt
 
   docs:
     name: Documentation site
