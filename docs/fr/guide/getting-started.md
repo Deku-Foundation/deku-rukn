@@ -36,4 +36,4 @@ Sortie attendue pour `hello.rukn` :
     دع العدد = ٦ * ٧؛
     اطبع(العدد)؛
 
-Chaque instruction se termine par ؛ ou ;. Le programme accepte un seul fichier source. Les fonctions nommées, paramètres, retours, récursion et boucles sont pris en charge expérimentalement. Les valeurs de fonction de première classe, fermetures, modules/imports, collections, accès fichiers/réseau depuis le langage, VM bytecode et compilation native ne sont pas encore implémentés.
+Chaque instruction se termine par ؛ ou ;. Le programme accepte un seul fichier source. Les fonctions nommées, références de fonction comme valeurs, appels d’ordre supérieur, paramètres, retours, récursion et boucles sont pris en charge expérimentalement. Les fermetures, modules/imports, collections, accès fichiers/réseau depuis le langage, VM bytecode et compilation native ne sont pas encore implémentés.
