@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
 use unicode_ident::{is_xid_continue, is_xid_start};
+use unicode_normalization::UnicodeNormalization;
 
 /// Maximum source size in UTF-8 bytes accepted by the interpreter and CLI.
 pub const MAX_SOURCE_BYTES: usize = 1_048_576;
@@ -303,7 +304,10 @@ impl Lexer {
         while is_identifier_continue(self.peek()) {
             self.advance();
         }
-        let text: String = self.chars[self.start..self.current].iter().collect();
+        // Normalize identifier spelling to NFC before keyword recognition and name lookup.
+        // String/comment contents are handled by separate lexer paths and are never normalized.
+        let source_text: String = self.chars[self.start..self.current].iter().collect();
+        let text: String = source_text.nfc().collect();
         let kind = match text.as_str() {
             "دع" => TokenKind::Let,
             "اطبع" => TokenKind::Print,
@@ -319,7 +323,12 @@ impl Lexer {
             "أو" => TokenKind::Or,
             _ => TokenKind::Identifier,
         };
-        self.token(kind)
+        Token {
+            kind,
+            lexeme: text,
+            line: self.token_line,
+            column: self.token_column,
+        }
     }
     fn error_at_token_start(&self, message: String) -> LangError {
         LangError {
@@ -1780,6 +1789,26 @@ mod tests {
         let source = "دع عَلم = ٧؛ اطبع(عَلم)؛ دع پ = ۳؛ اطبع(پ)؛";
         assert_eq!(run(source).unwrap(), ["7", "3"]);
     }
+    #[test]
+    fn canonically_equivalent_arabic_identifiers_share_one_binding() {
+        // U+0627 ARABIC LETTER ALEF + U+0654 HAMZA ABOVE normalizes to U+0623 ALEF WITH HAMZA ABOVE.
+        let source = "دع أ = ٧؛ اطبع(ا\u{0654})؛";
+        assert_eq!(run(source).unwrap(), ["7"]);
+    }
+
+    #[test]
+    fn normalization_does_not_rewrite_string_literal_contents() {
+        let source = "اطبع(«ا\u{0654}»)؛";
+        assert_eq!(run(source).unwrap(), ["ا\u{0654}"]);
+    }
+
+    #[test]
+    fn canonically_equivalent_keyword_spellings_are_recognized() {
+        // The decomposed spelling of «أرجع» must be recognized by the same lexer rule.
+        let source = "دالة قيمة() { ا\u{0654}رجع ٣؛ } اطبع(قيمة())؛";
+        assert_eq!(run(source).unwrap(), ["3"]);
+    }
+
     #[test]
     fn accepts_supplementary_plane_unicode_identifiers() {
         // U+10400 (DESERET CAPITAL LETTER LONG I) is an XID_Start character.
