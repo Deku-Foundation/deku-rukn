@@ -12,14 +12,15 @@ Les étapes reposent sur des preuves, pas sur des dates promises. Une fonctionna
 - [x] Crate Rust, CLI et premiers tests.
 - [x] Mots-clés arabes, identifiants Unicode et diagnostics.
 - [x] Grammaire initiale et documentation trilingue.
-- [ ] CI réussie pour formatage, lint, tests et sortie de l’exemple.
-- [ ] Processus de décisions de conception examiné et documenté.
+- [x] CI réussie pour formatage, lint, tests et sortie de l’exemple.
+- [x] Processus de décisions de conception examiné et documenté.
 
 ## M1 — Noyau du langage
 
 - [x] Limites de taille source, de jetons et de profondeur syntaxique ; rejet des résultats numériques non finis.
 - [x] Ajouter une cible de fuzzing de bout en bout, bornée et hebdomadaire, pour l’API publique de l’interpréteur.
-- [ ] Ajouter le fuzzing ciblé du parseur et un corpus machine-readable de programmes invalides.
+- [ ] Ajouter le fuzzing ciblé du parseur.
+- [x] Ajouter un corpus CLI machine-readable pour programmes valides et invalides, sortie/fragment d’erreur attendus et code de sortie.
 - [x] Adopter un profil lexical `XID_Start` / `XID_Continue` verrouillé, avec adaptation du souligné et tests de régression arabes/persans.
 - [ ] Décider la normalisation des identifiants, les avertissements de scripts mélangés/confusables et les diagnostics des contrôles bidirectionnels, avec un corpus de compatibilité.
 - [ ] Conditions, blocs et portées après revue sémantique.
@@ -43,6 +44,10 @@ Les étapes reposent sur des preuves, pas sur des dates promises. Une fonctionna
 - [ ] Benchmarks et corpus de non-régression.
 
 ## M4 — Recherche sur le compilateur et l’amorçage
+
+Voir la [stratégie d’amorçage du compilateur](/fr/project/compiler-bootstrap) pour les étapes et critères d’acceptation.
+
+- [x] Documenter l’objectif d’auto-hébergement, la nécessité d’un stade zéro et la validation par étapes.
 
 - [ ] Représentation intermédiaire stable.
 - [ ] Comparaison mesurée de l’interpréteur, de la VM bytecode et de la compilation native avec un corpus commun.
