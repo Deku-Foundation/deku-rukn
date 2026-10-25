@@ -13,7 +13,7 @@ description: Plan pratique pour tester le lexer, le parseur, l’évaluateur, la
 | --- | --- | --- |
 | Lexer | Types de jetons, conversion des chiffres, positions, caractères invalides | Points-virgules arabes/ASCII, trois familles de chiffres, chaîne non terminée |
 | Parseur | Précédence, associativité, terminators, profondeur bornée | `2 + 3 * 4`, parenthèse manquante, expression très imbriquée |
-| Évaluateur | Sémantique des valeurs et échecs | Addition de types différents, nom inconnu, division par zéro, résultat non fini |
+| Évaluateur | Sémantique des valeurs et échecs | Addition de types différents, nom inconnu, division par zéro, résultat non fini, budget de copies de chaînes |
 | CLI | Entrée fichier, stdout/stderr, codes de sortie | Chemin absent, arguments multiples, fichier non UTF-8 |
 | Documentation | Liens et exemples exacts | Construire les trois locales et comparer l’exemple au résultat CI |
 | Publication | Contrôles reproductibles et compatibilité | Dépendances verrouillées, revue de la spécification, liste de publication |
@@ -25,7 +25,7 @@ description: Plan pratique pour tester le lexer, le parseur, l’évaluateur, la
 - La normalisation numérique conserve la valeur représentée par chaque famille de chiffres acceptée.
 - La précédence des opérateurs doit correspondre à la spécification et couvrir des combinaisons mixtes.
 - Une opération invalide doit produire un diagnostic plutôt qu’infini ou NaN silencieux.
-- Les limites de source, de jetons et de profondeur doivent rejeter les entrées excessives de façon prévisible.
+- Les limites de source, de jetons, de profondeur, de taille d’une chaîne et du budget cumulé d’allocations/copies doivent rejeter les entrées excessives de façon prévisible.
 - Chaque exemple documentaire provient d’un fichier réel ou est explicitement présenté comme illustratif.
 
 Un corpus lisible par machine associant source, stdout attendu, catégorie d’erreur et code de sortie faciliterait les tests et la comparaison future de plusieurs implémentations.
