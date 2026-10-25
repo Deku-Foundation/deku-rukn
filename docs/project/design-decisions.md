@@ -26,6 +26,7 @@ A programming language needs a decision record, not just a roadmap. This page tr
 | RUKN-DR-0006 | Numeric literal digit-family consistency | Implemented experimental default in draft 0.3; compatibility review remains open | Tests for all supported digit families, decimal separators, exact error locations and a migration note for mixed-family literals |
 | RUKN-DR-0007 | Runtime string size and cumulative copy budget | Implemented guardrail in draft 0.4; conservative accounting, not a sandbox | Regression tests for repeated copies, concatenation and print output; review limits before 1.0 and for embedding |
 | RUKN-DR-0008 | Minimum control-flow core and lexical scopes | Implemented experimental baseline in draft 0.5 | Conformance cases for scope/shadowing, assignment, boolean conditions, loop limits and malformed blocks; revisit language ergonomics before 1.0 |
+| RUKN-DR-0009 | Named functions, return flow and recursion limits | Implemented experimental baseline in draft 0.6; top-level named functions only, not first-class values | Tests for exact arity, recursive calls, return propagation, no caller-local capture and call-depth limit; closures and function values remain deferred |
 
 These entries are research topics, not approvals to implement a specific option.
 
