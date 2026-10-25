@@ -103,6 +103,16 @@ struct Token {
     column: usize,
 }
 
+impl Token {
+    fn display_lexeme(&self) -> &str {
+        if self.source_lexeme.is_empty() {
+            &self.lexeme
+        } else {
+            &self.source_lexeme
+        }
+    }
+}
+
 struct Lexer {
     chars: Vec<char>,
     start: usize,
@@ -249,8 +259,8 @@ impl Lexer {
         let lexeme: String = self.chars[self.start..self.current].iter().collect();
         Token {
             kind,
-            source_lexeme: lexeme.clone(),
             lexeme,
+            source_lexeme: String::new(),
             line: self.token_line,
             column: self.token_column,
         }
@@ -329,10 +339,15 @@ impl Lexer {
             "أو" => TokenKind::Or,
             _ => TokenKind::Identifier,
         };
+        let source_lexeme = if source_text == text {
+            String::new()
+        } else {
+            source_text
+        };
         Token {
             kind,
             lexeme: text,
-            source_lexeme: source_text,
+            source_lexeme,
             line: self.token_line,
             column: self.token_column,
         }
@@ -577,7 +592,7 @@ impl Parser {
                 })
             {
                 return Err(LangError::at(
-                    format!("تعريف دالة مكرر: {}", name.source_lexeme),
+                    format!("تعريف دالة مكرر: {}", name.display_lexeme()),
                     name,
                 ));
             }
@@ -597,7 +612,7 @@ impl Parser {
             let name = self.consume(TokenKind::Identifier, "توقعت اسمًا بعد «دالة»")?;
             if is_builtin_function(&name.lexeme) {
                 return Err(LangError::at(
-                    format!("اسم «{}» محجوز لدالة مدمجة", name.source_lexeme),
+                    format!("اسم «{}» محجوز لدالة مدمجة", name.display_lexeme()),
                     &name,
                 ));
             }
@@ -617,7 +632,7 @@ impl Parser {
                         .any(|existing: &Token| existing.lexeme == parameter.lexeme)
                     {
                         return Err(LangError::at(
-                            format!("اسم معامل مكرر: {}", parameter.source_lexeme),
+                            format!("اسم معامل مكرر: {}", parameter.display_lexeme()),
                             &parameter,
                         ));
                     }
@@ -1236,7 +1251,7 @@ impl Interpreter {
             }
         }
         Err(LangError::at(
-            format!("إسناد إلى متغير غير معرّف: {}", name.source_lexeme),
+            format!("إسناد إلى متغير غير معرّف: {}", name.display_lexeme()),
             name,
         ))
     }
@@ -1566,7 +1581,7 @@ impl Interpreter {
                         .then(|| Value::Function(name.lexeme.clone()))
                     })
                     .ok_or_else(|| {
-                        LangError::at(format!("متغير غير معرّف: {}", name.source_lexeme), name)
+                        LangError::at(format!("متغير غير معرّف: {}", name.display_lexeme()), name)
                     })?;
                 self.reserve_runtime_string_bytes(value.string_bytes(), name)?;
                 Ok(value)
@@ -1588,7 +1603,7 @@ impl Interpreter {
                         .then(|| Value::Function(name.lexeme.clone()))
                     })
                     .ok_or_else(|| {
-                        LangError::at(format!("دالة غير معرّفة: {}", name.source_lexeme), name)
+                        LangError::at(format!("دالة غير معرّفة: {}", name.display_lexeme()), name)
                     })?;
                 self.reserve_runtime_string_bytes(callee.string_bytes(), name)?;
                 match callee {
@@ -1596,7 +1611,7 @@ impl Interpreter {
                         self.call_function(&function_name, name, paren, arguments)
                     }
                     _ => Err(LangError::at(
-                        format!("القيمة «{}» ليست دالة قابلة للاستدعاء", name.source_lexeme),
+                        format!("القيمة «{}» ليست دالة قابلة للاستدعاء", name.display_lexeme()),
                         name,
                     )),
                 }
