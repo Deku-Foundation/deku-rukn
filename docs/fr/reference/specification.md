@@ -5,7 +5,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 
 # Spécification du langage Rukn
 
-**État : brouillon 0.6.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
+**État : brouillon 0.7.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
 
 ## Règles lexicales
 
@@ -60,7 +60,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 - L’affectation d’un nom non défini est une erreur. L’affectation est une instruction, pas une expression.
 - Les conditions de إذا et بينما doivent produire un booléen ; aucune conversion implicite de vérité n’est effectuée.
 - Les conditions de boucle sont évaluées dans l’ordre source. Au-delà de 1 000 000 évaluations cumulées de conditions while, l’exécution est interrompue pour borner les boucles incontrôlées.
-- Les fonctions se déclarent avec `دالة nom(paramètre, ...)` et sont autorisées uniquement au niveau supérieur dans cette version. Leurs noms sont enregistrés avant l’exécution des instructions ; les appels anticipés et la récursion mutuelle sont donc pris en charge. Les noms de fonctions dupliqués sont rejetés à l’analyse. Les fonctions appartiennent à un espace global distinct ; ce ne sont pas des valeurs de première classe pouvant être affectées, retournées ou stockées.
+- Les fonctions se déclarent avec `دالة nom(paramètre, ...)` et sont autorisées uniquement au niveau supérieur dans cette version. Leurs noms sont enregistrés avant l’exécution des instructions ; les appels anticipés et la récursion mutuelle sont donc pris en charge. Les noms dupliqués sont rejetés à l’analyse. Lorsqu’aucune variable lexicale ne masque le nom, une référence nommée de fonction est une valeur qui peut être affectée, passée comme argument ou retournée. Les appels utilisent la forme `nom(...)` : un alias peut être appelé, mais les résultats d’appel arbitraires ne peuvent pas encore être chaînés directement sans variable intermédiaire. Les références ne capturent pas d’environnement ; les fermetures et déclarations de fonctions imbriquées restent non prises en charge.
 - Les arguments sont évalués de gauche à droite dans l’environnement de l’appelant. L’arité doit correspondre exactement ; au plus 64 paramètres/arguments sont admis.
 - Le corps d’une fonction s’exécute avec l’environnement global et un nouvel environnement de paramètres/variables locales. Il ne capture pas les variables locales de l’appelant ; les fermetures et déclarations de fonctions imbriquées ne sont pas prises en charge. Les affectations globales persistent après l’appel.
 - `أرجع expression؛` retourne une valeur ; `أرجع؛` retourne `لاشيء`. Une fonction qui termine sans retour explicite retourne aussi `لاشيء`. Un retour hors fonction produit une erreur.
@@ -88,4 +88,4 @@ Le budget compte de manière conservative les copies de valeurs chaîne, les ré
 
 ## Lacunes connues
 
-La grammaire n’est pas encore générée depuis une définition formelle. La normalisation Unicode, la politique sur les identifiants visuellement confondables, les liaisons immuables, un système de types statique, les fonctions de première classe et les fermetures, les collections, modules, une IR typée, une VM bytecode et un corpus commun aux futures implémentations interpréteur/VM/compilateur restent des travaux ouverts avant une version stable.
+La grammaire n’est pas encore générée depuis une définition formelle. La normalisation Unicode, la politique sur les identifiants visuellement confondables, les liaisons immuables, un système de types statique, les fermetures, les collections, modules, une IR typée, une VM bytecode et un corpus commun aux futures implémentations interpréteur/VM/compilateur restent des travaux ouverts avant une version stable.
