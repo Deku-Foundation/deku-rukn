@@ -31,3 +31,5 @@ function_arity_mismatch	1		تتطلب 1 معاملًا	دالة واحدة(أ) {
 duplicate_function_parameter	1		معامل مكرر	دالة تكرار(أ, أ) { أرجع أ؛ }
 nested_function_definition	1		المستوى الأعلى	{ دالة محلية() { أرجع ١؛ } }
 recursion_depth_limit	1		عمق استدعاء الدوال	دالة تكرار() { أرجع تكرار()؛ } اطبع(تكرار())؛
+forward_function_reference	0	7\n		دالة أ() { أرجع ب()؛ } دالة ب() { أرجع ٧؛ } اطبع(أ())؛
+duplicate_function_definition	1		تعريف دالة مكرر	دالة حساب() { أرجع ١؛ } دالة حساب() { أرجع ٢؛ }
