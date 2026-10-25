@@ -108,7 +108,17 @@ Expected output:
 
 `أرجع expression؛` returns a value. `أرجع؛` returns `لاشيء`, and reaching the end of a function without an explicit return also returns `لاشيء`. A return statement outside a function is an error. Functions may be declared only at top level in this version and support recursion up to 128 active calls. At most 64 parameters or arguments are allowed.
 
-Functions are named callable declarations, not first-class values. They cannot be stored in variables or returned, nested function declarations are rejected, and they do not capture local variables from the caller. Closures, modules and a static type checker are future work.
+A named function can also be used as a value: assign it to a variable, pass it to another function, or return it from a function. Calls still use identifier syntax, so store a returned function in a variable before calling it. Function references do not capture caller-local variables; closures, nested declarations, modules and a static type checker remain future work.
+
+```rukn
+دالة جمع(أ, ب) { أرجع أ + ب؛ }
+دالة تطبيق(عملية, أ, ب) { أرجع عملية(أ, ب)؛ }
+دع العملية = جمع؛
+اطبع(العملية(٢, ٣))؛
+اطبع(تطبيق(جمع, ٤, ٥))؛
+```
+
+Expected output: `5` and `9`.
 
 ## Values
 
@@ -153,7 +163,7 @@ Undefined variables, malformed strings, unsupported characters, division by zero
 
 ## Not part of the language yet
 
-Closures, first-class function values, collections, user-defined types, modules, explicit error-handling syntax, a static type checker and a stable ABI are not implemented yet. Named functions, parameters, returns, recursion, conditionals, blocks, lexical scopes, assignment and bounded while loops are implemented. See the specification and roadmap.
+Closures, anonymous functions, arbitrary call-expression chaining, collections, user-defined types, modules, explicit error-handling syntax, a static type checker and a stable ABI are not implemented yet. Named function values, higher-order calls, parameters, returns, recursion, conditionals, blocks, lexical scopes, assignment and bounded while loops are implemented. See the specification and roadmap.
 
 
 ## Unicode identifiers
