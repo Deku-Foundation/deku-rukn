@@ -42,6 +42,8 @@ Expected output:
 صحيح
 ```
 
+The repository also contains focused examples: [named functions and recursion](examples/functions.rukn) and [immutable lists, indexing and built-ins](examples/lists.rukn). Run them with `cargo run --locked -- examples/functions.rukn` and `cargo run --locked -- examples/lists.rukn`.
+
 ## Design principles
 
 - **Arabic-first syntax:** Arabic keywords, Unicode identifiers and Arabic-Indic numerals; each numeric literal uses one digit family consistently.
