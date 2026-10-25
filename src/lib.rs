@@ -945,13 +945,14 @@ enum Value {
     Number(f64),
     String(String),
     Bool(bool),
+    Function(String),
     Nil,
 }
 impl Value {
     fn string_bytes(&self) -> usize {
         match self {
             Self::String(value) => value.len(),
-            Self::Number(_) | Self::Bool(_) | Self::Nil => 0,
+            Self::Number(_) | Self::Bool(_) | Self::Function(_) | Self::Nil => 0,
         }
     }
 }
@@ -963,6 +964,7 @@ impl fmt::Display for Value {
             Self::String(s) => write!(f, "{s}"),
             Self::Bool(true) => write!(f, "صحيح"),
             Self::Bool(false) => write!(f, "خطأ"),
+            Self::Function(name) => write!(f, "<دالة {name}>"),
             Self::Nil => write!(f, "لاشيء"),
         }
     }
@@ -1178,20 +1180,21 @@ impl Interpreter {
 
     fn call_function(
         &mut self,
-        name: &Token,
+        function_name: &str,
+        callsite: &Token,
         closing_paren: &Token,
         arguments: &[Expr],
     ) -> Result<Value, LangError> {
         let function = self
             .functions
-            .get(&name.lexeme)
+            .get(function_name)
             .cloned()
-            .ok_or_else(|| LangError::at(format!("دالة غير معرّفة: {}", name.lexeme), name))?;
+            .ok_or_else(|| LangError::at(format!("دالة غير معرّفة: {function_name}"), callsite))?;
         if arguments.len() != function.parameters.len() {
             return Err(LangError::at(
                 format!(
                     "الدالة «{}» تتطلب {} معاملًا، لكن استُخدم {}",
-                    name.lexeme,
+                    function_name,
                     function.parameters.len(),
                     arguments.len()
                 ),
@@ -1201,7 +1204,7 @@ impl Interpreter {
         if self.call_depth >= MAX_CALL_DEPTH {
             return Err(LangError::at(
                 format!("تجاوز البرنامج الحد الأقصى لعمق استدعاء الدوال ({MAX_CALL_DEPTH})"),
-                name,
+                callsite,
             ));
         }
 
@@ -1218,12 +1221,12 @@ impl Interpreter {
         if let Some(global_scope) = self.environment.first() {
             for value in global_scope.values() {
                 let Some(total) = global_string_bytes.checked_add(value.string_bytes()) else {
-                    return Err(LangError::at("تجاوز ميزانية النصوص في النطاق العام", name));
+                    return Err(LangError::at("تجاوز ميزانية النصوص في النطاق العام", callsite));
                 };
                 global_string_bytes = total;
             }
         }
-        self.reserve_runtime_string_bytes(global_string_bytes, name)?;
+        self.reserve_runtime_string_bytes(global_string_bytes, callsite)?;
         let global_scope = self.environment.first().cloned().unwrap_or_default();
         let mut caller_environment = std::mem::take(&mut self.environment);
         self.environment = vec![global_scope, parameter_scope];
@@ -1299,6 +1302,11 @@ impl Interpreter {
                     .rev()
                     .find_map(|scope| scope.get(&name.lexeme))
                     .cloned()
+                    .or_else(|| {
+                        self.functions
+                            .contains_key(&name.lexeme)
+                            .then(|| Value::Function(name.lexeme.clone()))
+                    })
                     .ok_or_else(|| {
                         LangError::at(format!("متغير غير معرّف: {}", name.lexeme), name)
                     })?;
@@ -1309,7 +1317,31 @@ impl Interpreter {
                 name,
                 paren,
                 arguments,
-            } => self.call_function(name, paren, arguments),
+            } => {
+                let callee = self
+                    .environment
+                    .iter()
+                    .rev()
+                    .find_map(|scope| scope.get(&name.lexeme))
+                    .cloned()
+                    .or_else(|| {
+                        self.functions
+                            .contains_key(&name.lexeme)
+                            .then(|| Value::Function(name.lexeme.clone()))
+                    })
+                    .ok_or_else(|| {
+                        LangError::at(format!("دالة غير معرّفة: {}", name.lexeme), name)
+                    })?;
+                match callee {
+                    Value::Function(function_name) => {
+                        self.call_function(&function_name, name, paren, arguments)
+                    }
+                    _ => Err(LangError::at(
+                        format!("القيمة «{}» ليست دالة قابلة للاستدعاء", name.lexeme),
+                        name,
+                    )),
+                }
+            },
             Expr::Grouping(expr) => self.evaluate(expr),
             Expr::Unary { operator, right } => {
                 let right = self.evaluate(right)?;
