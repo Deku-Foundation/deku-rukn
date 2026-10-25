@@ -84,7 +84,7 @@ L’implémentation applique actuellement les limites suivantes :
 | Profondeur active des appels de fonction | 128 |
 | Paramètres / arguments de fonction | 64 |
 
-Le budget compte de manière conservative les copies de valeurs chaîne, les résultats de concaténation et la sortie collectée pendant une exécution. Il s’agit d’un comptage cumulatif, et non d’une mesure exacte du tas encore vivant. Les entrées dépassant ces bornes sont rejetées avec une erreur du langage. Ces limites d’implémentation peuvent évoluer avant une version stable ; elles ne constituent pas un bac à sable formel ni une garantie contre toutes les formes de déni de service.
+Le budget compte de manière conservative les copies de valeurs chaîne, les copies des noms de références de fonction, les résultats de concaténation et la sortie collectée pendant une exécution. Il s’agit d’un comptage cumulatif, et non d’une mesure exacte du tas encore vivant. Les entrées dépassant ces bornes sont rejetées avec une erreur du langage. Ces limites d’implémentation peuvent évoluer avant une version stable ; elles ne constituent pas un bac à sable formel ni une garantie contre toutes les formes de déni de service.
 
 ## Lacunes connues
 
