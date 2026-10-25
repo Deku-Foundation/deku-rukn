@@ -11,7 +11,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 
 - Les fichiers source sont en UTF-8.
 - Un identifiant commence par un souligné ou un caractère Unicode `XID_Start`; les caractères suivants utilisent `XID_Continue` ou le souligné, via la dépendance verrouillée `unicode-ident 1.0.27` (UAX #31). Les marques combinantes autorisées peuvent suivre le premier caractère.
-- Les jetons d’identifiant sont normalisés en NFC via la dépendance verrouillée `unicode-normalization 0.1.25` avant la reconnaissance des mots-clés et la résolution des noms. Les formes canoniquement équivalentes désignent la même liaison ; les positions de ligne/colonne restent celles du source d’origine. Le contenu des chaînes littérales et des commentaires n’est pas normalisé.
+- Les jetons d’identifiant sont normalisés en NFC via la dépendance verrouillée `unicode-normalization 0.1.25` avant la reconnaissance des mots-clés et la résolution des noms. Les formes canoniquement équivalentes désignent la même liaison ; les positions de ligne/colonne et l’orthographe source pour les diagnostics sont conservées. Une orthographe brute supplémentaire n’est pas stockée lorsque NFC ne change pas le nom. Le contenu des chaînes littérales et des commentaires n’est pas normalisé.
 - NFC ne détecte ni les confusables visuels ni le mélange de scripts. Les avertissements de confusables, la politique de scripts mixtes et les outils de présentation/diagnostic bidirectionnels du source ne sont pas encore implémentés.
 - La notation scientifique ne fait pas partie de la grammaire numérique actuelle.
 - Mots réservés : دع, اطبع, دالة, أرجع, إذا, وإلا, بينما, صحيح, خطأ, لاشيء, و, أو.
