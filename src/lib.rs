@@ -2,7 +2,6 @@
 use std::collections::HashMap;
 use std::fmt;
 use std::rc::Rc;
-use std::sync::Arc;
 use unicode_ident::{is_xid_continue, is_xid_start};
 
 /// Maximum source size in UTF-8 bytes accepted by the interpreter and CLI.
@@ -1103,7 +1102,7 @@ fn is_builtin_function(name: &str) -> bool {
 #[derive(Debug, Clone)]
 struct FunctionDef {
     parameters: Vec<Token>,
-    body: Arc<Vec<Stmt>>,
+    body: Rc<Vec<Stmt>>,
 }
 
 enum Flow {
@@ -1168,7 +1167,7 @@ impl Interpreter {
                     name.lexeme.clone(),
                     FunctionDef {
                         parameters: parameters.clone(),
-                        body: Arc::new(body.clone()),
+                        body: Rc::new(body.clone()),
                     },
                 );
             }
