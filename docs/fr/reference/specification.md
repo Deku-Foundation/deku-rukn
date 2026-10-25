@@ -67,7 +67,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 - Les arguments sont évalués de gauche à droite dans l’environnement de l’appelant. L’arité doit correspondre exactement ; au plus 64 paramètres/arguments sont admis.
 - Le corps d’une fonction s’exécute avec l’environnement global et un nouvel environnement de paramètres/variables locales. Il ne capture pas les variables locales de l’appelant ; les fermetures et déclarations de fonctions imbriquées ne sont pas prises en charge. Les affectations globales persistent après l’appel.
 - `أرجع expression؛` retourne une valeur ; `أرجع؛` retourne `لاشيء`. Une fonction qui termine sans retour explicite retourne aussi `لاشيء`. Un retour hors fonction produit une erreur.
-- Les appels récursifs sont pris en charge avec une profondeur active maximale de 128 ; la profondeur d’expression est bornée indépendamment dans chaque cadre de fonction.
+- Les appels récursifs sont pris en charge avec une profondeur active maximale de 32 dans l’interpréteur arborescent actuel ; une pile gérée par une VM est nécessaire avant d’augmenter cette limite ; la profondeur d’expression est bornée indépendamment dans chaque cadre de fonction.
 - Les littéraux liste utilisent des crochets et des expressions séparées par des virgules, par exemple `[١, «texte», صحيح]`. Les listes sont immuables et peuvent contenir des types différents. L’indexation commence à zéro et exige un entier fini et non négatif. Un index de liste retourne un élément ; un index de chaîne retourne une valeur Unicode scalaire sous forme de chaîne. Un index hors limites est une erreur.
 - La fonction intégrée `طول(valeur)` accepte une chaîne ou une liste et retourne un nombre. La longueur et l’indexation des chaînes comptent les valeurs Unicode scalaires, pas les graphèmes. `أضف(liste, valeur)` retourne une nouvelle liste contenant l’élément ajouté sans modifier la liste initiale. Ces fonctions intégrées peuvent être passées comme valeurs ; leurs noms sont réservés.
 - Une variable inconnue et la division par zéro sont des erreurs.
@@ -86,7 +86,7 @@ L’implémentation applique actuellement les limites suivantes :
 | Taille d’une chaîne à l’exécution | 1 048 576 octets UTF-8 (1 Mio) |
 | Budget cumulé d’allocations/copies de chaînes par exécution | 16 777 216 octets (16 Mio) |
 | Évaluations des conditions while par exécution | 1 000 000 |
-| Profondeur active des appels de fonction | 128 |
+| Profondeur active des appels de fonction dans l’interpréteur arborescent | 32 |
 | Paramètres / arguments de fonction | 64 |
 | Éléments par liste | 16 384 |
 | Budget cumulé des éléments de listes créés/copiés par exécution | 1 000 000 |
