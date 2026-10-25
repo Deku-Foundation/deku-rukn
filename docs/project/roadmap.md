@@ -22,7 +22,8 @@ Milestones are evidence-based, not time promises. A feature is complete only whe
 - [ ] Add parser-focused fuzzing.
 - [x] Add a machine-readable CLI conformance corpus for valid and invalid programs, expected output/error fragment, and exit status.
 - [x] Adopt a pinned Unicode XID_Start / XID_Continue lexical baseline with underscore tailoring and Arabic/Persian regression tests.
-- [ ] Decide identifier normalization, mixed-script/confusable warnings and bidirectional-control diagnostics, with a compatibility corpus.
+- [x] Normalize identifier tokens to NFC before keyword recognition and name lookup; preserve literal text/comments and original source positions, with canonical-equivalence regression tests (draft 0.9).
+- [ ] Define confusable/mixed-script warnings and syntax-aware bidirectional source display/diagnostics, with a compatibility corpus.
 - [x] Add boolean conditionals, blocks, lexical scopes and assignment with regression tests.
 - [x] Add a bounded while loop with explicit boolean conditions and a per-run condition-evaluation budget.
 - [ ] Specify number semantics and error codes for tooling.
