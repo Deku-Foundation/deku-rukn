@@ -1846,6 +1846,24 @@ mod tests {
     }
 
     #[test]
+    fn rejects_bidirectional_format_controls_in_executable_tokens() {
+        let source = format!("دع قيمة = ١؛ {}", '\u{202E}');
+        let error = run(&source).unwrap_err();
+        assert!(
+            error.message.contains("U+202E"),
+            "unexpected bidi-control diagnostic: {}",
+            error.message
+        );
+    }
+
+    #[test]
+    fn preserves_bidirectional_controls_inside_string_literals() {
+        let control = '\u{202E}';
+        let source = format!("اطبع(«قبل{control}بعد»)؛");
+        assert_eq!(run(&source).unwrap(), [format!("قبل{control}بعد")]);
+    }
+
+    #[test]
     fn accepts_supplementary_plane_unicode_identifiers() {
         // U+10400 (DESERET CAPITAL LETTER LONG I) is an XID_Start character.
         // This guards the scanner against accidental BMP-only identifier logic.
