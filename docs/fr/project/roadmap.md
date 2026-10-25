@@ -22,7 +22,8 @@ Les étapes reposent sur des preuves, pas sur des dates promises. Une fonctionna
 - [ ] Ajouter le fuzzing ciblé du parseur.
 - [x] Ajouter un corpus CLI machine-readable pour programmes valides et invalides, sortie/fragment d’erreur attendus et code de sortie.
 - [x] Adopter un profil lexical `XID_Start` / `XID_Continue` verrouillé, avec adaptation du souligné et tests de régression arabes/persans.
-- [ ] Décider la normalisation des identifiants, les avertissements de scripts mélangés/confusables et les diagnostics des contrôles bidirectionnels, avec un corpus de compatibilité.
+- [x] Normaliser les jetons d’identifiant en NFC avant la reconnaissance des mots-clés et la résolution des noms ; préserver littéraux/commentaires et positions source, avec tests d’équivalence canonique (brouillon 0.9).
+- [ ] Définir les avertissements de confusables/scripts mixtes et l’affichage/diagnostic syntaxique du source bidi, avec un corpus de compatibilité.
 - [x] Conditions booléennes, blocs, portées lexicales et affectation avec tests de régression.
 - [x] Boucle while bornée avec conditions booléennes et budget cumulé par exécution.
 - [ ] Sémantique numérique et codes d’erreur destinés aux outils.
