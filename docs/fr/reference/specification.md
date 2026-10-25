@@ -5,13 +5,14 @@ description: Grammaire et sémantique actuelles de Rukn.
 
 # Spécification du langage Rukn
 
-**État : brouillon 0.8.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
+**État : brouillon 0.9.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
 
 ## Règles lexicales
 
 - Les fichiers source sont en UTF-8.
 - Un identifiant commence par un souligné ou un caractère Unicode `XID_Start`; les caractères suivants utilisent `XID_Continue` ou le souligné, via la dépendance verrouillée `unicode-ident 1.0.27` (UAX #31). Les marques combinantes autorisées peuvent suivre le premier caractère.
-- Les identifiants ne sont pas normalisés ; la détection des confusables et des contrôles bidirectionnels n’est pas implémentée.
+- Les jetons d’identifiant sont normalisés en NFC via la dépendance verrouillée `unicode-normalization 0.1.25` avant la reconnaissance des mots-clés et la résolution des noms. Les formes canoniquement équivalentes désignent la même liaison ; les positions de ligne/colonne restent celles du source d’origine. Le contenu des chaînes littérales et des commentaires n’est pas normalisé.
+- NFC ne détecte ni les confusables visuels ni le mélange de scripts. Les avertissements de confusables, la politique de scripts mixtes et les outils de présentation/diagnostic bidirectionnels du source ne sont pas encore implémentés.
 - La notation scientifique ne fait pas partie de la grammaire numérique actuelle.
 - Mots réservés : دع, اطبع, دالة, أرجع, إذا, وإلا, بينما, صحيح, خطأ, لاشيء, و, أو.
 - Les nombres acceptent les chiffres ASCII, arabo-indiens et persans. Le point ASCII ou le séparateur décimal arabe ٫ (U+066B) est accepté et doit être suivi d’au moins un chiffre ; les séparateurs répétés sont invalides. Tous les chiffres d’un même littéral doivent appartenir à la même famille ; un mélange est rejeté au premier chiffre incompatible.
@@ -95,4 +96,4 @@ Le budget des chaînes compte de manière conservative les copies de valeurs cha
 
 ## Lacunes connues
 
-La grammaire n’est pas encore générée depuis une définition formelle. La normalisation Unicode, la politique sur les identifiants visuellement confondables, les liaisons immuables, un système de types statique, les fermetures, les enregistrements/cartes, les modules, une IR typée, une VM bytecode et un corpus commun aux futures implémentations interpréteur/VM/compilateur restent des travaux ouverts avant une version stable.
+La grammaire n’est pas encore générée depuis une définition formelle. La politique sur les identifiants visuellement confondables, les diagnostics sur les scripts mixtes, les liaisons immuables, un système de types statique, les fermetures, les enregistrements/cartes, les modules, une IR typée, une VM bytecode et un corpus commun aux futures implémentations interpréteur/VM/compilateur restent des travaux ouverts avant une version stable.
