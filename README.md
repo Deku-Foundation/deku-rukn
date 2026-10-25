@@ -20,7 +20,7 @@ Rukn explores programming syntax and diagnostics designed to read naturally in A
 
 The initial Rust tree-walk interpreter supports variable declarations, printing, numbers, strings, booleans, a nil-like value, arithmetic, comparisons and equality. Rukn is not self-hosting.
 
-Not implemented yet: functions, loops, modules, collections, a package manager, bytecode VM, native compiler, IDE integration, language-level file/network access or a stable 1.0 specification.
+Implemented now: variable declarations, assignment, lexical block scopes, boolean conditionals, bounded while loops, Arabic keywords and booleans, Unicode identifiers, numbers and strings. Not implemented yet: functions, closures, modules, collections, a package manager, bytecode VM, native compiler, IDE integration, language-level file/network access or a stable 1.0 specification.
 
 ## Example
 
