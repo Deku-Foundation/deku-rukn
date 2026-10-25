@@ -7,7 +7,7 @@ description: Recherche sur les identifiants arabes, la normalisation, les confus
 
 **Statut : base lexicale implémentée et questions de sécurité ouvertes. La conformité complète à UAX #31 n’est pas revendiquée.**
 
-Pour un langage conçu avec l’arabe au premier plan, Unicode fait partie de la conception du langage. Rukn utilise maintenant la dépendance verrouillée `unicode-ident 1.0.27` pour les propriétés `XID_Start` et `XID_Continue`, avec le soulignement autorisé volontairement aux deux positions. Cela fournit une base lexicale conforme à l’approche UAX #31 ; normalisation, confusables visuels et diagnostics dédiés aux contrôles bidirectionnels restent à étudier.
+Pour un langage conçu avec l’arabe au premier plan, Unicode fait partie de la conception du langage. Rukn utilise `unicode-ident 1.0.27` pour `XID_Start` / `XID_Continue` et `unicode-normalization 0.1.25` pour normaliser les jetons d’identifiant en NFC avant la reconnaissance des mots-clés et la résolution des noms. C’est une politique explicite et testée, pas une revendication de conformité complète à UAX #31 ou UTS #55.
 
 ## État actuel
 
@@ -17,11 +17,12 @@ Pour un langage conçu avec l’arabe au premier plan, Unicode fait partie de la
 - Les chiffres d’un littéral sont convertis en chiffres ASCII avant l’analyse numérique.
 - Les marques combinantes prises en charge peuvent suivre le premier caractère ; les diacritiques arabes peuvent donc apparaître dans un identifiant.
 - La suite de non-régression couvre aussi un caractère `XID_Start` hors du plan multilingue de base (`U+10400`), suivi de caractères arabes. Cela vérifie le traitement des points de code sans prétendre que tout caractère Unicode est un identifiant valide.
-- L’orthographe des noms est conservée. Aucune normalisation ou alerte de confusables n’est actuellement appliquée.
+- Les jetons d’identifiant sont normalisés en NFC avant la reconnaissance des mots-clés et la résolution des noms. Les formes canoniquement équivalentes désignent la même liaison ; les positions de ligne/colonne restent celles du source d’origine. Le contenu des chaînes littérales et des commentaires n’est pas normalisé.
+- NFC ne détecte ni les confusables visuels ni le mélange de scripts. Les avertissements correspondants et l’affichage syntaxique du source RTL restent à concevoir.
 - Si le lexer rejette un caractère hors des chaînes et commentaires, le diagnostic donne son point de code `U+XXXX` et sa forme échappée. Cela ne recherche pas les contrôles bidirectionnels dans les commentaires ou valeurs de chaîne.
 - Les caractères XID suivent les données Unicode intégrées à la dépendance verrouillée ; toute mise à jour exige des tests de conformité et une revue de compatibilité.
 
-C’est une base lexicale plus cohérente, mais pas un profil de sécurité Unicode complet. La normalisation, les confusables, le mélange de scripts et les contrôles invisibles restent des sujets ouverts.
+C’est une base lexicale plus cohérente, mais pas un profil de sécurité Unicode complet. La détection des confusables, la politique sur les scripts mixtes, les contrôles invisibles et l’affichage syntaxique du source RTL restent ouverts.
 
 ## Axes de recherche
 
@@ -31,7 +32,7 @@ C’est une base lexicale plus cohérente, mais pas un profil de sécurité Unic
 
 ### Normalisation
 
-[UAX #15](https://www.unicode.org/reports/tr15/) définit les formes de normalisation. Une décision doit préciser si deux écritures canoniquement équivalentes désignent le même identifiant, à quel moment la normalisation intervient et comment les diagnostics conservent l’écriture source. Les chaînes de texte ne doivent pas être normalisées simplement parce que les identifiants le sont. Toute modification exige des tests de compatibilité et une note de migration.
+[UAX #15](https://www.unicode.org/reports/tr15/) définit les formes de normalisation. Rukn applique maintenant NFC avant la reconnaissance des mots-clés et la résolution des noms via `unicode-normalization 0.1.25` verrouillé. Les tests de conformité vérifient qu’un alef arabe suivi du hamza combinant équivaut à l’alef précomposé avec hamza et que le contenu des chaînes reste inchangé. Le paquet et le lockfile sont épinglés ; toute mise à jour exige une revue de compatibilité.
 
 ### Confusables et scripts mélangés
 
@@ -53,7 +54,8 @@ C’est une base lexicale plus cohérente, mais pas un profil de sécurité Unic
 
 - Grammaire normative des identifiants et version Unicode documentées.
 - Corpus de conformité partagé entre la spécification et l’implémentation.
-- Normalisation et confusables testés et documentés.
+- Normalisation NFC des identifiants et préservation des chaînes littérales testées et documentées.
+- Politique sur les confusables/scripts mixtes et affichage RTL du source examinés séparément.
 - Affichage des contrôles invisibles revu dans les éditeurs, terminaux et diagnostics.
 - Notes de compatibilité et de migration pour chaque modification significative.
 
