@@ -5,7 +5,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 
 # Spécification du langage Rukn
 
-**État : brouillon 0.7.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
+**État : brouillon 0.8.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
 
 ## Règles lexicales
 
@@ -42,9 +42,11 @@ description: Grammaire et sémantique actuelles de Rukn.
     comparison   = term { (">" | ">=" | "<" | "<=") term } ;
     term         = factor { ("+" | "-") factor } ;
     factor       = unary { ("*" | "/") unary } ;
-    unary        = ("!" | "-") unary | primary ;
-    primary      = number | string | "صحيح" | "خطأ" | "لاشيء"
+    unary        = ("!" | "-") unary | postfix ;
+    postfix      = primary { "[" expression "]" } ;
+    primary      = number | string | list_literal | "صحيح" | "خطأ" | "لاشيء"
                  | call_expression | identifier | "(" expression ")" ;
+    list_literal  = "[" [ argument_list ] "]" ;
     call_expression = identifier "(" [ argument_list ] ")" ;
     argument_list = expression { "," expression } ;
 
@@ -65,6 +67,8 @@ description: Grammaire et sémantique actuelles de Rukn.
 - Le corps d’une fonction s’exécute avec l’environnement global et un nouvel environnement de paramètres/variables locales. Il ne capture pas les variables locales de l’appelant ; les fermetures et déclarations de fonctions imbriquées ne sont pas prises en charge. Les affectations globales persistent après l’appel.
 - `أرجع expression؛` retourne une valeur ; `أرجع؛` retourne `لاشيء`. Une fonction qui termine sans retour explicite retourne aussi `لاشيء`. Un retour hors fonction produit une erreur.
 - Les appels récursifs sont pris en charge avec une profondeur active maximale de 128 ; la profondeur d’expression est bornée indépendamment dans chaque cadre de fonction.
+- Les littéraux liste utilisent des crochets et des expressions séparées par des virgules, par exemple `[١, «texte», صحيح]`. Les listes sont immuables et peuvent contenir des types différents. L’indexation commence à zéro et exige un entier fini et non négatif. Un index de liste retourne un élément ; un index de chaîne retourne une valeur Unicode scalaire sous forme de chaîne. Un index hors limites est une erreur.
+- La fonction intégrée `طول(valeur)` accepte une chaîne ou une liste et retourne un nombre. La longueur et l’indexation des chaînes comptent les valeurs Unicode scalaires, pas les graphèmes. `أضف(liste, valeur)` retourne une nouvelle liste contenant l’élément ajouté sans modifier la liste initiale. Ces fonctions intégrées peuvent être passées comme valeurs ; leurs noms sont réservés.
 - Une variable inconnue et la division par zéro sont des erreurs.
 - Les résultats numériques non finis produisent un diagnostic.
 - Les instructions sont évaluées dans l’ordre source et la sortie est collectée.
@@ -83,9 +87,12 @@ L’implémentation applique actuellement les limites suivantes :
 | Évaluations des conditions while par exécution | 1 000 000 |
 | Profondeur active des appels de fonction | 128 |
 | Paramètres / arguments de fonction | 64 |
+| Éléments par liste | 16 384 |
+| Budget cumulé des éléments de listes créés/copiés par exécution | 1 000 000 |
+| Profondeur des listes imbriquées | 64 |
 
-Le budget compte de manière conservative les copies de valeurs chaîne, les copies des noms de références de fonction, les résultats de concaténation et la sortie collectée pendant une exécution. Il s’agit d’un comptage cumulatif, et non d’une mesure exacte du tas encore vivant. Les entrées dépassant ces bornes sont rejetées avec une erreur du langage. Ces limites d’implémentation peuvent évoluer avant une version stable ; elles ne constituent pas un bac à sable formel ni une garantie contre toutes les formes de déni de service.
+Le budget des chaînes compte de manière conservative les copies de valeurs chaîne, les noms de références de fonction, les concaténations, la sortie collectée et les noms/chaînes copiés pendant un ajout à une liste. Le budget des collections compte les éléments créés ou copiés, y compris chaque ajout immuable. Ce sont des budgets cumulatifs, pas des mesures exactes du tas vivant. Les entrées dépassant ces bornes sont rejetées avec une erreur du langage. Ces limites d’implémentation peuvent évoluer avant une version stable ; elles ne constituent pas un bac à sable formel ni une garantie contre toutes les formes de déni de service.
 
 ## Lacunes connues
 
-La grammaire n’est pas encore générée depuis une définition formelle. La normalisation Unicode, la politique sur les identifiants visuellement confondables, les liaisons immuables, un système de types statique, les fermetures, les collections, modules, une IR typée, une VM bytecode et un corpus commun aux futures implémentations interpréteur/VM/compilateur restent des travaux ouverts avant une version stable.
+La grammaire n’est pas encore générée depuis une définition formelle. La normalisation Unicode, la politique sur les identifiants visuellement confondables, les liaisons immuables, un système de types statique, les fermetures, les enregistrements/cartes, les modules, une IR typée, une VM bytecode et un corpus commun aux futures implémentations interpréteur/VM/compilateur restent des travaux ouverts avant une version stable.
