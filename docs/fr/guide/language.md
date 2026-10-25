@@ -96,7 +96,17 @@ Sortie attendue :
 
 `أرجع expression؛` retourne une valeur. `أرجع؛` retourne `لاشيء`, et une fonction qui se termine sans retour explicite retourne également `لاشيء`. Un retour hors fonction est une erreur. Dans cette version, les fonctions ne peuvent être déclarées qu’au niveau supérieur ; la récursion est limitée à 128 appels actifs et chaque liste accepte au plus 64 paramètres/arguments.
 
-Les fonctions sont des déclarations nommées appelables, pas des valeurs de première classe. Elles ne peuvent être stockées ni retournées, les déclarations imbriquées sont rejetées et elles ne capturent pas les variables locales de l’appelant. Fermetures, modules et système de types statique restent à réaliser.
+Un nom de fonction peut aussi être utilisé comme valeur : l’affecter à une variable, le passer à une autre fonction ou le retourner. Les appels utilisent encore un identifiant ; stockez donc une fonction retournée dans une variable avant de l’appeler. Les références ne capturent pas les variables locales de l’appelant. Fermetures, fonctions anonymes, déclarations imbriquées, modules et typage statique restent à réaliser.
+
+```rukn
+دالة جمع(أ, ب) { أرجع أ + ب؛ }
+دالة تطبيق(عملية, أ, ب) { أرجع عملية(أ, ب)؛ }
+دع العملية = جمع؛
+اطبع(العملية(٢, ٣))؛
+اطبع(تطبيق(جمع, ٤, ٥))؛
+```
+
+Sortie attendue : `5` puis `9`.
 
 ## Valeurs
 
@@ -130,7 +140,7 @@ Un commentaire commence par # et se termine à la fin de la ligne. Les variables
 
 ## Fonctionnalités pas encore implémentées
 
-Les fermetures, valeurs de fonction de première classe, collections, types définis par l’utilisateur, modules, syntaxe explicite de gestion des erreurs, système de types statique et ABI stable ne sont pas encore implémentés. Les fonctions nommées, paramètres, retours, récursion, conditions, blocs, portées lexicales, affectations et boucles `بينما` bornées sont pris en charge expérimentalement. Consultez la spécification et la feuille de route.
+Les fermetures, fonctions anonymes, chaînage direct d’un résultat d’appel, collections, types définis par l’utilisateur, modules, syntaxe explicite de gestion des erreurs, système de types statique et ABI stable ne sont pas encore implémentés. Les références de fonctions nommées, appels d’ordre supérieur, paramètres, retours, récursion, conditions, blocs, portées lexicales, affectations et boucles `بينما` bornées sont pris en charge expérimentalement. Consultez la spécification et la feuille de route.
 
 
 ## Identifiants Unicode
