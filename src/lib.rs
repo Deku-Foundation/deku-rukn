@@ -1030,6 +1030,28 @@ impl Value {
             Self::Number(_) | Self::String(_) | Self::Bool(_) | Self::Function(_) | Self::Nil => 0,
         }
     }
+
+    fn display_bytes(&self) -> Option<usize> {
+        match self {
+            Self::Number(number) if number.fract() == 0.0 => Some(format!("{number:.0}").len()),
+            Self::Number(number) => Some(number.to_string().len()),
+            Self::String(value) => Some(value.len()),
+            Self::Bool(true) => Some("صحيح".len()),
+            Self::Bool(false) => Some("خطأ".len()),
+            Self::Function(name) => "<دالة ".len().checked_add(name.len())?.checked_add(1),
+            Self::List(list) => {
+                let mut bytes = 2usize; // Opening and closing square brackets.
+                for (index, value) in list.items.iter().enumerate() {
+                    if index != 0 {
+                        bytes = bytes.checked_add(2)?; // Comma and space.
+                    }
+                    bytes = bytes.checked_add(value.display_bytes()?)?;
+                }
+                Some(bytes)
+            }
+            Self::Nil => Some("لاشيء".len()),
+        }
+    }
 }
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -1228,7 +1250,18 @@ impl Interpreter {
                 keyword,
             } => {
                 let value = self.evaluate(expression)?;
-                self.reserve_runtime_string_bytes(value.string_bytes(), keyword)?;
+                let output_bytes = value.display_bytes().ok_or_else(|| {
+                    LangError::at("تجاوز حجم مخرجات الطباعة نطاق الحساب", keyword)
+                })?;
+                if output_bytes > MAX_STRING_BYTES {
+                    return Err(LangError::at(
+                        format!(
+                            "تجاوزت مخرجات الطباعة الحد الأقصى للنص ({MAX_STRING_BYTES} بايت)"
+                        ),
+                        keyword,
+                    ));
+                }
+                self.reserve_runtime_string_bytes(output_bytes, keyword)?;
                 self.output.push(value.to_string());
                 Flow::Continue
             }
@@ -1346,6 +1379,17 @@ impl Interpreter {
                     ));
                 }
                 let allocation = list.items.len() + 1;
+                let mut copied_string_bytes = values[1].string_bytes();
+                for item in &list.items {
+                    let Some(total) = copied_string_bytes.checked_add(item.string_bytes()) else {
+                        return Err(LangError::at(
+                            "تجاوز نسخ عناصر القائمة الحد العددي المدعوم",
+                            callsite,
+                        ));
+                    };
+                    copied_string_bytes = total;
+                }
+                self.reserve_runtime_string_bytes(copied_string_bytes, callsite)?;
                 self.reserve_runtime_collection_elements(allocation, callsite)?;
                 let mut items = Vec::with_capacity(allocation);
                 items.extend(list.items.iter().cloned());
