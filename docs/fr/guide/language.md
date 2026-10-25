@@ -94,7 +94,7 @@ Sortie attendue :
 120
 ```
 
-`أرجع expression؛` retourne une valeur. `أرجع؛` retourne `لاشيء`, et une fonction qui se termine sans retour explicite retourne également `لاشيء`. Un retour hors fonction est une erreur. Dans cette version, les fonctions ne peuvent être déclarées qu’au niveau supérieur ; la récursion est limitée à 128 appels actifs et chaque liste accepte au plus 64 paramètres/arguments.
+`أرجع expression؛` retourne une valeur. `أرجع؛` retourne `لاشيء`, et une fonction qui se termine sans retour explicite retourne également `لاشيء`. Un retour hors fonction est une erreur. Dans cette version, les fonctions ne peuvent être déclarées qu’au niveau supérieur ; la récursion est limitée à 32 appels actifs dans l’interpréteur arborescent actuel et chaque liste accepte au plus 64 paramètres/arguments.
 
 Un nom de fonction peut aussi être utilisé comme valeur : l’affecter à une variable, le passer à une autre fonction ou le retourner. Les appels utilisent encore un identifiant ; stockez donc une fonction retournée dans une variable avant de l’appeler. Les références ne capturent pas les variables locales de l’appelant. Fermetures, fonctions anonymes, déclarations imbriquées, modules et typage statique restent à réaliser.
 
