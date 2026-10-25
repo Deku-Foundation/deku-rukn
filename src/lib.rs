@@ -2262,7 +2262,7 @@ mod tests {
         }
         let depth_error = run(&nested).unwrap_err();
         assert!(
-            depth_error.message.contains("التداخل"),
+            depth_error.message.contains("للتداخل"),
             "unexpected nested-list diagnostic: {}",
             depth_error.message
         );
