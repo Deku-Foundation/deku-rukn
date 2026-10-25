@@ -18,7 +18,7 @@ Un compilateur doit initialement être exécuté par un programme existant, un a
 - **Base de confiance réductible :** réduire, versionner, tester et auditer l’implémentation initiale et les outils externes au fil du temps.
 - **Étapes reproductibles :** chaque stade passe le même corpus de conformité ; la reproductibilité binaire est recherchée lorsque le backend et l’environnement le permettent.
 
-Réécrire immédiatement le projet en Rukn ne supprime pas les dépendances. Le langage actuel ne possède pas encore de fonctions, boucles, modules ni bibliothèque suffisante pour exprimer proprement un compilateur. Il faut d’abord rendre le comportement mesurable, puis accroître les capacités du langage par étapes révisées.
+Réécrire immédiatement le projet en Rukn ne supprime pas les dépendances. Rukn possède maintenant des blocs, des portées lexicales, l’affectation, des conditions et une boucle while bornée, mais il lui manque encore fonctions, modules, collections et bibliothèque suffisante pour exprimer proprement un compilateur. Il faut stabiliser la sémantique de cette base, puis accroître les capacités du langage par étapes révisées.
 
 ## Modèle d’amorçage
 
@@ -125,7 +125,7 @@ La linguistique informatique arabe peut éclairer la terminologie, la morphologi
 
 1. Maintenir un corpus de conformité explicite et le réviser à chaque changement de comportement.
 2. Séparer le fuzzing du parseur de la cible de bout en bout.
-3. Spécifier blocs, portées, types et nombres avant le contrôle de flux.
+3. Stabiliser la sémantique du contrôle de flux existant, puis spécifier types et nombres avant d’ajouter d’autres fonctionnalités.
 4. Implémenter et tester fonctions et frontières de modules avant le port du compilateur.
 5. Choisir bytecode ou backend natif à partir des preuves de conformité et d’un plan documenté de cible/ABI.
 
