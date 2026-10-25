@@ -25,6 +25,7 @@ A programming language needs a decision record, not just a roadmap. This page tr
 | RUKN-DR-0005 | Arabic logical operators | Implemented baseline in draft 0.2; reserved words are pre-alpha compatibility choices | Boolean-only operands, left associativity, precedence and short-circuit regression tests |
 | RUKN-DR-0006 | Numeric literal digit-family consistency | Implemented experimental default in draft 0.3; compatibility review remains open | Tests for all supported digit families, decimal separators, exact error locations and a migration note for mixed-family literals |
 | RUKN-DR-0007 | Runtime string size and cumulative copy budget | Implemented guardrail in draft 0.4; conservative accounting, not a sandbox | Regression tests for repeated copies, concatenation and print output; review limits before 1.0 and for embedding |
+| RUKN-DR-0008 | Minimum control-flow core and lexical scopes | Implemented experimental baseline in draft 0.5 | Conformance cases for scope/shadowing, assignment, boolean conditions, loop limits and malformed blocks; revisit language ergonomics before 1.0 |
 
 These entries are research topics, not approvals to implement a specific option.
 
