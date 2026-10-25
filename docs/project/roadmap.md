@@ -12,14 +12,15 @@ Milestones are evidence-based, not time promises. A feature is complete only whe
 - [x] Rust crate, CLI entry point and initial test suite.
 - [x] Arabic keywords, Unicode identifiers and Arabic diagnostics.
 - [x] Initial grammar and documentation in Arabic, French and English.
-- [ ] CI passes formatting, lint, unit tests and example-output checks.
-- [ ] Publish a reviewed design-decision process.
+- [x] CI passes formatting, lint, unit tests and example-output checks.
+- [x] Publish a reviewed design-decision process.
 
 ## M1 — Language core
 
 - [x] Bound source size, token count and parser nesting; reject non-finite numeric results.
 - [x] Add a bounded, scheduled end-to-end fuzz smoke target for the public interpreter API.
-- [ ] Add parser-focused fuzzing and a machine-readable corpus of invalid programs.
+- [ ] Add parser-focused fuzzing.
+- [x] Add a machine-readable CLI conformance corpus for valid and invalid programs, expected output/error fragment, and exit status.
 - [x] Adopt a pinned Unicode XID_Start / XID_Continue lexical baseline with underscore tailoring and Arabic/Persian regression tests.
 - [ ] Decide identifier normalization, mixed-script/confusable warnings and bidirectional-control diagnostics, with a compatibility corpus.
 - [ ] Add conditions, blocks and lexical scopes after semantics are reviewed.
@@ -43,6 +44,10 @@ Milestones are evidence-based, not time promises. A feature is complete only whe
 - [ ] Benchmark suite and regression corpus.
 
 ## M4 — Compiler and bootstrap research
+
+See the [compiler bootstrap strategy](/project/compiler-bootstrap) for staged milestones and acceptance criteria.
+
+- [x] Document the self-hosting goal, stage-zero constraint, and staged bootstrap validation plan.
 
 - [ ] Specify a stable intermediate representation.
 - [ ] Compare tree-walk, bytecode VM and native back ends with a shared correctness suite and reproducible benchmarks.
