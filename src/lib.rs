@@ -789,22 +789,32 @@ impl Parser {
     fn call(&mut self) -> Result<Expr, LangError> {
         let mut expression = self.primary()?;
         while self.matches(TokenKind::LeftParen) {
-            let mut arguments = Vec::new();
-            if !self.check(TokenKind::RightParen) {
-                loop {
-                    if arguments.len() >= MAX_FUNCTION_PARAMETERS {
-                        return Err(LangError::at(
-                            format!("تجاوز الاستدعاء حد المعاملات ({MAX_FUNCTION_PARAMETERS})"),
-                            self.peek(),
-                        ));
-                    }
-                    arguments.push(self.expression()?);
-                    if !self.matches(TokenKind::Comma) {
-                        break;
+            let opening = self.previous().clone();
+            self.enter_nesting(&opening)?;
+            let parsed_arguments = (|| {
+                let mut arguments = Vec::new();
+                if !self.check(TokenKind::RightParen) {
+                    loop {
+                        if arguments.len() >= MAX_FUNCTION_PARAMETERS {
+                            return Err(LangError::at(
+                                format!(
+                                    "تجاوز الاستدعاء حد المعاملات ({MAX_FUNCTION_PARAMETERS})"
+                                ),
+                                self.peek(),
+                            ));
+                        }
+                        arguments.push(self.expression()?);
+                        if !self.matches(TokenKind::Comma) {
+                            break;
+                        }
                     }
                 }
-            }
-            let paren = self.consume(TokenKind::RightParen, "توقعت «)» بعد معاملات الاستدعاء")?;
+                let paren =
+                    self.consume(TokenKind::RightParen, "توقعت «)» بعد معاملات الاستدعاء")?;
+                Ok((arguments, paren))
+            })();
+            self.nesting -= 1;
+            let (arguments, paren) = parsed_arguments?;
             let name = match expression {
                 Expr::Variable(name) => name,
                 _ => {
@@ -994,7 +1004,15 @@ impl Interpreter {
     }
     fn interpret(mut self, statements: &[Stmt]) -> Result<Vec<String>, LangError> {
         for statement in statements {
-            self.execute(statement)?;
+            match self.execute(statement)? {
+                Flow::Continue => {}
+                Flow::Return { keyword, .. } => {
+                    return Err(LangError::at(
+                        "لا يمكن استخدام «أرجع» خارج دالة",
+                        &keyword,
+                    ));
+                }
+            }
         }
         Ok(self.output)
     }
@@ -1036,15 +1054,48 @@ impl Interpreter {
         Ok(())
     }
 
-    fn execute(&mut self, statement: &Stmt) -> Result<(), LangError> {
-        match statement {
+    fn execute(&mut self, statement: &Stmt) -> Result<Flow, LangError> {
+        let flow = match statement {
+            Stmt::Function {
+                keyword,
+                name,
+                parameters,
+                body,
+            } => {
+                if self.environment.len() != 1 {
+                    return Err(LangError::at(
+                        "تعريف الدوال مسموح في المستوى الأعلى فقط في هذه النسخة",
+                        keyword,
+                    ));
+                }
+                self.functions.insert(
+                    name.lexeme.clone(),
+                    FunctionDef {
+                        parameters: parameters.clone(),
+                        body: body.clone(),
+                    },
+                );
+                Flow::Continue
+            }
+            Stmt::Return { keyword, value } => {
+                let value = match value {
+                    Some(expression) => self.evaluate(expression)?,
+                    None => Value::Nil,
+                };
+                Flow::Return {
+                    value,
+                    keyword: keyword.clone(),
+                }
+            }
             Stmt::Let { name, initializer } => {
                 let value = self.evaluate(initializer)?;
                 self.define_variable(name, value)?;
+                Flow::Continue
             }
             Stmt::Assign { name, value } => {
                 let value = self.evaluate(value)?;
                 self.assign_variable(name, value)?;
+                Flow::Continue
             }
             Stmt::Print {
                 expression,
@@ -1053,14 +1104,22 @@ impl Interpreter {
                 let value = self.evaluate(expression)?;
                 self.reserve_runtime_string_bytes(value.string_bytes(), keyword)?;
                 self.output.push(value.to_string());
+                Flow::Continue
             }
             Stmt::Block { statements } => {
                 self.environment.push(HashMap::new());
-                let result = statements
-                    .iter()
-                    .try_for_each(|statement| self.execute(statement));
+                let result = (|| {
+                    let mut result = Flow::Continue;
+                    for statement in statements {
+                        result = self.execute(statement)?;
+                        if matches!(&result, Flow::Return { .. }) {
+                            break;
+                        }
+                    }
+                    Ok(result)
+                })();
                 self.environment.pop();
-                result?;
+                result?
             }
             Stmt::If {
                 keyword,
@@ -1069,11 +1128,10 @@ impl Interpreter {
                 else_branch,
             } => match self.evaluate(condition)? {
                 Value::Bool(true) => self.execute(then_branch)?,
-                Value::Bool(false) => {
-                    if let Some(branch) = else_branch {
-                        self.execute(branch)?;
-                    }
-                }
+                Value::Bool(false) => match else_branch {
+                    Some(branch) => self.execute(branch)?,
+                    None => Flow::Continue,
+                },
                 _ => {
                     return Err(LangError::at("يتطلب شرط «إذا» قيمة منطقية", keyword));
                 }
@@ -1085,8 +1143,13 @@ impl Interpreter {
             } => loop {
                 self.evaluate_loop_condition(keyword)?;
                 match self.evaluate(condition)? {
-                    Value::Bool(true) => self.execute(body)?,
-                    Value::Bool(false) => break,
+                    Value::Bool(true) => {
+                        let flow = self.execute(body)?;
+                        if matches!(&flow, Flow::Return { .. }) {
+                            break flow;
+                        }
+                    }
+                    Value::Bool(false) => break Flow::Continue,
                     _ => {
                         return Err(LangError::at("يتطلب شرط «بينما» قيمة منطقية", keyword));
                     }
@@ -1094,9 +1157,85 @@ impl Interpreter {
             },
             Stmt::Expression(expression) => {
                 self.evaluate(expression)?;
+                Flow::Continue
+            }
+        };
+        Ok(flow)
+    }
+
+    fn call_function(
+        &mut self,
+        name: &Token,
+        closing_paren: &Token,
+        arguments: &[Expr],
+    ) -> Result<Value, LangError> {
+        let function = self.functions.get(&name.lexeme).cloned().ok_or_else(|| {
+            LangError::at(format!("دالة غير معرّفة: {}", name.lexeme), name)
+        })?;
+        if arguments.len() != function.parameters.len() {
+            return Err(LangError::at(
+                format!(
+                    "الدالة «{}» تتطلب {} معاملًا، لكن استُخدم {}",
+                    name.lexeme,
+                    function.parameters.len(),
+                    arguments.len()
+                ),
+                closing_paren,
+            ));
+        }
+        if self.call_depth >= MAX_CALL_DEPTH {
+            return Err(LangError::at(
+                format!("تجاوز البرنامج الحد الأقصى لعمق استدعاء الدوال ({MAX_CALL_DEPTH})"),
+                name,
+            ));
+        }
+
+        let mut values = Vec::with_capacity(arguments.len());
+        for argument in arguments {
+            values.push(self.evaluate(argument)?);
+        }
+        let mut parameter_scope = HashMap::with_capacity(function.parameters.len());
+        for (parameter, value) in function.parameters.iter().zip(values) {
+            parameter_scope.insert(parameter.lexeme.clone(), value);
+        }
+
+        let mut global_string_bytes = 0usize;
+        if let Some(global_scope) = self.environment.first() {
+            for value in global_scope.values() {
+                let Some(total) = global_string_bytes.checked_add(value.string_bytes()) else {
+                    return Err(LangError::at("تجاوز ميزانية النصوص في النطاق العام", name));
+                };
+                global_string_bytes = total;
             }
         }
-        Ok(())
+        self.reserve_runtime_string_bytes(global_string_bytes, name)?;
+        let global_scope = self.environment.first().cloned().unwrap_or_default();
+        let mut caller_environment = std::mem::take(&mut self.environment);
+        self.environment = vec![global_scope, parameter_scope];
+        self.call_depth += 1;
+
+        let execution = (|| {
+            let mut flow = Flow::Continue;
+            for statement in &function.body {
+                flow = self.execute(statement)?;
+                if matches!(&flow, Flow::Return { .. }) {
+                    break;
+                }
+            }
+            Ok(flow)
+        })();
+
+        self.call_depth -= 1;
+        let callee_environment = std::mem::take(&mut self.environment);
+        if let Some(caller_globals) = caller_environment.first_mut() {
+            *caller_globals = callee_environment.into_iter().next().unwrap_or_default();
+        }
+        self.environment = caller_environment;
+
+        match execution? {
+            Flow::Continue => Ok(Value::Nil),
+            Flow::Return { value, .. } => Ok(value),
+        }
     }
     fn evaluate(&mut self, expr: &Expr) -> Result<Value, LangError> {
         if self.evaluation_depth >= MAX_NESTING {
@@ -1145,6 +1284,11 @@ impl Interpreter {
                 self.reserve_runtime_string_bytes(value.string_bytes(), name)?;
                 Ok(value)
             }
+            Expr::Call {
+                name,
+                paren,
+                arguments,
+            } => self.call_function(name, paren, arguments),
             Expr::Grouping(expr) => self.evaluate(expr),
             Expr::Unary { operator, right } => {
                 let right = self.evaluate(right)?;
