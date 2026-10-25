@@ -1105,7 +1105,10 @@ pub fn run(source: &str) -> Result<Vec<String>, LangError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{MAX_NESTING, MAX_RUNTIME_STRING_BYTES, MAX_SOURCE_BYTES, run};
+    use super::{
+        MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING, MAX_RUNTIME_STRING_BYTES,
+        MAX_SOURCE_BYTES, run,
+    };
 
     #[test]
     fn arabic_program_and_digits() {
@@ -1373,6 +1376,86 @@ mod tests {
             "unexpected diagnostic: {}",
             error.message
         );
+        assert!(error.line > 0 && error.column > 0);
+    }
+
+    #[test]
+    fn conditional_blocks_select_the_expected_branch() {
+        assert_eq!(
+            run(
+                "دع العدد = ٣؛ إذا (العدد > ٢) { اطبع(«كبير»)؛ } وإلا { اطبع(«صغير»)؛ }"
+            )
+            .unwrap(),
+            ["كبير"]
+        );
+        assert_eq!(
+            run("إذا (خطأ) { اطبع(١)؛ } وإلا { اطبع(٢)؛ }").unwrap(),
+            ["2"]
+        );
+    }
+
+    #[test]
+    fn while_loops_and_assignment_work() {
+        assert_eq!(
+            run(
+                "دع العد = ٠؛ بينما (العد < ٣) { اطبع(العد)؛ العد = العد + ١؛ }"
+            )
+            .unwrap(),
+            ["0", "1", "2"]
+        );
+    }
+
+    #[test]
+    fn lexical_scopes_shadow_without_leaking_and_assign_nearest_binding() {
+        assert_eq!(
+            run(
+                "دع الاسم = «خارج»؛ { دع الاسم = «داخل»؛ الاسم = «معدل»؛ اطبع(الاسم)؛ } اطبع(الاسم)؛"
+            )
+            .unwrap(),
+            ["معدل", "خارج"]
+        );
+    }
+
+    #[test]
+    fn assignment_to_an_undefined_variable_is_an_error() {
+        let error = run("غائب = ١؛").unwrap_err();
+        assert!(error.message.contains("غير معرّف"));
+        assert_eq!((error.line, error.column), (1, 1));
+    }
+
+    #[test]
+    fn control_flow_conditions_require_booleans() {
+        let if_error = run("إذا (١) { اطبع(١)؛ }").unwrap_err();
+        assert!(if_error.message.contains("شرط «إذا»"));
+        assert!(if_error.message.contains("منطقية"));
+
+        let while_error = run("بينما («نعم») { }").unwrap_err();
+        assert!(while_error.message.contains("شرط «بينما»"));
+        assert!(while_error.message.contains("منطقية"));
+    }
+
+    #[test]
+    fn infinite_loops_are_bounded() {
+        let error = run("بينما (صحيح) { }").unwrap_err();
+        assert!(error.message.contains("خطوات شروط الحلقات").not());
+        assert!(error.message.contains("تقييم شروط الحلقات"));
+        assert!(error.line > 0 && error.column > 0);
+        assert_eq!(
+            MAX_LOOP_CONDITION_EVALUATIONS,
+            1_000_000,
+            "update this assertion if the documented runtime bound changes"
+        );
+    }
+
+    #[test]
+    fn deeply_nested_blocks_are_rejected() {
+        let source = format!(
+            "{}{}",
+            "{".repeat(MAX_NESTING + 1),
+            "}".repeat(MAX_NESTING + 1)
+        );
+        let error = run(&source).unwrap_err();
+        assert!(error.message.contains("التداخل"));
         assert!(error.line > 0 && error.column > 0);
     }
 
