@@ -47,6 +47,12 @@ Rukn utilise actuellement un lexer écrit à la main, un parseur récursif desce
 
 **Amorçage et assurance du compilateur :** le [Rust Compiler Development Guide](https://rustc-dev-guide.rust-lang.org/) décrit l’architecture et les builds par étapes ; le [tutoriel LLVM Kaleidoscope](https://llvm.org/docs/tutorial/) présente un chemin pratique du frontend à l’IR et au code natif ; [CompCert](https://compcert.org/doc/) est une référence de recherche en compilation formellement vérifiée. L’article de Ken Thompson [Reflections on Trusting Trust](https://doi.org/10.1145/358198.358210) explique pourquoi le binaire du compilateur compte autant que son code source. Ces leçons sont synthétisées dans la [stratégie d’amorçage de Rukn](/fr/project/compiler-bootstrap) ; l’auto-hébergement reste un objectif, pas une capacité actuelle.
 
+### Sémantique exécutable et raisonnement mécanisé
+
+Avant d’ajouter une VM bytecode ou un backend natif, définissez un petit modèle sémantique pour les fonctions déjà présentes dans le langage. Les références primaires utiles sont la [documentation PLT Redex](https://docs.racket-lang.org/redex/), qui permet de décrire des sémantiques exécutables et des relations de réduction, et [Software Foundations: Programming Language Foundations](https://softwarefoundations.cis.upenn.edu/plf-current/index.html), qui développe la sémantique opérationnelle et les propriétés des systèmes de types à l’aide de preuves vérifiées par machine.
+
+Ces outils n’ont pas à devenir des dépendances de Rukn à l’exécution. Employez de petits modèles pour préciser la portée lexicale, la propagation des retours, l’ordre d’évaluation, l’immutabilité des listes et les erreurs, puis transformez chaque règle retenue en test de régression/conformité du code Rust. Une preuve mécanisée ne porte que sur les propriétés formalisées dans le modèle et ses hypothèses ; elle ne prouve pas automatiquement l’implémentation entière.
+
 ## 3. Tests, fuzzing et performance
 
 - [Rust Compiler Development Guide : Fuzzing](https://rustc-dev-guide.rust-lang.org/fuzzing.html) — détecter et minimiser les défauts de compilateur.
