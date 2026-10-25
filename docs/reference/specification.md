@@ -88,7 +88,7 @@ The current implementation applies these guardrails:
 | Active function-call depth | 128 |
 | Function parameters / call arguments | 64 |
 
-The runtime string budget conservatively counts string-value clones, concatenation results, and captured print output during one run. It is cumulative accounting, not an exact measurement of live heap usage. Inputs exceeding these bounds are rejected with a language error. These are implementation limits and may change before a stable language release; they are not a formal sandbox and do not guarantee isolation against every denial-of-service scenario.
+The runtime string budget conservatively counts string-value clones, named function-reference name copies, concatenation results, and captured print output during one run. It is cumulative accounting, not an exact measurement of live heap usage. Inputs exceeding these bounds are rejected with a language error. These are implementation limits and may change before a stable language release; they are not a formal sandbox and do not guarantee isolation against every denial-of-service scenario.
 
 ## Known gaps
 
