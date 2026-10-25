@@ -106,7 +106,7 @@ Expected output:
 120
 ```
 
-`أرجع expression؛` returns a value. `أرجع؛` returns `لاشيء`, and reaching the end of a function without an explicit return also returns `لاشيء`. A return statement outside a function is an error. Functions may be declared only at top level in this version and support recursion up to 128 active calls. At most 64 parameters or arguments are allowed.
+`أرجع expression؛` returns a value. `أرجع؛` returns `لاشيء`, and reaching the end of a function without an explicit return also returns `لاشيء`. A return statement outside a function is an error. Functions may be declared only at top level in this version and support recursion up to 32 active calls in the current tree-walk interpreter. At most 64 parameters or arguments are allowed.
 
 A named function can also be used as a value: assign it to a variable, pass it to another function, or return it from a function. Calls still use identifier syntax, so store a returned function in a variable before calling it. Function references do not capture caller-local variables; closures, nested declarations, modules and a static type checker remain future work.
 
