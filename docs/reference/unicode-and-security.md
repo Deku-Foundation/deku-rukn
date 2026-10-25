@@ -7,7 +7,7 @@ description: Research-backed design questions for Arabic identifiers, normalizat
 
 **Status: implementation baseline plus open security questions. This page does not claim complete UAX #31 conformance.**
 
-Arabic-first programming makes Unicode behavior part of the language design, not a cosmetic feature. Rukn now uses the pinned `unicode-ident 1.0.27` crate for Unicode `XID_Start` and `XID_Continue`, with underscore deliberately allowed at either position. This adopts the UAX #31 identifier-property baseline while keeping normalization, visual-confusable handling, and dedicated bidirectional-control diagnostics open.
+Arabic-first programming makes Unicode behavior part of the language design, not a cosmetic feature. Rukn uses pinned `unicode-ident 1.0.27` for `XID_Start` / `XID_Continue` and pinned `unicode-normalization 0.1.25` to normalize identifier tokens to NFC before keyword recognition and name lookup. This is a deliberate, tested identifier policy, not complete UAX #31 or UTS #55 conformance.
 
 ## Current implementation
 
@@ -17,11 +17,12 @@ Arabic-first programming makes Unicode behavior part of the language design, not
 - Digits in numeric literals are normalized to ASCII before parsing.
 - XID continuation allows supported combining marks after the first character, so Arabic diacritics may appear inside identifiers.
 - The regression suite also exercises a supplementary-plane `XID_Start` character (`U+10400`) followed by Arabic identifier characters. This guards code-point handling without claiming that every Unicode character is a valid identifier.
-- Identifier spelling is preserved as written. Names are not normalized, and visually confusable identifiers are not currently flagged.
+- Identifier tokens are normalized to NFC before keyword recognition and name lookup. Canonically equivalent spellings resolve to one binding; token line/column positions continue to refer to the original source. String-literal contents and comments are not normalized.
+- NFC normalization does not detect visually confusable names or mixed scripts. Those warnings, and syntax-aware source presentation / dedicated bidi diagnostics, remain open.
 - If the lexer rejects a character outside strings and comments, the diagnostic includes its `U+XXXX` code point and escaped form. This does not inspect bidirectional controls inside comments or string values.
 - Accepted XID characters follow the data bundled with the pinned dependency; update that dependency only with identifier conformance tests and a compatibility review.
 
-This is a more consistent lexical baseline, but not a complete Unicode security profile. Identifier normalization, confusable detection, mixed-script policy, and invisible-control handling remain open.
+This is a more consistent lexical baseline, but not a complete Unicode security profile. Confusable detection, mixed-script policy, invisible-control handling, and syntax-aware right-to-left source presentation remain open.
 
 ## Research baseline
 
@@ -33,9 +34,9 @@ The review must specifically test Arabic combining marks, diacritics, Persian ch
 
 ### 2. Choose normalization semantics explicitly
 
-[Unicode Standard Annex #15 (UAX #15)](https://www.unicode.org/reports/tr15/) defines normalization forms. A language decision must state whether canonically equivalent identifier spellings resolve to the same binding, whether normalization occurs before lookup, and what spelling diagnostics preserve.
+[Unicode Standard Annex #15 (UAX #15)](https://www.unicode.org/reports/tr15/) defines normalization forms. Rukn now applies NFC before keyword matching and name resolution using the pinned `unicode-normalization 0.1.25` dependency. The conformance tests prove that Arabic alef plus combining hamza above resolves as the precomposed alef-with-hamza identifier, and that string-literal content remains unchanged. The package version and lockfile are pinned; a dependency update requires compatibility review.
 
-Do not normalize string-literal contents merely because identifier normalization is selected. Identifiers and user text have different semantics. If normalization is introduced, pin the Unicode version, add compatibility tests, and document any change that can make previously distinct identifiers collide.
+Do not normalize string-literal contents merely because identifier normalization is selected. Identifiers and user text have different semantics. Since NFC can make previously distinct source spellings equivalent, the language specification must keep this collision behavior explicit. Unicode normalization stability does not eliminate the need to review XID-property updates separately.
 
 ### 3. Treat confusables and mixed scripts as a tooling concern
 
@@ -59,7 +60,8 @@ A blanket ban on Latin characters would make interoperation and common technical
 
 - A normative identifier grammar and Unicode version are specified.
 - The implementation and specification share a conformance corpus.
-- Normalization and confusable behavior are tested and documented.
+- NFC identifier normalization and string-preservation behavior are tested and documented.
+- Confusable/mixed-script policy and right-to-left source presentation receive a separate reviewed design.
 - Invisible-control handling is reviewed for editors, terminals, and diagnostics.
 - Changes to the identifier profile have a compatibility and migration note.
 
