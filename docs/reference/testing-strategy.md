@@ -5,7 +5,7 @@ description: A practical validation plan for the Rukn lexer, parser, evaluator, 
 
 # Testing and conformance strategy
 
-**Status: engineering baseline with a bounded fuzz smoke target.** Unit tests and the standard CI gates remain the primary correctness checks. A separate workflow runs a 60-second libFuzzer campaign for pull requests that touch source or fuzz files, weekly, and by manual dispatch. A machine-readable conformance corpus, longer fuzz campaigns, and benchmark gates remain future work.
+**Status: engineering baseline with a bounded fuzz smoke target and a CLI conformance corpus.** Unit tests and the standard CI gates remain the primary correctness checks. The dependency-free integration runner executes the checked-in 15-case corpus against the real CLI, including stdout, exit status, and diagnostic-fragment checks. A separate workflow runs a 60-second libFuzzer campaign for pull requests that touch source or fuzz files, weekly, and by manual dispatch. Parser-focused fuzzing, longer campaigns, structured diagnostic assertions, and benchmark gates remain future work.
 
 ## Test layers
 
@@ -31,7 +31,7 @@ String delimiter and escape behavior is documented in [String literal behavior](
 - The CLI reads no more than one byte beyond the source-size limit before rejecting an oversized file; it must not buffer an unbounded file before calling the interpreter.
 - All code examples in the documentation are either copied from a real example file or explicitly labelled as illustrative.
 
-A useful next step is a machine-readable corpus of source files paired with expected stdout, stderr category, and process exit code. This can be consumed by tests and later by alternate interpreter/compiler implementations.
+The current corpus is the first executable compatibility contract for the CLI. Extend it whenever a language feature, diagnostic category, or runtime bound changes; keep the data format independent of the current interpreter so future VM and compiler implementations can consume the same expected behavior.
 
 ## Fuzzing plan
 
