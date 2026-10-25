@@ -1221,7 +1221,10 @@ impl Interpreter {
         if let Some(global_scope) = self.environment.first() {
             for value in global_scope.values() {
                 let Some(total) = global_string_bytes.checked_add(value.string_bytes()) else {
-                    return Err(LangError::at("تجاوز ميزانية النصوص في النطاق العام", callsite));
+                    return Err(LangError::at(
+                        "تجاوز ميزانية النصوص في النطاق العام",
+                        callsite,
+                    ));
                 };
                 global_string_bytes = total;
             }
@@ -1341,7 +1344,7 @@ impl Interpreter {
                         name,
                     )),
                 }
-            },
+            }
             Expr::Grouping(expr) => self.evaluate(expr),
             Expr::Unary { operator, right } => {
                 let right = self.evaluate(right)?;
@@ -1868,8 +1871,7 @@ mod tests {
         let returned = "دالة جمع(أ, ب) { أرجع أ + ب؛ } دالة موفر() { أرجع جمع؛ } دع مجموع = موفر()؛ اطبع(مجموع(٧, ٨))؛";
         assert_eq!(run(returned).unwrap(), ["15"]);
 
-        let equality =
-            "دالة أولى() { أرجع ١؛ } دالة ثانية() { أرجع ١؛ } اطبع(أولى == أولى)؛ اطبع(أولى != ثانية)؛";
+        let equality = "دالة أولى() { أرجع ١؛ } دالة ثانية() { أرجع ١؛ } اطبع(أولى == أولى)؛ اطبع(أولى != ثانية)؛";
         assert_eq!(run(equality).unwrap(), ["صحيح", "صحيح"]);
     }
 
