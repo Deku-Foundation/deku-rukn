@@ -49,6 +49,12 @@ Rukn currently uses a hand-written lexer, recursive-descent parser and tree-walk
 
 **Compiler bootstrap and assurance:** the [Rust Compiler Development Guide](https://rustc-dev-guide.rust-lang.org/) documents staged compiler builds and architecture; the [LLVM Kaleidoscope tutorial](https://llvm.org/docs/tutorial/) is a worked path from a small front end to IR and native output; [CompCert](https://compcert.org/doc/) is a research reference for formally verified compilation. Ken Thompson's [Reflections on Trusting Trust](https://doi.org/10.1145/358198.358210) explains why trusting the compiler binary matters as well as reviewing source. These references are synthesized into Rukn's [compiler bootstrap strategy](/project/compiler-bootstrap); self-hosting is a target, not an existing capability.
 
+### Executable semantics and mechanized reasoning
+
+Before adding a bytecode VM or a native backend, define a compact semantic model for the language features that already exist. Two useful primary resources are [PLT Redex documentation](https://docs.racket-lang.org/redex/), which supports executable language semantics and reduction relations, and [Software Foundations: Programming Language Foundations](https://softwarefoundations.cis.upenn.edu/plf-current/index.html), which develops operational semantics and type-system properties with machine-checked proofs.
+
+These tools need not become Rukn runtime dependencies. Use small models to pin down observable rules—scope lookup, function return propagation, list immutability, evaluation order and error cases—then convert each agreed rule into regression/conformance tests for the Rust implementation. Mechanized proofs only establish properties of the model and assumptions actually formalized; they do not automatically prove the implementation correct.
+
 ## 3. Testing, fuzzing and performance
 
 - [Rust Compiler Development Guide: Fuzzing](https://rustc-dev-guide.rust-lang.org/fuzzing.html) — practical guidance on finding and minimizing compiler failures.
