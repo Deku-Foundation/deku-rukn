@@ -1,0 +1,18 @@
+# Rukn CLI conformance corpus v1
+# Fields: case_name<TAB>expected_exit<TAB>stdout_escaped<TAB>stderr_fragment_escaped<TAB>source_escaped
+# Escapes: \\ = backslash; \n = newline; \r = carriage return; \t = tab. A blank stderr fragment means stderr must be empty.
+arabic_hello	0	مرحبًا يا العالم\n42\nخطأ\nصحيح\n		دع الاسم = «العالم»؛ اطبع(«مرحبًا يا » + الاسم)؛ دع الناتج = ٦ * ٧؛ اطبع(الناتج)؛ اطبع(صحيح == خطأ)؛ اطبع(صحيح أو خطأ)؛
+operator_precedence	0	14\n20\n		اطبع(2 + 3 * 4)؛ اطبع((2 + 3) * 4)؛
+three_digit_families	0	123\n123\n123\n		اطبع(123)؛ اطبع(١٢٣)؛ اطبع(۱۲۳)؛
+arabic_decimal_separator	0	12.5\n12.5\n12.5\n12.5\n		اطبع(12.5)؛ اطبع(١٢٫٥)؛ اطبع(۱۲٫۵)؛ اطبع(١٢.٥)؛
+logical_short_circuit	0	خطأ\nصحيح\n		اطبع(خطأ و (١ / ٠ == ٠))؛ اطبع(صحيح أو (١ / ٠ == ٠))؛
+string_escape_decoding	0	سطر\nثانٍ\t\\\n		اطبع("سطر\\nثانٍ\\t\\\\")؛
+print_without_parentheses	0	صحيح\n		اطبع صحيح؛
+empty_program	0			
+undefined_variable	1		غير معرّف	اطبع(غير_معرف)؛
+division_by_zero	1		القسمة على صفر	اطبع(8 / 0)؛
+mixed_digit_families	1		خلط مجموعات الأرقام	اطبع(1٢)؛
+incompatible_types	1		جمع عددين	اطبع(1 + "2")؛
+unterminated_string	1		نص غير مغلق	اطبع("نص)؛
+unsupported_string_escape	1		تسلسل هروب غير مدعوم	اطبع("خطأ\\q")؛
+missing_statement_terminator	1		الفاصلة المنقوطة	اطبع(١)
