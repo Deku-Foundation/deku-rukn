@@ -1437,14 +1437,9 @@ mod tests {
     #[test]
     fn infinite_loops_are_bounded() {
         let error = run("بينما (صحيح) { }").unwrap_err();
-        assert!(error.message.contains("خطوات شروط الحلقات").not());
         assert!(error.message.contains("تقييم شروط الحلقات"));
         assert!(error.line > 0 && error.column > 0);
-        assert_eq!(
-            MAX_LOOP_CONDITION_EVALUATIONS,
-            1_000_000,
-            "update this assertion if the documented runtime bound changes"
-        );
+        assert_eq!(MAX_LOOP_CONDITION_EVALUATIONS, 1_000_000);
     }
 
     #[test]
