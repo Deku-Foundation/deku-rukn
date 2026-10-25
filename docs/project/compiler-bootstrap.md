@@ -18,7 +18,7 @@ A compiler must initially be executed by an existing machine-code runtime, assem
 - **Reducible trust base:** the stage-zero implementation and external build tools are minimized, versioned, tested, and auditable over time.
 - **Reproducible stages:** each compiler stage passes the same conformance suite; binary reproducibility is pursued where the backend and build environment make it practical.
 
-Rewriting the project in Rukn immediately would not remove dependencies. Rukn now has blocks, lexical scopes, assignment, conditions, bounded while loops, named top-level functions, function references as values, higher-order calls, parameters, returns and recursion. It still lacks closures, modules, collections and the library facilities needed to express a compiler cleanly. The next task is to stabilize these semantics, then define module boundaries and the minimum standard library.
+Rewriting the project in Rukn immediately would not remove dependencies. Rukn now has blocks, lexical scopes, assignment, conditions, bounded while loops, immutable heterogeneous lists, zero-based indexing, `طول`/`أضف`, named top-level functions, function references as values, higher-order calls, parameters, returns and recursion. It still lacks closures, modules, maps/records, file-oriented compiler tooling and the standard-library facilities needed to express a compiler cleanly. The next task is to stabilize these semantics, then define module boundaries and the minimum standard library.
 
 ## Bootstrap model
 
@@ -58,7 +58,7 @@ This is a target architecture. Stage 1 and later self-hosted stages do not exist
 Before implementing the compiler in Rukn, decide and specify:
 
 - expression and statement semantics, blocks and lexical scopes (implemented experimentally; stabilize through conformance tests);
-- closures, module boundaries and a defined import model;
+- closures, module boundaries, a defined import model, maps/records and file-oriented standard-library operations;
 - a type model, numeric widths and overflow rules, mutability, and type inference policy;
 - collections, records or algebraic data types, strings, and explicit error propagation;
 - modules, imports, source locations, and a stable diagnostic format;
