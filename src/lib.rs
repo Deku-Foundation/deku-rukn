@@ -1186,11 +1186,10 @@ impl Interpreter {
         closing_paren: &Token,
         arguments: &[Expr],
     ) -> Result<Value, LangError> {
-        let function = self
-            .functions
-            .get(function_name)
-            .cloned()
-            .ok_or_else(|| LangError::at(format!("دالة غير معرّفة: {function_name}"), callsite))?;
+        let function =
+            self.functions.get(function_name).cloned().ok_or_else(|| {
+                LangError::at(format!("دالة غير معرّفة: {function_name}"), callsite)
+            })?;
         if arguments.len() != function.parameters.len() {
             return Err(LangError::at(
                 format!(
