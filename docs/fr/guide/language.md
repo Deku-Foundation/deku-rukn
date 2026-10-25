@@ -16,6 +16,57 @@ Cette page décrit le comportement implémenté, pas toute la vision à long ter
 
 Chaque instruction se termine par ؛ ou ;. Les chiffres ASCII, arabo-indiens et persans sont acceptés. Le séparateur décimal peut être le point ASCII ou le séparateur arabe ٫ (U+066B) ; il doit être suivi d’au moins un chiffre. Tous les chiffres d’un même nombre doivent appartenir à une seule famille ; mélanger les familles dans un littéral est une erreur.
 
+## Affectation et portées lexicales
+
+Utilisez `=` dans une instruction pour modifier une variable existante. Affecter un nom non défini est une erreur. En cas de noms imbriqués, l’affectation met à jour la liaison existante la plus proche, en partant de la portée intérieure.
+
+Les blocs entre accolades créent des portées lexicales. Une variable déclarée dans un bloc n’est plus accessible une fois le bloc terminé. Redéclarer le même nom dans un bloc imbriqué masque la liaison extérieure ; le redéclarer dans la même portée remplace la liaison de cette portée.
+
+```rukn
+دع الاسم = «خارج»؛
+{
+    دع الاسم = «داخل»؛
+    الاسم = «معدّل»؛
+    اطبع(الاسم)؛
+}
+اطبع(الاسم)؛
+```
+
+Sortie attendue :
+
+```text
+معدّل
+خارج
+```
+
+## Conditions et boucles
+
+`إذا` exécute un bloc si la condition vaut `صحيح` ; `وإلا` permet de définir le bloc alternatif. `بينما` répète son bloc tant que la condition vaut `صحيح`. Les conditions doivent produire des booléens ; les nombres et chaînes ne sont pas convertis implicitement en booléens.
+
+```rukn
+دع العد = ٠؛
+بينما (العد < ٣) {
+    اطبع(العد)؛
+    العد = العد + ١؛
+}
+إذا (العد == ٣) {
+    اطبع(«انتهى»)؛
+} وإلا {
+    اطبع(«لم ينتهِ»)؛
+}
+```
+
+Sortie attendue :
+
+```text
+0
+1
+2
+انتهى
+```
+
+L’interpréteur arrête une exécution après 1 000 000 d’évaluations cumulées de conditions `بينما`. Cette limite de ressources n’est ni une garantie de temps d’exécution ni un bac à sable complet.
+
 ## Valeurs
 
 | Type | Exemples |
@@ -44,6 +95,11 @@ La priorité décroît dans cet ordre : négation, multiplication/division, addi
 ## Commentaires et erreurs
 
 Un commentaire commence par # et se termine à la fin de la ligne. Les variables inconnues, chaînes non fermées, caractères non pris en charge, divisions par zéro et incompatibilités de types produisent un diagnostic avec ligne et colonne. Les conversions implicites sont interdites.
+
+
+## Fonctionnalités pas encore implémentées
+
+Les fonctions, fermetures, collections, types définis par l’utilisateur, modules, syntaxe explicite de gestion des erreurs et ABI stable ne sont pas encore implémentés. Les conditions, blocs, portées lexicales, affectations et boucles `بينما` bornées sont maintenant pris en charge. Consultez la spécification et la feuille de route.
 
 
 ## Identifiants Unicode
