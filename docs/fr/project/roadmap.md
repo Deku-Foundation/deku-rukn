@@ -31,7 +31,8 @@ Les étapes reposent sur des preuves, pas sur des dates promises. Une fonctionna
 ## M2 — Abstractions
 
 - [x] Fonctions nommées de niveau supérieur, paramètres, retours et récursion, avec limite d’appels et tests de conformité (brouillon 0.6).
-- [ ] Valeurs de fonction de première classe et fermetures.
+- [x] Références de fonctions nommées comme valeurs : affectation, passage en argument, retour, appels d’ordre supérieur et égalité des références (brouillon 0.7).
+- [ ] Fermetures et capture de portée lexicale.
 - [ ] Collections et itération.
 - [ ] Modules, imports et modèle de dépendances.
 - [ ] Propagation explicite des erreurs et sémantique des autres formes de boucles.
