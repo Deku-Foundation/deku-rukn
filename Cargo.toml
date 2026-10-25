@@ -17,6 +17,7 @@ path = "src/lib.rs"
 
 [dependencies]
 unicode-ident = "=1.0.27"
+unicode-normalization = "=0.1.25"
 
 [lints.rust]
 unsafe_code = "forbid"
