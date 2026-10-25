@@ -952,7 +952,8 @@ impl Value {
     fn string_bytes(&self) -> usize {
         match self {
             Self::String(value) => value.len(),
-            Self::Number(_) | Self::Bool(_) | Self::Function(_) | Self::Nil => 0,
+            Self::Function(name) => name.len(),
+            Self::Number(_) | Self::Bool(_) | Self::Nil => 0,
         }
     }
 }
@@ -1335,6 +1336,7 @@ impl Interpreter {
                     .ok_or_else(|| {
                         LangError::at(format!("دالة غير معرّفة: {}", name.lexeme), name)
                     })?;
+                self.reserve_runtime_string_bytes(callee.string_bytes(), name)?;
                 match callee {
                     Value::Function(function_name) => {
                         self.call_function(&function_name, name, paren, arguments)
@@ -1873,6 +1875,21 @@ mod tests {
 
         let equality = "دالة أولى() { أرجع ١؛ } دالة ثانية() { أرجع ١؛ } اطبع(أولى == أولى)؛ اطبع(أولى != ثانية)؛";
         assert_eq!(run(equality).unwrap(), ["صحيح", "صحيح"]);
+    }
+
+    #[test]
+    fn function_reference_name_copies_respect_runtime_budget() {
+        let long_name = "م".repeat(160_000);
+        let source = format!(
+            "دالة {long_name}() {{ أرجع ١؛ }} دع ف = {long_name}؛ دع عد = ٠؛ بينما (عد < 30) {{ ف()؛ عد = عد + ١؛ }}"
+        );
+        assert!(source.len() < MAX_SOURCE_BYTES);
+        let error = run(&source).unwrap_err();
+        assert!(
+            error.message.contains("ميزانية النصوص"),
+            "unexpected diagnostic: {}",
+            error.message
+        );
     }
 
     #[test]
