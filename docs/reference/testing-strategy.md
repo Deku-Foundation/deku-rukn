@@ -5,7 +5,7 @@ description: A practical validation plan for the Rukn lexer, parser, evaluator, 
 
 # Testing and conformance strategy
 
-**Status: engineering baseline with a bounded fuzz smoke target and a CLI conformance corpus.** Unit tests and the standard CI gates remain the primary correctness checks. The dependency-free integration runner executes the checked-in 21-case corpus against the real CLI, including stdout, exit status, and diagnostic-fragment checks. The corpus covers lexical shadowing, assignment, if/else conditions, while-loop behavior, non-boolean conditions, malformed blocks, and undefined assignment. A separate workflow runs a 60-second libFuzzer campaign for pull requests that touch source or fuzz files, weekly, and by manual dispatch. Parser-focused fuzzing, longer campaigns, structured diagnostic assertions, and benchmark gates remain future work.
+**Status: engineering baseline with a bounded fuzz smoke target and a CLI conformance corpus.** Unit tests and the standard CI gates remain the primary correctness checks. The dependency-free integration runner executes the checked-in 30-case corpus against the real CLI, including stdout, exit status, and diagnostic-fragment checks. The corpus covers lexical shadowing, assignment, if/else, while-loop behavior, named function calls, recursion, returns, arity errors, undefined functions, malformed blocks, and resource limits. A separate workflow runs a 60-second libFuzzer campaign for pull requests that touch source or fuzz files, weekly, and by manual dispatch. Parser-focused fuzzing, longer campaigns, structured diagnostic assertions, and benchmark gates remain future work.
 
 ## Test layers
 
@@ -13,7 +13,7 @@ description: A practical validation plan for the Rukn lexer, parser, evaluator, 
 | --- | --- | --- |
 | Lexer and string decoding | Token kinds, numeral conversion, source locations, invalid characters, escape decoding | Arabic and ASCII semicolons, three digit families, unterminated strings, escaped delimiters, unknown escapes |
 | Parser | Precedence, associativity, block syntax, required terminators, bounded nesting | `2 + 3 * 4`, missing `)`, missing `}`, deeply nested blocks and unary expressions |
-| Evaluator | Value semantics and failure behavior | Mixed-type addition, undefined names/assignments, lexical shadowing, boolean conditions, bounded loops, division by zero, non-finite arithmetic, bounded runtime string copies |
+| Evaluator | Value semantics and failure behavior | Mixed-type addition, undefined names/assignments, lexical shadowing, boolean conditions, bounded loops, named calls, return propagation, recursion and arity limits, division by zero, non-finite arithmetic, bounded runtime string copies |
 | CLI | Bounded file input, UTF-8 validation, stdout/stderr and exit codes | Missing path, multiple arguments, invalid UTF-8, over-limit source files |
 | Documentation | Pages resolve and snippets remain accurate | Build all three locales; compare the featured example to CI output |
 | Release | Repeatable checks and compatibility notes | Locked dependencies, draft spec review, release checklist |
@@ -30,6 +30,8 @@ String delimiter and escape behavior is documented in [String literal behavior](
 - Source, token, parser/block-nesting, single-string, cumulative runtime string-allocation, and while-condition-evaluation limits reject excessive inputs predictably.
 - Assignment updates the nearest existing lexical binding; block-local names do not leak into the enclosing scope.
 - If and while conditions require booleans and never use implicit truthiness.
+- Function arguments are evaluated left to right, arity is exact, recursive calls respect the active-call budget, and functions do not capture caller-block locals.
+- Return flow must propagate through blocks and conditionals, and a top-level return must produce a diagnostic.
 - The CLI reads no more than one byte beyond the source-size limit before rejecting an oversized file; it must not buffer an unbounded file before calling the interpreter.
 - All code examples in the documentation are either copied from a real example file or explicitly labelled as illustrative.
 
