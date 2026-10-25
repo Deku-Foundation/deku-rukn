@@ -1611,7 +1611,10 @@ impl Interpreter {
                         self.call_function(&function_name, name, paren, arguments)
                     }
                     _ => Err(LangError::at(
-                        format!("القيمة «{}» ليست دالة قابلة للاستدعاء", name.display_lexeme()),
+                        format!(
+                            "القيمة «{}» ليست دالة قابلة للاستدعاء",
+                            name.display_lexeme()
+                        ),
                         name,
                     )),
                 }
