@@ -5,7 +5,7 @@ description: The current grammar, values and semantics of Rukn.
 
 # Rukn language specification
 
-**Status: draft, version 0.3.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
+**Status: draft, version 0.4.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
 
 ## Lexical rules
 
@@ -24,7 +24,7 @@ description: The current grammar, values and semantics of Rukn.
     program      = { statement } ;
     statement    = declaration | print_statement | expression_statement ;
     declaration  = "دع" identifier "=" expression terminator ;
-    print_statement = "اطبع" [ "(" ] expression [ ")" ] terminator ;
+    print_statement = "اطبع" ( "(" expression ")" | expression ) terminator ;
     expression_statement = expression terminator ;
     terminator   = "؛" | ";" ;
     expression   = logical_or ;
@@ -61,8 +61,10 @@ The current implementation applies these guardrails:
 | Source size | 1,048,576 bytes (1 MiB) |
 | Lexer tokens | 16,384 |
 | Parser nesting | 64 levels |
+| Single runtime string | 1,048,576 UTF-8 bytes (1 MiB) |
+| Cumulative runtime string allocation/copy budget per run | 16,777,216 bytes (16 MiB) |
 
-Inputs exceeding these bounds are rejected with a language error. These values are implementation limits and may change before a stable language release. They are not a formal sandbox and do not guarantee isolation against every denial-of-service scenario.
+The runtime string budget conservatively counts string-value clones, concatenation results, and captured print output during one run. It is cumulative accounting, not an exact measurement of live heap usage. Inputs exceeding these bounds are rejected with a language error. These are implementation limits and may change before a stable language release; they are not a formal sandbox and do not guarantee isolation against every denial-of-service scenario.
 
 ## Known gaps
 

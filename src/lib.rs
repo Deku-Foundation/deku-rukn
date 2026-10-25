@@ -5,6 +5,10 @@ use unicode_ident::{is_xid_continue, is_xid_start};
 
 /// Maximum source size in UTF-8 bytes accepted by the interpreter and CLI.
 pub const MAX_SOURCE_BYTES: usize = 1_048_576;
+/// Maximum size, in UTF-8 bytes, of a single runtime string value.
+pub const MAX_STRING_BYTES: usize = MAX_SOURCE_BYTES;
+/// Conservative cumulative budget for runtime string clones, concatenations and output.
+pub const MAX_RUNTIME_STRING_BYTES: usize = 16 * 1024 * 1024;
 const MAX_TOKENS: usize = 16_384;
 // Keep recursion well below typical thread stack limits; this is a safety bound, not a language feature.
 const MAX_NESTING: usize = 64;
@@ -395,7 +399,10 @@ fn is_identifier_continue(ch: char) -> bool {
 
 #[derive(Debug, Clone)]
 enum Expr {
-    Literal(Value),
+    Literal {
+        value: Value,
+        token: Token,
+    },
     Variable(Token),
     Grouping(Box<Expr>),
     Unary {
@@ -416,7 +423,7 @@ enum Expr {
 #[derive(Debug, Clone)]
 enum Stmt {
     Let { name: Token, initializer: Expr },
-    Print { expression: Expr },
+    Print { expression: Expr, keyword: Token },
     Expression(Expr),
 }
 
@@ -473,13 +480,17 @@ impl Parser {
             return Ok(Stmt::Let { name, initializer });
         }
         if self.matches(TokenKind::Print) {
+            let keyword = self.previous().clone();
             let parenthesized = self.matches(TokenKind::LeftParen);
             let expression = self.expression()?;
             if parenthesized {
                 self.consume(TokenKind::RightParen, "توقعت «)» بعد قيمة الطباعة")?;
             }
             self.consume(TokenKind::Semicolon, "أنهِ التعليمة بالفاصلة المنقوطة «؛»")?;
-            return Ok(Stmt::Print { expression });
+            return Ok(Stmt::Print {
+                expression,
+                keyword,
+            });
         }
         let expression = self.expression()?;
         self.consume(TokenKind::Semicolon, "أنهِ التعليمة بالفاصلة المنقوطة «؛»")?;
@@ -584,13 +595,25 @@ impl Parser {
     }
     fn primary(&mut self) -> Result<Expr, LangError> {
         if self.matches(TokenKind::False) {
-            return Ok(Expr::Literal(Value::Bool(false)));
+            let token = self.previous().clone();
+            return Ok(Expr::Literal {
+                value: Value::Bool(false),
+                token,
+            });
         }
         if self.matches(TokenKind::True) {
-            return Ok(Expr::Literal(Value::Bool(true)));
+            let token = self.previous().clone();
+            return Ok(Expr::Literal {
+                value: Value::Bool(true),
+                token,
+            });
         }
         if self.matches(TokenKind::Nil) {
-            return Ok(Expr::Literal(Value::Nil));
+            let token = self.previous().clone();
+            return Ok(Expr::Literal {
+                value: Value::Nil,
+                token,
+            });
         }
         if self.matches(TokenKind::Number) {
             let token = self.previous().clone();
@@ -600,12 +623,18 @@ impl Parser {
             if !value.is_finite() {
                 return Err(LangError::at("يجب أن يكون العدد محدودًا", &token));
             }
-            return Ok(Expr::Literal(Value::Number(value)));
+            return Ok(Expr::Literal {
+                value: Value::Number(value),
+                token,
+            });
         }
         if self.matches(TokenKind::String) {
             let token = self.previous().clone();
             let value = decode_string_literal(&token)?;
-            return Ok(Expr::Literal(Value::String(value)));
+            return Ok(Expr::Literal {
+                value: Value::String(value),
+                token,
+            });
         }
         if self.matches(TokenKind::Identifier) {
             return Ok(Expr::Variable(self.previous().clone()));
@@ -662,6 +691,14 @@ enum Value {
     Bool(bool),
     Nil,
 }
+impl Value {
+    fn string_bytes(&self) -> usize {
+        match self {
+            Self::String(value) => value.len(),
+            Self::Number(_) | Self::Bool(_) | Self::Nil => 0,
+        }
+    }
+}
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -678,6 +715,7 @@ struct Interpreter {
     environment: HashMap<String, Value>,
     output: Vec<String>,
     evaluation_depth: usize,
+    runtime_string_bytes: usize,
 }
 impl Interpreter {
     fn new() -> Self {
@@ -685,7 +723,27 @@ impl Interpreter {
             environment: HashMap::new(),
             output: Vec::new(),
             evaluation_depth: 0,
+            runtime_string_bytes: 0,
         }
+    }
+    fn reserve_runtime_string_bytes(
+        &mut self,
+        bytes: usize,
+        token: &Token,
+    ) -> Result<(), LangError> {
+        let Some(total) = self.runtime_string_bytes.checked_add(bytes) else {
+            return Err(LangError::at("تجاوز البرنامج ميزانية تخصيص النصوص", token));
+        };
+        if total > MAX_RUNTIME_STRING_BYTES {
+            return Err(LangError::at(
+                format!(
+                    "تجاوز البرنامج ميزانية النصوص أثناء التنفيذ ({MAX_RUNTIME_STRING_BYTES} بايت)"
+                ),
+                token,
+            ));
+        }
+        self.runtime_string_bytes = total;
+        Ok(())
     }
     fn interpret(mut self, statements: &[Stmt]) -> Result<Vec<String>, LangError> {
         for statement in statements {
@@ -699,9 +757,13 @@ impl Interpreter {
                 let value = self.evaluate(initializer)?;
                 self.environment.insert(name.lexeme.clone(), value);
             }
-            Stmt::Print { expression } => {
-                let value = self.evaluate(expression)?.to_string();
-                self.output.push(value);
+            Stmt::Print {
+                expression,
+                keyword,
+            } => {
+                let value = self.evaluate(expression)?;
+                self.reserve_runtime_string_bytes(value.string_bytes(), keyword)?;
+                self.output.push(value.to_string());
             }
             Stmt::Expression(expression) => {
                 self.evaluate(expression)?;
@@ -716,7 +778,8 @@ impl Interpreter {
                 Expr::Unary { operator, .. }
                 | Expr::Binary { operator, .. }
                 | Expr::Logical { operator, .. } => Some(operator),
-                Expr::Literal(_) | Expr::Grouping(_) => None,
+                Expr::Literal { token, .. } => Some(token),
+                Expr::Grouping(_) => None,
             };
             return Err(match token {
                 Some(token) => LangError::at(
@@ -737,12 +800,24 @@ impl Interpreter {
     }
     fn evaluate_inner(&mut self, expr: &Expr) -> Result<Value, LangError> {
         match expr {
-            Expr::Literal(value) => Ok(value.clone()),
-            Expr::Variable(name) => self
-                .environment
-                .get(&name.lexeme)
-                .cloned()
-                .ok_or_else(|| LangError::at(format!("متغير غير معرّف: {}", name.lexeme), name)),
+            Expr::Literal { value, token } => {
+                self.reserve_runtime_string_bytes(value.string_bytes(), token)?;
+                Ok(value.clone())
+            }
+            Expr::Variable(name) => {
+                let Some(bytes) = self.environment.get(&name.lexeme).map(Value::string_bytes)
+                else {
+                    return Err(LangError::at(
+                        format!("متغير غير معرّف: {}", name.lexeme),
+                        name,
+                    ));
+                };
+                self.reserve_runtime_string_bytes(bytes, name)?;
+                self.environment
+                    .get(&name.lexeme)
+                    .cloned()
+                    .ok_or_else(|| LangError::at(format!("متغير غير معرّف: {}", name.lexeme), name))
+            }
             Expr::Grouping(expr) => self.evaluate(expr),
             Expr::Unary { operator, right } => {
                 let right = self.evaluate(right)?;
@@ -789,11 +864,26 @@ impl Interpreter {
             }
         }
     }
-    fn binary(&self, left: Value, op: &Token, right: Value) -> Result<Value, LangError> {
+    fn binary(&mut self, left: Value, op: &Token, right: Value) -> Result<Value, LangError> {
         use TokenKind as K;
         match (op.kind, left, right) {
             (K::Plus, Value::Number(a), Value::Number(b)) => finite_number(a + b, op),
-            (K::Plus, Value::String(a), Value::String(b)) => Ok(Value::String(a + &b)),
+            (K::Plus, Value::String(a), Value::String(b)) => {
+                let Some(length) = a.len().checked_add(b.len()) else {
+                    return Err(LangError::at("تجاوز طول النص الحد المدعوم", op));
+                };
+                if length > MAX_STRING_BYTES {
+                    return Err(LangError::at(
+                        format!("تجاوز النص الناتج الحد الأقصى ({MAX_STRING_BYTES} بايت)"),
+                        op,
+                    ));
+                }
+                self.reserve_runtime_string_bytes(length, op)?;
+                let mut combined = String::with_capacity(length);
+                combined.push_str(&a);
+                combined.push_str(&b);
+                Ok(Value::String(combined))
+            }
             (K::Minus, Value::Number(a), Value::Number(b)) => finite_number(a - b, op),
             (K::Star, Value::Number(a), Value::Number(b)) => finite_number(a * b, op),
             (K::Slash, Value::Number(_), Value::Number(0.0)) => {
@@ -834,7 +924,7 @@ pub fn run(source: &str) -> Result<Vec<String>, LangError> {
 
 #[cfg(test)]
 mod tests {
-    use super::{MAX_NESTING, MAX_SOURCE_BYTES, run};
+    use super::{MAX_NESTING, MAX_RUNTIME_STRING_BYTES, MAX_SOURCE_BYTES, run};
 
     #[test]
     fn arabic_program_and_digits() {
@@ -1059,6 +1149,50 @@ mod tests {
         let error = run(r#"اطبع("خطأ\q")؛"#).unwrap_err();
         assert!(error.message.contains("تسلسل هروب غير مدعوم"));
         assert_eq!((error.line, error.column), (1, 6));
+    }
+
+    #[test]
+    fn runtime_string_allocation_budget_rejects_repeated_large_copies() {
+        let literal = "x".repeat(128 * 1024);
+        let mut source = format!("دع النص = «{literal}»؛\n");
+        for index in 0..(MAX_RUNTIME_STRING_BYTES / (128 * 1024) + 2) {
+            source.push_str(&format!("دع نسخة_{index} = النص؛\n"));
+        }
+        assert!(source.len() < MAX_SOURCE_BYTES);
+        let error = run(&source).unwrap_err();
+        assert!(
+            error.message.contains("ميزانية النصوص"),
+            "unexpected diagnostic: {}",
+            error.message
+        );
+        assert!(error.line > 0 && error.column > 0);
+    }
+
+    #[test]
+    fn concatenated_string_values_are_bounded() {
+        let long_literal = "x".repeat(MAX_SOURCE_BYTES * 3 / 5);
+        let source = format!("دع النص = «{long_literal}»؛ دع الناتج = النص + النص؛");
+        assert!(source.len() < MAX_SOURCE_BYTES);
+        let error = run(&source).unwrap_err();
+        assert!(error.message.contains("الحد الأقصى"), "{}", error.message);
+        assert!(error.line > 0 && error.column > 0);
+    }
+
+    #[test]
+    fn repeated_prints_respect_runtime_string_allocation_budget() {
+        let literal = "x".repeat(128 * 1024);
+        let mut source = format!("دع النص = «{literal}»؛\n");
+        for _ in 0..(MAX_RUNTIME_STRING_BYTES / (128 * 1024) + 2) {
+            source.push_str("اطبع(النص)؛\n");
+        }
+        assert!(source.len() < MAX_SOURCE_BYTES);
+        let error = run(&source).unwrap_err();
+        assert!(
+            error.message.contains("ميزانية النصوص"),
+            "unexpected diagnostic: {}",
+            error.message
+        );
+        assert!(error.line > 0 && error.column > 0);
     }
 
     #[test]

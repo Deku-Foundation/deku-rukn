@@ -5,7 +5,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 
 # Spécification du langage Rukn
 
-**État : brouillon 0.3.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
+**État : brouillon 0.4.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
 
 ## Règles lexicales
 
@@ -24,7 +24,7 @@ description: Grammaire et sémantique actuelles de Rukn.
     program      = { statement } ;
     statement    = declaration | print_statement | expression_statement ;
     declaration  = "دع" identifier "=" expression terminator ;
-    print_statement = "اطبع" [ "(" ] expression [ ")" ] terminator ;
+    print_statement = "اطبع" ( "(" expression ")" | expression ) terminator ;
     expression   = logical_or ;
     logical_or   = logical_and { "أو" logical_and } ;
     logical_and  = equality { "و" equality } ;
@@ -56,8 +56,10 @@ L’implémentation applique actuellement les limites suivantes :
 | Taille de la source | 1 048 576 octets (1 Mio) |
 | Nombre de jetons lexicaux | 16 384 |
 | Profondeur d’imbrication syntaxique | 64 niveaux |
+| Taille d’une chaîne à l’exécution | 1 048 576 octets UTF-8 (1 Mio) |
+| Budget cumulé d’allocations/copies de chaînes par exécution | 16 777 216 octets (16 Mio) |
 
-Les entrées dépassant ces bornes sont rejetées avec une erreur du langage. Ces valeurs sont des limites d’implémentation susceptibles d’évoluer avant une version stable. Elles ne constituent pas un bac à sable formel ni une garantie contre toutes les formes de déni de service.
+Le budget compte de manière conservative les copies de valeurs chaîne, les résultats de concaténation et la sortie collectée pendant une exécution. Il s’agit d’un comptage cumulatif, et non d’une mesure exacte du tas encore vivant. Les entrées dépassant ces bornes sont rejetées avec une erreur du langage. Ces limites d’implémentation peuvent évoluer avant une version stable ; elles ne constituent pas un bac à sable formel ni une garantie contre toutes les formes de déni de service.
 
 ## Lacunes connues
 

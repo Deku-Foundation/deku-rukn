@@ -24,6 +24,7 @@ Un langage nécessite un registre de décisions, pas seulement une feuille de ro
 | RUKN-DR-0004 | Amorçage et auto-hébergement | Différé | Parseur stable, bibliothèque standard, tests du compilateur et amorçage reproductible |
 | RUKN-DR-0005 | Opérateurs logiques arabes | Base implémentée dans le brouillon 0.2 ; mots réservés expérimentaux avant stabilisation | Tests des booléens, de l’associativité, de la priorité et du court-circuit |
 | RUKN-DR-0006 | Une seule famille de chiffres par littéral | Base expérimentale implémentée dans le brouillon 0.3 ; revue de compatibilité encore ouverte | Tests des familles de chiffres, des séparateurs décimaux, de la position des erreurs et note de migration |
+| RUKN-DR-0007 | Taille des chaînes et budget cumulé de copies à l’exécution | Garde-fou implémenté dans le brouillon 0.4 ; comptage conservateur, pas un bac à sable | Tests de copies répétées, concaténation et sortie imprimée ; revoir les limites avant 1.0 et en cas d’intégration |
 
 Ces entrées sont des sujets de recherche, pas une autorisation d’implémenter une option particulière.
 
