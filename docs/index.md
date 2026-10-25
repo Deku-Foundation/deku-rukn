@@ -62,6 +62,6 @@ Expected output:
 
 **Experimental · pre-alpha · not for production use.**
 
-Rukn now includes assignment, lexical block scopes, boolean conditionals and a bounded `بينما` loop. It does not yet include functions, closures, modules, collections, a package manager, a bytecode VM, native compilation, IDE integration or a self-hosting compiler. Those remain future research and engineering goals.
+Rukn now includes assignment, lexical block scopes, boolean conditionals, a bounded `بينما` loop, named top-level functions, parameters, return values and recursion. First-class functions, closures, modules, collections, a package manager, a bytecode VM, native compilation, IDE integration and a self-hosting compiler remain future research and engineering goals.
 
 The first priorities are a precise and tested language specification, robust diagnostics, Unicode identifier policy, regression tests, and a reproducible documentation build.
