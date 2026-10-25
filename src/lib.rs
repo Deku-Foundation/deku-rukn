@@ -1213,6 +1213,11 @@ impl Interpreter {
         self.environment = vec![global_scope, parameter_scope];
         self.call_depth += 1;
 
+        // Expression nesting is bounded within each function frame. Keep it
+        // separate from the independent recursion/call-depth budget.
+        let caller_evaluation_depth = self.evaluation_depth;
+        self.evaluation_depth = 0;
+
         let execution = (|| {
             let mut flow = Flow::Continue;
             for statement in &function.body {
@@ -1224,6 +1229,7 @@ impl Interpreter {
             Ok(flow)
         })();
 
+        self.evaluation_depth = caller_evaluation_depth;
         self.call_depth -= 1;
         let callee_environment = std::mem::take(&mut self.environment);
         if let Some(caller_globals) = caller_environment.first_mut() {
