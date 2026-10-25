@@ -807,49 +807,103 @@ impl Parser {
 
     fn call(&mut self) -> Result<Expr, LangError> {
         let mut expression = self.primary()?;
-        while self.matches(TokenKind::LeftParen) {
-            let opening = self.previous().clone();
-            self.enter_nesting(&opening)?;
-            let parsed_arguments = (|| {
-                let mut arguments = Vec::new();
-                if !self.check(TokenKind::RightParen) {
-                    loop {
-                        if arguments.len() >= MAX_FUNCTION_PARAMETERS {
-                            return Err(LangError::at(
-                                format!("تجاوز الاستدعاء حد المعاملات ({MAX_FUNCTION_PARAMETERS})"),
-                                self.peek(),
-                            ));
-                        }
-                        arguments.push(self.expression()?);
-                        if !self.matches(TokenKind::Comma) {
-                            break;
+        loop {
+            if self.matches(TokenKind::LeftParen) {
+                let opening = self.previous().clone();
+                self.enter_nesting(&opening)?;
+                let parsed_arguments = (|| {
+                    let mut arguments = Vec::new();
+                    if !self.check(TokenKind::RightParen) {
+                        loop {
+                            if arguments.len() >= MAX_FUNCTION_PARAMETERS {
+                                return Err(LangError::at(
+                                    format!(
+                                        "تجاوز الاستدعاء حد المعاملات ({MAX_FUNCTION_PARAMETERS})"
+                                    ),
+                                    self.peek(),
+                                ));
+                            }
+                            arguments.push(self.expression()?);
+                            if !self.matches(TokenKind::Comma) {
+                                break;
+                            }
                         }
                     }
-                }
-                let paren = self.consume(TokenKind::RightParen, "توقعت «)» بعد معاملات الاستدعاء")?;
-                Ok((arguments, paren))
-            })();
-            self.nesting -= 1;
-            let (arguments, paren) = parsed_arguments?;
-            let name = match expression {
-                Expr::Variable(name) => name,
-                _ => {
-                    return Err(LangError::at(
-                        "يدعم ركن حاليًا استدعاء الدوال المسماة فقط",
-                        &paren,
-                    ));
-                }
-            };
-            expression = Expr::Call {
-                name,
-                paren,
-                arguments,
-            };
+                    let paren =
+                        self.consume(TokenKind::RightParen, "توقعت «)» بعد معاملات الاستدعاء")?;
+                    Ok((arguments, paren))
+                })();
+                self.nesting -= 1;
+                let (arguments, paren) = parsed_arguments?;
+                let name = match expression {
+                    Expr::Variable(name) => name,
+                    _ => {
+                        return Err(LangError::at(
+                            "يدعم ركن حاليًا استدعاء الأسماء أو المتغيرات القابلة للاستدعاء فقط",
+                            &paren,
+                        ));
+                    }
+                };
+                expression = Expr::Call {
+                    name,
+                    paren,
+                    arguments,
+                };
+                continue;
+            }
+
+            if self.matches(TokenKind::LeftBracket) {
+                let bracket = self.previous().clone();
+                self.enter_nesting(&bracket)?;
+                let parsed_index = (|| {
+                    let index = self.expression()?;
+                    self.consume(
+                        TokenKind::RightBracket,
+                        "توقعت «]» بعد فهرس القائمة أو النص",
+                    )?;
+                    Ok(index)
+                })();
+                self.nesting -= 1;
+                let index = parsed_index?;
+                expression = Expr::Index {
+                    target: Box::new(expression),
+                    index: Box::new(index),
+                    bracket,
+                };
+                continue;
+            }
+
+            break;
         }
         Ok(expression)
     }
 
     fn primary(&mut self) -> Result<Expr, LangError> {
+        if self.matches(TokenKind::LeftBracket) {
+            let bracket = self.previous().clone();
+            self.enter_nesting(&bracket)?;
+            let parsed_elements = (|| {
+                let mut elements = Vec::new();
+                if !self.check(TokenKind::RightBracket) {
+                    loop {
+                        if elements.len() >= MAX_LIST_ELEMENTS {
+                            return Err(LangError::at(
+                                format!("تجاوزت القائمة الحد الأقصى للعناصر ({MAX_LIST_ELEMENTS})"),
+                                self.peek(),
+                            ));
+                        }
+                        elements.push(self.expression()?);
+                        if !self.matches(TokenKind::Comma) {
+                            break;
+                        }
+                    }
+                }
+                self.consume(TokenKind::RightBracket, "توقعت «]» لإغلاق القائمة")?;
+                Ok(elements)
+            })();
+            self.nesting -= 1;
+            return parsed_elements.map(|elements| Expr::List { elements, bracket });
+        }
         if self.matches(TokenKind::False) {
             let token = self.previous().clone();
             return Ok(Expr::Literal {
