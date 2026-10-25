@@ -66,7 +66,7 @@ The print parentheses are optional in the implementation, but if an opening pare
 - A variable lookup for an unknown name is an error.
 - Division by positive or negative zero is an error.
 - Non-finite numeric results are rejected with a language diagnostic.
-- Function declarations use `دالة name(parameter, ...)` and are permitted only at top level in this version. Function names occupy a separate global function namespace; they are not first-class values and cannot be returned, assigned, or stored.
+- Function declarations use `دالة name(parameter, ...)` and are permitted only at top level in this version. All top-level function names are registered before statement execution, so forward calls and mutual recursion work. Duplicate function names are rejected during parsing. Function names occupy a separate global function namespace; they are not first-class values and cannot be returned, assigned, or stored.
 - Arguments are evaluated left to right in the caller's environment. Arity must match exactly; at most 64 parameters/arguments are accepted.
 - A function body runs with the global environment and a fresh parameter/local environment. It cannot capture caller-block locals; closures and nested function declarations are unsupported. Assignments to global bindings persist after the call.
 - `أرجع expression؛` returns a value; `أرجع؛` returns `لاشيء`. Falling off the end of a function also returns `لاشيء`. A return outside a function is an error.
