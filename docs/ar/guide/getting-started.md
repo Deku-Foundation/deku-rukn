@@ -21,6 +21,7 @@ description: بناء مفسر ركن من المصدر وتشغيل أول بر
     cargo build --release --locked
     cargo run --locked -- examples/hello.rukn
     cargo run --locked -- examples/functions.rukn
+    cargo run --locked -- examples/lists.rukn
 
 الناتج المتوقع لمثال hello.rukn:
 
