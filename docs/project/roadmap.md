@@ -33,7 +33,8 @@ Milestones are evidence-based, not time promises. A feature is complete only whe
 - [x] Named top-level functions, parameters, return values and recursion, with a bounded call depth and conformance tests (draft 0.6).
 - [x] Named function references as values: assignment, parameter passing, return, higher-order calls and function-reference equality (draft 0.7).
 - [ ] Closures and lexical environment capture.
-- [ ] Collections and iteration.
+- [x] Immutable list literals, zero-based indexing, `طول` and immutable `أضف`, with resource bounds and conformance tests (draft 0.8).
+- [ ] Maps/records, slicing and richer collection APIs.
 - [ ] Modules, imports and a dependency model.
 - [ ] Explicit error propagation and semantics for additional loop forms.
 - [ ] Stabilize numeric semantics and define a static type-checking direction.
