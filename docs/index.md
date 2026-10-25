@@ -26,7 +26,7 @@ features:
     link: /guide/language
     linkText: Explore the language
   - title: Small, explicit core
-    details: A Rust tree-walk interpreter with numbers, strings, booleans, variables, operators, and clear diagnostics.
+    details: A Rust tree-walk interpreter with numbers, strings, booleans, immutable lists, lexical scopes, control flow, named functions and clear diagnostics.
     link: /reference/architecture
     linkText: Understand the interpreter
   - title: Research before promises
