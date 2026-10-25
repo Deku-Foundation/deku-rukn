@@ -34,7 +34,7 @@ jobs:
       - name: Verify function and recursion example
         run: |
           cargo run --locked -- examples/functions.rukn > /tmp/rukn-functions-output.txt
-          diff -u <(printf '42\n120\n') /tmp/rukn-functions-output.txt
+          diff -u <(printf '42\n120\n5\n9\n') /tmp/rukn-functions-output.txt
 
   docs:
     name: Documentation site
