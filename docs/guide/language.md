@@ -28,6 +28,57 @@ A binding can be reassigned by declaring the same name again in the same scope; 
 
 Parentheses around the printed expression are optional.
 
+## Assignment and lexical scopes
+
+Use `=` as a statement to update an existing variable. Assigning to an undefined name is an error. The assignment target is the nearest binding with that name in the current scope or an outer scope.
+
+Curly-braced blocks create lexical scopes. A variable declared inside a block is not visible after the block ends. Declaring the same name in a nested block shadows the outer binding; declaring it again in the same scope replaces that scope's current binding.
+
+```rukn
+دع الاسم = «خارج»؛
+{
+    دع الاسم = «داخل»؛
+    الاسم = «معدّل»؛
+    اطبع(الاسم)؛
+}
+اطبع(الاسم)؛
+```
+
+Expected output:
+
+```text
+معدّل
+خارج
+```
+
+## Conditions and loops
+
+`إذا` selects a block when its condition is `صحيح`; optional `وإلا` selects the alternative block. `بينما` repeats its block while the condition evaluates to `صحيح`. Conditions must evaluate to booleans; numbers and strings are not implicitly converted.
+
+```rukn
+دع العد = ٠؛
+بينما (العد < ٣) {
+    اطبع(العد)؛
+    العد = العد + ١؛
+}
+إذا (العد == ٣) {
+    اطبع(«انتهى»)؛
+} وإلا {
+    اطبع(«لم ينتهِ»)؛
+}
+```
+
+Expected output:
+
+```text
+0
+1
+2
+انتهى
+```
+
+The interpreter stops a run after 1,000,000 total `بينما` condition evaluations. This is an implementation resource limit, not a timing guarantee or a full sandbox.
+
 ## Values
 
 | Kind | Examples | Notes |
@@ -71,7 +122,7 @@ Undefined variables, malformed strings, unsupported characters, division by zero
 
 ## Not part of the language yet
 
-Control flow, functions, closures, collections, user-defined types, modules, error handling syntax, a formal module system and a stable ABI are not implemented. See the specification and roadmap.
+Functions, closures, collections, user-defined types, modules, explicit error-handling syntax, a formal module system and a stable ABI are not implemented yet. Basic conditionals, blocks, lexical scopes, assignment and bounded while loops are implemented. See the specification and roadmap.
 
 
 ## Unicode identifiers
