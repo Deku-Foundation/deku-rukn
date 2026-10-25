@@ -48,7 +48,9 @@ Suggested separation:
 3. End-to-end target: call the public interpreter and treat structured diagnostics as valid outcomes.
 4. Regression corpus: every minimized crash or incorrect result becomes a permanent test.
 
-The dedicated `Fuzz smoke` workflow pins `cargo-fuzz 0.13.2` and runs `cargo +nightly fuzz run run_source -- -max_total_time=60 -timeout=5 -max_len=16384`. It runs on source/fuzz pull requests, weekly, and by manual dispatch. The bounded run keeps CI cost predictable; it is not a security proof and does not replace longer campaigns. Keep every minimized crash or incorrect result as a permanent regression test, and expand toward a separate parser target and a machine-readable conformance corpus.
+The dedicated `Fuzz smoke` workflow pins `cargo-fuzz 0.13.2` and runs two bounded targets on source/fuzz pull requests, weekly, and by manual dispatch: `run_source` mutates arbitrary UTF-8-decoded bytes, while `generated_program` selects from grammar-aware templates for arithmetic, branches, bounded loops, functions, higher-order calls, NFC identifiers, lists and Unicode indexing. The seed corpora include canonical-equivalent Arabic identifiers, a bidirectional control in executable source, list/higher-order programs, Unicode string indexing and the nested-list depth boundary. This improves feature-directed exploration but is not a full grammar generator or a security proof; longer campaigns and a dedicated parser target remain future work. Keep every minimized crash or incorrect result as a permanent regression test.
+
+Recent relevant research: [Bootstrapping Fuzzers for Compilers of Low-Resource Language Dialects Using Language Models (2025)](https://arxiv.org/abs/2512.05887) studies grammar-aware fuzzer generation across MLIR dialects. It is a research direction, not a guarantee that model-generated tests are valid or that its coverage results transfer directly to Rukn. The immediate Rukn approach uses bounded hand-reviewed templates first, with conformance cases as the semantic oracle.
 
 ## Benchmarks and compiler research
 
