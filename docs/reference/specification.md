@@ -5,7 +5,7 @@ description: The current grammar, values and semantics of Rukn.
 
 # Rukn language specification
 
-**Status: draft, version 0.7.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
+**Status: draft, version 0.8.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
 
 ## Lexical rules
 
@@ -43,9 +43,11 @@ description: The current grammar, values and semantics of Rukn.
     comparison   = term { (">" | ">=" | "<" | "<=") term } ;
     term         = factor { ("+" | "-") factor } ;
     factor       = unary { ("*" | "/") unary } ;
-    unary        = ("!" | "-") unary | primary ;
-    primary      = number | string | "صحيح" | "خطأ" | "لاشيء"
+    unary        = ("!" | "-") unary | postfix ;
+    postfix      = primary { "[" expression "]" } ;
+    primary      = number | string | list_literal | "صحيح" | "خطأ" | "لاشيء"
                  | call_expression | identifier | "(" expression ")" ;
+    list_literal  = "[" [ argument_list ] "]" ;
     call_expression = identifier "(" [ argument_list ] ")" ;
     argument_list = expression { "," expression } ;
 
@@ -67,6 +69,8 @@ The print parentheses are optional in the implementation, but if an opening pare
 - Division by positive or negative zero is an error.
 - Non-finite numeric results are rejected with a language diagnostic.
 - Function declarations use `دالة name(parameter, ...)` and are permitted only at top level in this version. All top-level function names are registered before statement execution, so forward calls and mutual recursion work. Duplicate function names are rejected during parsing. A function name evaluates to a named function reference when no lexical variable shadows it; references can be assigned to variables, passed as arguments, and returned from functions. References with the same function name compare equal. Calls use identifier syntax (`name(...)`), so an alias can be called but arbitrary call results cannot yet be chained directly. Function references do not capture an environment: closures and nested function declarations are unsupported.
+- List literals use square brackets and comma-separated expressions, for example `[1, «نص», صحيح]`. Lists are immutable and can contain mixed value types. Indexing is zero-based and requires a finite, non-negative integer. Indexing a list returns an element; indexing a string returns one Unicode scalar value as a string. Out-of-range indexes are errors.
+- The built-in `طول(value)` accepts a string or list and returns a number. String length and string indexes count Unicode scalar values, not grapheme clusters. The built-in `أضف(list, value)` returns a new list with the appended value; it does not mutate the original list. Both built-ins can be passed as function references. User-defined top-level functions may not reuse the built-in names.
 - Arguments are evaluated left to right in the caller's environment. Arity must match exactly; at most 64 parameters/arguments are accepted.
 - A function body runs with the global environment and a fresh parameter/local environment. It cannot capture caller-block locals; closures and nested function declarations are unsupported. Assignments to global bindings persist after the call.
 - `أرجع expression؛` returns a value; `أرجع؛` returns `لاشيء`. Falling off the end of a function also returns `لاشيء`. A return outside a function is an error.
@@ -87,9 +91,12 @@ The current implementation applies these guardrails:
 | while-condition evaluations per run | 1,000,000 |
 | Active function-call depth | 128 |
 | Function parameters / call arguments | 64 |
+| Elements in one list | 16,384 |
+| Cumulative list elements allocated/copied per run | 1,000,000 |
+| Nested list depth | 64 |
 
-The runtime string budget conservatively counts string-value clones, named function-reference name copies, concatenation results, and captured print output during one run. It is cumulative accounting, not an exact measurement of live heap usage. Inputs exceeding these bounds are rejected with a language error. These are implementation limits and may change before a stable language release; they are not a formal sandbox and do not guarantee isolation against every denial-of-service scenario.
+The runtime string budget conservatively counts string-value clones, named function-reference name copies, concatenation results, captured print output, and string/function-name copies made by list append during one run. The collection budget counts list elements created or copied, including each immutable append; it is cumulative accounting rather than exact live-heap measurement. Inputs exceeding these bounds are rejected with a language error. These are implementation limits and may change before a stable language release; they are not a formal sandbox and do not guarantee isolation against every denial-of-service scenario.
 
 ## Known gaps
 
-The grammar is not yet generated from a formal parser definition. Unicode normalization, a confusable-identifier policy, immutable bindings, a static type checker, closures, collections, modules, a typed intermediate representation, bytecode, and a conformance corpus shared across future interpreter/VM/compiler implementations remain open work before a stable language release.
+The grammar is not yet generated from a formal parser definition. Unicode normalization, a confusable-identifier policy, immutable bindings, a static type checker, closures, records/maps, modules, a typed intermediate representation, bytecode, and a conformance corpus shared across future interpreter/VM/compiler implementations remain open work before a stable language release.
