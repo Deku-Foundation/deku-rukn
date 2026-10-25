@@ -9,6 +9,8 @@ pub const MAX_SOURCE_BYTES: usize = 1_048_576;
 pub const MAX_STRING_BYTES: usize = MAX_SOURCE_BYTES;
 /// Conservative cumulative budget for runtime string clones, concatenations and output.
 pub const MAX_RUNTIME_STRING_BYTES: usize = 16 * 1024 * 1024;
+/// Maximum number of while-condition evaluations in one program run.
+pub const MAX_LOOP_CONDITION_EVALUATIONS: usize = 1_000_000;
 const MAX_TOKENS: usize = 16_384;
 // Keep recursion well below typical thread stack limits; this is a safety bound, not a language feature.
 const MAX_NESTING: usize = 64;
@@ -44,6 +46,8 @@ impl std::error::Error for LangError {}
 enum TokenKind {
     LeftParen,
     RightParen,
+    LeftBrace,
+    RightBrace,
     Plus,
     Minus,
     Star,
@@ -64,6 +68,9 @@ enum TokenKind {
     String,
     Let,
     Print,
+    If,
+    Else,
+    While,
     True,
     False,
     Nil,
@@ -110,6 +117,8 @@ impl Lexer {
             match ch {
                 '(' => tokens.push(self.token(TokenKind::LeftParen)),
                 ')' => tokens.push(self.token(TokenKind::RightParen)),
+                '{' => tokens.push(self.token(TokenKind::LeftBrace)),
+                '}' => tokens.push(self.token(TokenKind::RightBrace)),
                 '+' => tokens.push(self.token(TokenKind::Plus)),
                 '-' => tokens.push(self.token(TokenKind::Minus)),
                 '*' => tokens.push(self.token(TokenKind::Star)),
@@ -280,6 +289,9 @@ impl Lexer {
         let kind = match text.as_str() {
             "دع" => TokenKind::Let,
             "اطبع" => TokenKind::Print,
+            "إذا" => TokenKind::If,
+            "وإلا" => TokenKind::Else,
+            "بينما" => TokenKind::While,
             "صحيح" => TokenKind::True,
             "خطأ" => TokenKind::False,
             "لاشيء" => TokenKind::Nil,
@@ -423,7 +435,20 @@ enum Expr {
 #[derive(Debug, Clone)]
 enum Stmt {
     Let { name: Token, initializer: Expr },
+    Assign { name: Token, value: Expr },
     Print { expression: Expr, keyword: Token },
+    Block { statements: Vec<Stmt> },
+    If {
+        keyword: Token,
+        condition: Expr,
+        then_branch: Box<Stmt>,
+        else_branch: Option<Box<Stmt>>,
+    },
+    While {
+        keyword: Token,
+        condition: Expr,
+        body: Box<Stmt>,
+    },
     Expression(Expr),
 }
 
@@ -492,9 +517,80 @@ impl Parser {
                 keyword,
             });
         }
+        if self.matches(TokenKind::If) {
+            let keyword = self.previous().clone();
+            self.consume(TokenKind::LeftParen, "توقعت «(» بعد «إذا»")?;
+            let condition = self.expression()?;
+            self.consume(TokenKind::RightParen, "توقعت «)» بعد شرط «إذا»")?;
+            let then_branch = Box::new(self.required_block("توقعت كتلة «{ ... }» بعد شرط «إذا»")?);
+            let else_branch = if self.matches(TokenKind::Else) {
+                Some(Box::new(self.required_block("توقعت كتلة «{ ... }» بعد «وإلا»")?))
+            } else {
+                None
+            };
+            return Ok(Stmt::If {
+                keyword,
+                condition,
+                then_branch,
+                else_branch,
+            });
+        }
+        if self.matches(TokenKind::While) {
+            let keyword = self.previous().clone();
+            self.consume(TokenKind::LeftParen, "توقعت «(» بعد «بينما»")?;
+            let condition = self.expression()?;
+            self.consume(TokenKind::RightParen, "توقعت «)» بعد شرط «بينما»")?;
+            let body = Box::new(self.required_block("توقعت كتلة «{ ... }» بعد شرط «بينما»")?);
+            return Ok(Stmt::While {
+                keyword,
+                condition,
+                body,
+            });
+        }
+        if self.matches(TokenKind::LeftBrace) {
+            let opening = self.previous().clone();
+            return Ok(Stmt::Block {
+                statements: self.block_statements(&opening)?,
+            });
+        }
+        if self.check(TokenKind::Identifier)
+            && self
+                .tokens
+                .get(self.current + 1)
+                .is_some_and(|token| token.kind == TokenKind::Equal)
+        {
+            let name = self.consume(TokenKind::Identifier, "توقعت اسم متغير قبل الإسناد")?;
+            self.consume(TokenKind::Equal, "توقعت «=» بعد اسم المتغير")?;
+            let value = self.expression()?;
+            self.consume(TokenKind::Semicolon, "أنهِ التعليمة بالفاصلة المنقوطة «؛»")?;
+            return Ok(Stmt::Assign { name, value });
+        }
         let expression = self.expression()?;
         self.consume(TokenKind::Semicolon, "أنهِ التعليمة بالفاصلة المنقوطة «؛»")?;
         Ok(Stmt::Expression(expression))
+    }
+
+    fn required_block(&mut self, message: &str) -> Result<Stmt, LangError> {
+        let opening = self.consume(TokenKind::LeftBrace, message)?;
+        Ok(Stmt::Block {
+            statements: self.block_statements(&opening)?,
+        })
+    }
+
+    fn block_statements(&mut self, opening: &Token) -> Result<Vec<Stmt>, LangError> {
+        self.enter_nesting(opening)?;
+        let result = self.block_statements_inner();
+        self.nesting -= 1;
+        result
+    }
+
+    fn block_statements_inner(&mut self) -> Result<Vec<Stmt>, LangError> {
+        let mut statements = Vec::new();
+        while !self.check(TokenKind::RightBrace) && !self.check(TokenKind::Eof) {
+            statements.push(self.statement()?);
+        }
+        self.consume(TokenKind::RightBrace, "توقعت «}» لإغلاق الكتلة")?;
+        Ok(statements)
     }
     fn expression(&mut self) -> Result<Expr, LangError> {
         self.logical_or()
@@ -712,18 +808,20 @@ impl fmt::Display for Value {
     }
 }
 struct Interpreter {
-    environment: HashMap<String, Value>,
+    environment: Vec<HashMap<String, Value>>,
     output: Vec<String>,
     evaluation_depth: usize,
     runtime_string_bytes: usize,
+    loop_condition_evaluations: usize,
 }
 impl Interpreter {
     fn new() -> Self {
         Self {
-            environment: HashMap::new(),
+            environment: vec![HashMap::new()],
             output: Vec::new(),
             evaluation_depth: 0,
             runtime_string_bytes: 0,
+            loop_condition_evaluations: 0,
         }
     }
     fn reserve_runtime_string_bytes(
@@ -751,11 +849,53 @@ impl Interpreter {
         }
         Ok(self.output)
     }
+
+    fn define_variable(&mut self, name: &Token, value: Value) -> Result<(), LangError> {
+        let Some(scope) = self.environment.last_mut() else {
+            return Err(LangError::at("بيئة المتغيرات غير متاحة", name));
+        };
+        scope.insert(name.lexeme.clone(), value);
+        Ok(())
+    }
+
+    fn assign_variable(&mut self, name: &Token, value: Value) -> Result<(), LangError> {
+        for scope in self.environment.iter_mut().rev() {
+            if scope.contains_key(&name.lexeme) {
+                scope.insert(name.lexeme.clone(), value);
+                return Ok(());
+            }
+        }
+        Err(LangError::at(
+            format!("إسناد إلى متغير غير معرّف: {}", name.lexeme),
+            name,
+        ))
+    }
+
+    fn evaluate_loop_condition(&mut self, keyword: &Token) -> Result<(), LangError> {
+        let Some(next) = self.loop_condition_evaluations.checked_add(1) else {
+            return Err(LangError::at("تجاوز عدّاد الحلقات نطاقه", keyword));
+        };
+        if next > MAX_LOOP_CONDITION_EVALUATIONS {
+            return Err(LangError::at(
+                format!(
+                    "تجاوز البرنامج الحد الأقصى لتقييم شروط الحلقات ({MAX_LOOP_CONDITION_EVALUATIONS})"
+                ),
+                keyword,
+            ));
+        }
+        self.loop_condition_evaluations = next;
+        Ok(())
+    }
+
     fn execute(&mut self, statement: &Stmt) -> Result<(), LangError> {
         match statement {
             Stmt::Let { name, initializer } => {
                 let value = self.evaluate(initializer)?;
-                self.environment.insert(name.lexeme.clone(), value);
+                self.define_variable(name, value)?;
+            }
+            Stmt::Assign { name, value } => {
+                let value = self.evaluate(value)?;
+                self.assign_variable(name, value)?;
             }
             Stmt::Print {
                 expression,
@@ -765,6 +905,48 @@ impl Interpreter {
                 self.reserve_runtime_string_bytes(value.string_bytes(), keyword)?;
                 self.output.push(value.to_string());
             }
+            Stmt::Block { statements } => {
+                self.environment.push(HashMap::new());
+                let result = statements.iter().try_for_each(|statement| self.execute(statement));
+                self.environment.pop();
+                result?;
+            }
+            Stmt::If {
+                keyword,
+                condition,
+                then_branch,
+                else_branch,
+            } => match self.evaluate(condition)? {
+                Value::Bool(true) => self.execute(then_branch)?,
+                Value::Bool(false) => {
+                    if let Some(branch) = else_branch {
+                        self.execute(branch)?;
+                    }
+                }
+                _ => {
+                    return Err(LangError::at(
+                        "يتطلب شرط «إذا» قيمة منطقية",
+                        keyword,
+                    ));
+                }
+            },
+            Stmt::While {
+                keyword,
+                condition,
+                body,
+            } => loop {
+                self.evaluate_loop_condition(keyword)?;
+                match self.evaluate(condition)? {
+                    Value::Bool(true) => self.execute(body)?,
+                    Value::Bool(false) => break,
+                    _ => {
+                        return Err(LangError::at(
+                            "يتطلب شرط «بينما» قيمة منطقية",
+                            keyword,
+                        ));
+                    }
+                }
+            },
             Stmt::Expression(expression) => {
                 self.evaluate(expression)?;
             }
@@ -805,18 +987,17 @@ impl Interpreter {
                 Ok(value.clone())
             }
             Expr::Variable(name) => {
-                let Some(bytes) = self.environment.get(&name.lexeme).map(Value::string_bytes)
-                else {
-                    return Err(LangError::at(
-                        format!("متغير غير معرّف: {}", name.lexeme),
-                        name,
-                    ));
-                };
-                self.reserve_runtime_string_bytes(bytes, name)?;
-                self.environment
-                    .get(&name.lexeme)
+                let value = self
+                    .environment
+                    .iter()
+                    .rev()
+                    .find_map(|scope| scope.get(&name.lexeme))
                     .cloned()
-                    .ok_or_else(|| LangError::at(format!("متغير غير معرّف: {}", name.lexeme), name))
+                    .ok_or_else(|| {
+                        LangError::at(format!("متغير غير معرّف: {}", name.lexeme), name)
+                    })?;
+                self.reserve_runtime_string_bytes(value.string_bytes(), name)?;
+                Ok(value)
             }
             Expr::Grouping(expr) => self.evaluate(expr),
             Expr::Unary { operator, right } => {
