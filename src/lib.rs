@@ -705,13 +705,19 @@ impl Interpreter {
             runtime_string_bytes: 0,
         }
     }
-    fn reserve_runtime_string_bytes(&mut self, bytes: usize, token: &Token) -> Result<(), LangError> {
+    fn reserve_runtime_string_bytes(
+        &mut self,
+        bytes: usize,
+        token: &Token,
+    ) -> Result<(), LangError> {
         let Some(total) = self.runtime_string_bytes.checked_add(bytes) else {
             return Err(LangError::at("تجاوز البرنامج ميزانية تخصيص النصوص", token));
         };
         if total > MAX_RUNTIME_STRING_BYTES {
             return Err(LangError::at(
-                format!("تجاوز البرنامج ميزانية النصوص أثناء التنفيذ ({MAX_RUNTIME_STRING_BYTES} بايت)"),
+                format!(
+                    "تجاوز البرنامج ميزانية النصوص أثناء التنفيذ ({MAX_RUNTIME_STRING_BYTES} بايت)"
+                ),
                 token,
             ));
         }
@@ -1136,8 +1142,9 @@ mod tests {
 
     #[test]
     fn concatenated_string_values_are_bounded() {
-        let too_long = "x".repeat(MAX_SOURCE_BYTES / 2 + 1);
-        let source = format!("اطبع(«{too_long}» + «{too_long}»)؛");
+        let long_literal = "x".repeat(MAX_SOURCE_BYTES * 3 / 5);
+        let source = format!("دع النص = «{long_literal}»؛ دع الناتج = النص + النص؛");
+        assert!(source.len() < MAX_SOURCE_BYTES);
         let error = run(&source).unwrap_err();
         assert!(error.message.contains("الحد الأقصى"), "{}", error.message);
         assert!(error.line > 0 && error.column > 0);
