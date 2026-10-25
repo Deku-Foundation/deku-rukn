@@ -560,6 +560,12 @@ impl Parser {
                 ));
             }
             let name = self.consume(TokenKind::Identifier, "توقعت اسمًا بعد «دالة»")?;
+            if is_builtin_function(&name.lexeme) {
+                return Err(LangError::at(
+                    format!("اسم «{}» محجوز لدالة مدمجة", name.lexeme),
+                    &name,
+                ));
+            }
             self.consume(TokenKind::LeftParen, "توقعت «(» بعد اسم الدالة")?;
             let mut parameters = Vec::new();
             if !self.check(TokenKind::RightParen) {
@@ -1049,6 +1055,10 @@ impl fmt::Display for Value {
     }
 }
 #[derive(Debug, Clone)]
+fn is_builtin_function(name: &str) -> bool {
+    matches!(name, "طول" | "أضف")
+}
+
 struct FunctionDef {
     parameters: Vec<Token>,
     body: Arc<Vec<Stmt>>,
@@ -1279,6 +1289,76 @@ impl Interpreter {
         Ok(flow)
     }
 
+    fn call_builtin(
+        &mut self,
+        function_name: &str,
+        callsite: &Token,
+        closing_paren: &Token,
+        arguments: &[Expr],
+    ) -> Result<Value, LangError> {
+        let expected = if function_name == "طول" { 1 } else { 2 };
+        if arguments.len() != expected {
+            return Err(LangError::at(
+                format!(
+                    "الدالة «{function_name}» تتطلب {expected} معاملًا، لكن استُخدم {}",
+                    arguments.len()
+                ),
+                closing_paren,
+            ));
+        }
+        let mut values = Vec::with_capacity(arguments.len());
+        for argument in arguments {
+            values.push(self.evaluate(argument)?);
+        }
+
+        match function_name {
+            "طول" => {
+                let length = match &values[0] {
+                    Value::String(value) => value.chars().count(),
+                    Value::List(list) => list.items.len(),
+                    _ => {
+                        return Err(LangError::at(
+                            "تتطلب «طول» نصًا أو قائمة",
+                            callsite,
+                        ));
+                    }
+                };
+                Ok(Value::Number(length as f64))
+            }
+            "أضف" => {
+                let Value::List(list) = &values[0] else {
+                    return Err(LangError::at(
+                        "يتطلب المعامل الأول في «أضف» قائمة",
+                        callsite,
+                    ));
+                };
+                if list.items.len() >= MAX_LIST_ELEMENTS {
+                    return Err(LangError::at(
+                        format!("تجاوزت القائمة الحد الأقصى للعناصر ({MAX_LIST_ELEMENTS})"),
+                        callsite,
+                    ));
+                }
+                let new_depth = list.depth.max(values[1].collection_depth() + 1);
+                if new_depth > MAX_COLLECTION_DEPTH {
+                    return Err(LangError::at(
+                        format!("تجاوزت القائمة الحد الأقصى للتداخل ({MAX_COLLECTION_DEPTH})"),
+                        callsite,
+                    ));
+                }
+                let allocation = list.items.len() + 1;
+                self.reserve_runtime_collection_elements(allocation, callsite)?;
+                let mut items = Vec::with_capacity(allocation);
+                items.extend(list.items.iter().cloned());
+                items.push(values[1].clone());
+                Ok(Value::List(Rc::new(ListValue {
+                    items,
+                    depth: new_depth,
+                })))
+            }
+            _ => unreachable!("only registered builtins reach this method"),
+        }
+    }
+
     fn call_function(
         &mut self,
         function_name: &str,
@@ -1286,6 +1366,9 @@ impl Interpreter {
         closing_paren: &Token,
         arguments: &[Expr],
     ) -> Result<Value, LangError> {
+        if is_builtin_function(function_name) {
+            return self.call_builtin(function_name, callsite, closing_paren, arguments);
+        }
         let function =
             self.functions.get(function_name).cloned().ok_or_else(|| {
                 LangError::at(format!("دالة غير معرّفة: {function_name}"), callsite)
@@ -1406,8 +1489,8 @@ impl Interpreter {
                     .find_map(|scope| scope.get(&name.lexeme))
                     .cloned()
                     .or_else(|| {
-                        self.functions
-                            .contains_key(&name.lexeme)
+                        (self.functions.contains_key(&name.lexeme)
+                            || is_builtin_function(&name.lexeme))
                             .then(|| Value::Function(name.lexeme.clone()))
                     })
                     .ok_or_else(|| {
@@ -1428,8 +1511,8 @@ impl Interpreter {
                     .find_map(|scope| scope.get(&name.lexeme))
                     .cloned()
                     .or_else(|| {
-                        self.functions
-                            .contains_key(&name.lexeme)
+                        (self.functions.contains_key(&name.lexeme)
+                            || is_builtin_function(&name.lexeme))
                             .then(|| Value::Function(name.lexeme.clone()))
                     })
                     .ok_or_else(|| {
@@ -1445,6 +1528,75 @@ impl Interpreter {
                         name,
                     )),
                 }
+            }
+            Expr::List { elements, bracket } => {
+                let mut values = Vec::with_capacity(elements.len());
+                for element in elements {
+                    values.push(self.evaluate(element)?);
+                }
+                let depth = 1 + values
+                    .iter()
+                    .map(Value::collection_depth)
+                    .max()
+                    .unwrap_or(0);
+                if depth > MAX_COLLECTION_DEPTH {
+                    return Err(LangError::at(
+                        format!("تجاوزت القائمة الحد الأقصى للتداخل ({MAX_COLLECTION_DEPTH})"),
+                        bracket,
+                    ));
+                }
+                self.reserve_runtime_collection_elements(values.len(), bracket)?;
+                Ok(Value::List(Rc::new(ListValue {
+                    items: values,
+                    depth,
+                })))
+            }
+            Expr::Index {
+                target,
+                index,
+                bracket,
+            } => {
+                let target = self.evaluate(target)?;
+                let index = match self.evaluate(index)? {
+                    Value::Number(value)
+                        if value.is_finite()
+                            && value.fract() == 0.0
+                            && value >= 0.0
+                            && value <= MAX_STRING_BYTES as f64 =>
+                    {
+                        value as usize
+                    }
+                    Value::Number(_) => {
+                        return Err(LangError::at(
+                            "يجب أن يكون الفهرس عددًا صحيحًا غير سالب",
+                            bracket,
+                        ));
+                    }
+                    _ => {
+                        return Err(LangError::at(
+                            "يجب أن يكون الفهرس عددًا صحيحًا غير سالب",
+                            bracket,
+                        ));
+                    }
+                };
+                let value = match target {
+                    Value::List(list) => list.items.get(index).cloned().ok_or_else(|| {
+                        LangError::at("فهرس القائمة خارج الحدود", bracket)
+                    })?,
+                    Value::String(text) => text
+                        .chars()
+                        .nth(index)
+                        .map(|character| Value::String(character.to_string()))
+                        .ok_or_else(|| LangError::at("فهرس النص خارج الحدود", bracket))?,
+                    _ => {
+                        return Err(LangError::at(
+                            "تدعم الفهرسة القوائم والنصوص فقط",
+                            bracket,
+                        ));
+                    }
+                };
+                self.reserve_runtime_string_bytes(value.string_bytes(), bracket)?;
+                Ok(value)
             }
             Expr::Grouping(expr) => self.evaluate(expr),
             Expr::Unary { operator, right } => {
