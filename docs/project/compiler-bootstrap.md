@@ -18,7 +18,7 @@ A compiler must initially be executed by an existing machine-code runtime, assem
 - **Reducible trust base:** the stage-zero implementation and external build tools are minimized, versioned, tested, and auditable over time.
 - **Reproducible stages:** each compiler stage passes the same conformance suite; binary reproducibility is pursued where the backend and build environment make it practical.
 
-Rewriting the project in Rukn immediately would not remove dependencies. The current language lacks functions, loops, modules, and the library facilities needed to express a compiler cleanly. The first task is to make the language testable and semantically precise, then expand its expressive power in reviewed steps.
+Rewriting the project in Rukn immediately would not remove dependencies. Rukn now has basic blocks, lexical scopes, assignment, conditionals, and a bounded while loop, but still lacks functions, modules, collections, and the library facilities needed to express a compiler cleanly. The next task is to stabilize its semantics and expand its expressive power in reviewed steps.
 
 ## Bootstrap model
 
@@ -131,7 +131,7 @@ Arabic computational-linguistics research can inform language-facing choices suc
 
 1. Keep the new CLI conformance corpus small, explicit, and reviewed as observable behavior changes.
 2. Separate parser/fuzz coverage from the end-to-end interpreter target.
-3. Specify the semantics of blocks, scope, types, and numeric values before adding control flow.
+3. Stabilize the semantics of the existing control flow; specify types and numeric behavior before adding more language features.
 4. Implement and test functions and module boundaries before attempting to port the compiler.
 5. Choose a bytecode or native backend only with conformance evidence and a written target/ABI plan.
 
