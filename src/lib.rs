@@ -1706,8 +1706,8 @@ pub fn run(source: &str) -> Result<Vec<String>, LangError> {
 #[cfg(test)]
 mod tests {
     use super::{
-        MAX_CALL_DEPTH, MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING, MAX_RUNTIME_STRING_BYTES,
-        MAX_SOURCE_BYTES, run,
+        MAX_CALL_DEPTH, MAX_COLLECTION_DEPTH, MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING,
+        MAX_RUNTIME_COLLECTION_ELEMENTS, MAX_RUNTIME_STRING_BYTES, MAX_SOURCE_BYTES, run,
     };
 
     #[test]
@@ -2142,6 +2142,60 @@ mod tests {
             "unexpected diagnostic: {}",
             error.message
         );
+    }
+
+    #[test]
+    fn list_literals_indexing_and_unicode_string_indexing_work() {
+        assert_eq!(
+            run("دع القيم = [١, ٢, ٣]؛ اطبع(القيم[٠])؛ اطبع(القيم[٢])؛ اطبع(«أهلًا»[٠])؛ اطبع(«أهلًا»[٤])؛")
+                .unwrap(),
+            ["1", "3", "أ", "ا"]
+        );
+        assert_eq!(
+            run("اطبع(طول(«أهلًا»))؛ اطبع(طول([١, ٢, ٣]))؛").unwrap(),
+            ["5", "3"]
+        );
+    }
+
+    #[test]
+    fn append_returns_a_new_list_without_mutating_the_original() {
+        let source = "دع أصل = [١, ٢]؛ دع جديد = أضف(أصل, ٣)؛ اطبع(طول(أصل))؛ اطبع(طول(جديد))؛ اطبع(أصل[١])؛ اطبع(جديد[٢])؛";
+        assert_eq!(run(source).unwrap(), ["2", "3", "2", "3"]);
+    }
+
+    #[test]
+    fn builtins_can_be_passed_to_higher_order_functions() {
+        let source = "دالة تطبيق(عملية, قيمة) { أرجع عملية(قيمة)؛ } اطبع(تطبيق(طول, [١, ٢, ٣]))؛";
+        assert_eq!(run(source).unwrap(), ["3"]);
+    }
+
+    #[test]
+    fn invalid_indexes_and_non_list_append_are_diagnostics() {
+        for source in [
+            "اطبع([١][١])؛",
+            "اطبع([١][-١])؛",
+            "اطبع([١][١٫٥])؛",
+            "اطبع(١[٠])؛",
+        ] {
+            assert!(run(source).is_err(), "expected an indexing error for {source}");
+        }
+        let error = run("أضف(١, ٢)؛").unwrap_err();
+        assert!(error.message.contains("قائمة"));
+    }
+
+    #[test]
+    fn deeply_nested_lists_and_large_append_workloads_are_bounded() {
+        let mut nested = "دع قائمة = ٠؛".to_owned();
+        for _ in 0..(MAX_COLLECTION_DEPTH + 1) {
+            nested.push_str(" قائمة = أضف([], قائمة)؛");
+        }
+        let depth_error = run(&nested).unwrap_err();
+        assert!(depth_error.message.contains("التداخل"));
+
+        let growth =
+            "دع قائمة = []؛ دع عد = ٠؛ بينما (عد < 2000) { قائمة = أضف(قائمة, ٠)؛ عد = عد + ١؛ }";
+        let budget_error = run(growth).unwrap_err();
+        assert!(budget_error.message.contains("ميزانية عناصر المجموعات"));
     }
 
     #[test]
