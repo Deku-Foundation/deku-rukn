@@ -18,6 +18,13 @@ test = false
 doc = false
 bench = false
 
+[[bin]]
+name = "generated_program"
+path = "fuzz_targets/generated_program.rs"
+test = false
+doc = false
+bench = false
+
 [workspace]
 members = ["."]
 resolver = "3"
