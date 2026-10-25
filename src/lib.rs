@@ -1,6 +1,7 @@
 //! A small Arabic-first interpreter. This milestone is experimental, not a stable language ABI.
 use std::collections::HashMap;
 use std::fmt;
+use std::rc::Rc;
 use std::sync::Arc;
 use unicode_ident::{is_xid_continue, is_xid_start};
 
@@ -10,6 +11,12 @@ pub const MAX_SOURCE_BYTES: usize = 1_048_576;
 pub const MAX_STRING_BYTES: usize = MAX_SOURCE_BYTES;
 /// Conservative cumulative budget for runtime string clones, concatenations, copied names and formatted output.
 pub const MAX_RUNTIME_STRING_BYTES: usize = 16 * 1024 * 1024;
+/// Maximum number of values in one immutable list.
+pub const MAX_LIST_ELEMENTS: usize = 16_384;
+/// Maximum cumulative list elements allocated/copied during one run.
+pub const MAX_RUNTIME_COLLECTION_ELEMENTS: usize = 1_000_000;
+/// Maximum nested immutable-list depth.
+pub const MAX_COLLECTION_DEPTH: usize = 64;
 /// Maximum number of while-condition evaluations in one program run.
 pub const MAX_LOOP_CONDITION_EVALUATIONS: usize = 1_000_000;
 /// Maximum recursive function-call depth.
@@ -52,6 +59,8 @@ enum TokenKind {
     RightParen,
     LeftBrace,
     RightBrace,
+    LeftBracket,
+    RightBracket,
     Comma,
     Plus,
     Minus,
@@ -126,6 +135,8 @@ impl Lexer {
                 ')' => tokens.push(self.token(TokenKind::RightParen)),
                 '{' => tokens.push(self.token(TokenKind::LeftBrace)),
                 '}' => tokens.push(self.token(TokenKind::RightBrace)),
+                '[' => tokens.push(self.token(TokenKind::LeftBracket)),
+                ']' => tokens.push(self.token(TokenKind::RightBracket)),
                 ',' => tokens.push(self.token(TokenKind::Comma)),
                 '+' => tokens.push(self.token(TokenKind::Plus)),
                 '-' => tokens.push(self.token(TokenKind::Minus)),
@@ -1085,11 +1096,11 @@ impl fmt::Display for Value {
         }
     }
 }
-#[derive(Debug, Clone)]
 fn is_builtin_function(name: &str) -> bool {
     matches!(name, "طول" | "أضف")
 }
 
+#[derive(Debug, Clone)]
 struct FunctionDef {
     parameters: Vec<Token>,
     body: Arc<Vec<Stmt>>,
