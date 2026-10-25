@@ -1395,8 +1395,8 @@ pub fn run(source: &str) -> Result<Vec<String>, LangError> {
 #[cfg(test)]
 mod tests {
     use super::{
-        MAX_CALL_DEPTH, MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING,
-        MAX_RUNTIME_STRING_BYTES, MAX_SOURCE_BYTES, run,
+        MAX_CALL_DEPTH, MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING, MAX_RUNTIME_STRING_BYTES,
+        MAX_SOURCE_BYTES, run,
     };
 
     #[test]
@@ -1749,13 +1749,15 @@ mod tests {
 
     #[test]
     fn recursive_functions_work() {
-        let source = "دالة عاملي(ن) { إذا (ن <= ١) { أرجع ١؛ } أرجع ن * عاملي(ن - ١)؛ } اطبع(عاملي(٥))؛";
+        let source =
+            "دالة عاملي(ن) { إذا (ن <= ١) { أرجع ١؛ } أرجع ن * عاملي(ن - ١)؛ } اطبع(عاملي(٥))؛";
         assert_eq!(run(source).unwrap(), ["120"]);
     }
 
     #[test]
     fn function_calls_can_update_globals_without_capturing_caller_locals() {
-        let source = "دع عام = ١؛ دالة زد(زيادة) { عام = عام + زيادة؛ أرجع عام؛ } اطبع(زد(٢))؛ اطبع(عام)؛";
+        let source =
+            "دع عام = ١؛ دالة زد(زيادة) { عام = عام + زيادة؛ أرجع عام؛ } اطبع(زد(٢))؛ اطبع(عام)؛";
         assert_eq!(run(source).unwrap(), ["3", "3"]);
 
         let dynamic_scope = "دالة اقرأ() { أرجع محلي؛ } { دع محلي = ٢؛ اطبع(اقرأ())؛ }";
@@ -1771,16 +1773,13 @@ mod tests {
         let undefined_error = run("مجهولة(١)؛").unwrap_err();
         assert!(undefined_error.message.contains("دالة غير معرّفة"));
 
-        let arity_error =
-            run("دالة واحدة(أ) { أرجع أ؛ } اطبع(واحدة())؛").unwrap_err();
+        let arity_error = run("دالة واحدة(أ) { أرجع أ؛ } اطبع(واحدة())؛").unwrap_err();
         assert!(arity_error.message.contains("تتطلب 1 معاملًا"));
 
-        let duplicate_parameter =
-            run("دالة تكرار(أ, أ) { أرجع أ؛ }").unwrap_err();
+        let duplicate_parameter = run("دالة تكرار(أ, أ) { أرجع أ؛ }").unwrap_err();
         assert!(duplicate_parameter.message.contains("معامل مكرر"));
 
-        let nested_definition =
-            run("{ دالة محلية() { أرجع ١؛ } }").unwrap_err();
+        let nested_definition = run("{ دالة محلية() { أرجع ١؛ } }").unwrap_err();
         assert!(nested_definition.message.contains("المستوى الأعلى"));
     }
 
