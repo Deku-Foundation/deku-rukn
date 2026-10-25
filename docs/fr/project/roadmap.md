@@ -23,7 +23,8 @@ Les étapes reposent sur des preuves, pas sur des dates promises. Une fonctionna
 - [x] Ajouter un corpus CLI machine-readable pour programmes valides et invalides, sortie/fragment d’erreur attendus et code de sortie.
 - [x] Adopter un profil lexical `XID_Start` / `XID_Continue` verrouillé, avec adaptation du souligné et tests de régression arabes/persans.
 - [ ] Décider la normalisation des identifiants, les avertissements de scripts mélangés/confusables et les diagnostics des contrôles bidirectionnels, avec un corpus de compatibilité.
-- [ ] Conditions, blocs et portées après revue sémantique.
+- [x] Conditions booléennes, blocs, portées lexicales et affectation avec tests de régression.
+- [x] Boucle while bornée avec conditions booléennes et budget cumulé par exécution.
 - [ ] Sémantique numérique et codes d’erreur destinés aux outils.
 - [ ] Diagnostics structurés stables pour les éditeurs.
 
@@ -32,7 +33,7 @@ Les étapes reposent sur des preuves, pas sur des dates promises. Une fonctionna
 - [ ] Fonctions, paramètres et valeurs de retour.
 - [ ] Collections et itération.
 - [ ] Modules, imports et modèle de dépendances.
-- [ ] Propagation explicite des erreurs et comportement des futures boucles.
+- [ ] Propagation explicite des erreurs et sémantique des autres formes de boucles.
 - [ ] Bibliothèque standard avec niveaux de stabilité documentés.
 
 ## M3 — Outils
