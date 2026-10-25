@@ -5,7 +5,7 @@ description: A practical validation plan for the Rukn lexer, parser, evaluator, 
 
 # Testing and conformance strategy
 
-**Status: engineering baseline with a bounded fuzz smoke target and a CLI conformance corpus.** Unit tests and the standard CI gates remain the primary correctness checks. The dependency-free integration runner executes the checked-in 30-case corpus against the real CLI, including stdout, exit status, and diagnostic-fragment checks. The corpus covers lexical shadowing, assignment, if/else, while-loop behavior, named function calls, recursion, returns, arity errors, undefined functions, malformed blocks, and resource limits. A separate workflow runs a 60-second libFuzzer campaign for pull requests that touch source or fuzz files, weekly, and by manual dispatch. Parser-focused fuzzing, longer campaigns, structured diagnostic assertions, and benchmark gates remain future work.
+**Status: engineering baseline with a bounded fuzz smoke target and a CLI conformance corpus.** Unit tests and the standard CI gates remain the primary correctness checks. The dependency-free integration runner executes the checked-in 32-case corpus against the real CLI, including stdout, exit status, and diagnostic-fragment checks. The corpus covers lexical shadowing, assignment, if/else, while-loop behavior, named function calls, forward references, mutual recursion, returns, arity/duplicate-definition errors, undefined functions, malformed blocks, and resource limits. A separate workflow runs a 60-second libFuzzer campaign for pull requests that touch source or fuzz files, weekly, and by manual dispatch. Parser-focused fuzzing, longer campaigns, structured diagnostic assertions, and benchmark gates remain future work.
 
 ## Test layers
 
