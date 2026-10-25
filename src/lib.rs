@@ -530,7 +530,24 @@ impl Parser {
     fn parse(&mut self) -> Result<Vec<Stmt>, LangError> {
         let mut statements = Vec::new();
         while !self.check(TokenKind::Eof) {
-            statements.push(self.statement()?);
+            let statement = self.statement()?;
+            if let Stmt::Function { name, .. } = &statement {
+                if statements.iter().any(|previous| {
+                    matches!(
+                        previous,
+                        Stmt::Function {
+                            name: previous_name,
+                            ..
+                        } if previous_name.lexeme == name.lexeme
+                    )
+                }) {
+                    return Err(LangError::at(
+                        format!("تعريف دالة مكرر: {}", name.lexeme),
+                        name,
+                    ));
+                }
+            }
+            statements.push(statement);
         }
         Ok(statements)
     }
