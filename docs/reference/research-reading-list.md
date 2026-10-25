@@ -62,12 +62,12 @@ As checked on 24 October 2026, the latest tagged cargo-fuzz release is [0.13.2](
 Suggested sequence:
 
 1. Preserve unit tests for normal behaviour and invalid input.
-2. Maintain the machine-readable CLI conformance corpus with input, expected stdout, diagnostic fragment, and exit status; it currently covers 32 cases including scopes, assignment, conditions, bounded loops, named functions, forward references, mutual recursion, returns, and error paths. Extend it whenever semantics change.
+2. Maintain the machine-readable CLI conformance corpus with input, expected stdout, diagnostic fragment, and exit status; it currently covers 37 cases including scopes, assignment, conditions, bounded loops, named functions, function values, higher-order calls, forward references, mutual recursion, returns, and error paths. Extend it whenever semantics change.
 3. Fuzz lexer/parser/run boundaries and convert each minimized issue into a regression test.
 4. Benchmark only with correctness checked against that corpus.
 5. Record source workloads, hardware, compiler version, commands and variance for every published comparison.
 
-The bounded end-to-end fuzz smoke target and a 32-case CLI conformance corpus are active in CI. Parser-specific fuzzing, longer campaigns and reproducible benchmark gates remain future work.
+The bounded end-to-end fuzz smoke target and a 37-case CLI conformance corpus are active in CI. Parser-specific fuzzing, longer campaigns and reproducible benchmark gates remain future work.
 
 ## 4. Editor and tooling interoperability
 
