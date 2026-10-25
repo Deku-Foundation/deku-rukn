@@ -1456,6 +1456,7 @@ impl Interpreter {
                 | Expr::Binary { operator, .. }
                 | Expr::Logical { operator, .. } => Some(operator),
                 Expr::Literal { token, .. } => Some(token),
+                Expr::List { bracket, .. } | Expr::Index { bracket, .. } => Some(bracket),
                 Expr::Grouping(_) => None,
             };
             return Err(match token {
