@@ -79,6 +79,37 @@ Expected output:
 
 The interpreter stops a run after 1,000,000 total `بينما` condition evaluations. This is an implementation resource limit, not a timing guarantee or a full sandbox.
 
+## Named functions, arguments and returns
+
+Function declarations use the Arabic keyword `دالة`, a name, a comma-separated parameter list, and a braced body. Call a named function with parentheses; the number of arguments must match the declared parameter count.
+
+```rukn
+دالة جمع(أ, ب) {
+    أرجع أ + ب؛
+}
+
+دالة عاملي(ن) {
+    إذا (ن <= ١) {
+        أرجع ١؛
+    }
+    أرجع ن * عاملي(ن - ١)؛
+}
+
+اطبع(جمع(٢٠, ٢٢))؛
+اطبع(عاملي(٥))؛
+```
+
+Expected output:
+
+```text
+42
+120
+```
+
+`أرجع expression؛` returns a value. `أرجع؛` returns `لاشيء`, and reaching the end of a function without an explicit return also returns `لاشيء`. A return statement outside a function is an error. Functions may be declared only at top level in this version and support recursion up to 128 active calls. At most 64 parameters or arguments are allowed.
+
+Functions are named callable declarations, not first-class values. They cannot be stored in variables or returned, nested function declarations are rejected, and they do not capture local variables from the caller. Closures, modules and a static type checker are future work.
+
 ## Values
 
 | Kind | Examples | Notes |
@@ -122,7 +153,7 @@ Undefined variables, malformed strings, unsupported characters, division by zero
 
 ## Not part of the language yet
 
-Functions, closures, collections, user-defined types, modules, explicit error-handling syntax, a formal module system and a stable ABI are not implemented yet. Basic conditionals, blocks, lexical scopes, assignment and bounded while loops are implemented. See the specification and roadmap.
+Closures, first-class function values, collections, user-defined types, modules, explicit error-handling syntax, a static type checker and a stable ABI are not implemented yet. Named functions, parameters, returns, recursion, conditionals, blocks, lexical scopes, assignment and bounded while loops are implemented. See the specification and roadmap.
 
 
 ## Unicode identifiers
