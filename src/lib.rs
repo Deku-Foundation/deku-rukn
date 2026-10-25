@@ -1707,7 +1707,7 @@ pub fn run(source: &str) -> Result<Vec<String>, LangError> {
 mod tests {
     use super::{
         MAX_CALL_DEPTH, MAX_COLLECTION_DEPTH, MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING,
-        MAX_RUNTIME_COLLECTION_ELEMENTS, MAX_RUNTIME_STRING_BYTES, MAX_SOURCE_BYTES, run,
+        MAX_RUNTIME_STRING_BYTES, MAX_SOURCE_BYTES, run,
     };
 
     #[test]
