@@ -1762,6 +1762,15 @@ mod tests {
     }
 
     #[test]
+    fn functions_can_call_later_definitions_and_mutually_recurse() {
+        let source = "دالة أ() { أرجع ب()؛ } دالة ب() { أرجع ٧؛ } اطبع(أ())؛";
+        assert_eq!(run(source).unwrap(), ["7"]);
+
+        let mutual = "دالة زوجي(ن) { إذا (ن == ٠) { أرجع صحيح؛ } أرجع فردي(ن - ١)؛ } دالة فردي(ن) { إذا (ن == ٠) { أرجع خطأ؛ } أرجع زوجي(ن - ١)؛ } اطبع(زوجي(٦))؛ اطبع(فردي(٧))؛";
+        assert_eq!(run(mutual).unwrap(), ["صحيح", "صحيح"]);
+    }
+
+    #[test]
     fn function_calls_can_update_globals_without_capturing_caller_locals() {
         let source =
             "دع عام = ١؛ دالة زد(زيادة) { عام = عام + زيادة؛ أرجع عام؛ } اطبع(زد(٢))؛ اطبع(عام)؛";
