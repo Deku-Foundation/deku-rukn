@@ -5,7 +5,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 
 # Spécification du langage Rukn
 
-**État : brouillon 0.5.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
+**État : brouillon 0.6.** Ce document décrit uniquement l’interpréteur actuel ; il ne spécifie pas un futur langage 1.0.
 
 ## Règles lexicales
 
@@ -13,7 +13,7 @@ description: Grammaire et sémantique actuelles de Rukn.
 - Un identifiant commence par un souligné ou un caractère Unicode `XID_Start`; les caractères suivants utilisent `XID_Continue` ou le souligné, via la dépendance verrouillée `unicode-ident 1.0.27` (UAX #31). Les marques combinantes autorisées peuvent suivre le premier caractère.
 - Les identifiants ne sont pas normalisés ; la détection des confusables et des contrôles bidirectionnels n’est pas implémentée.
 - La notation scientifique ne fait pas partie de la grammaire numérique actuelle.
-- Mots réservés : دع, اطبع, إذا, وإلا, بينما, صحيح, خطأ, لاشيء, و, أو.
+- Mots réservés : دع, اطبع, دالة, أرجع, إذا, وإلا, بينما, صحيح, خطأ, لاشيء, و, أو.
 - Les nombres acceptent les chiffres ASCII, arabo-indiens et persans. Le point ASCII ou le séparateur décimal arabe ٫ (U+066B) est accepté et doit être suivi d’au moins un chiffre ; les séparateurs répétés sont invalides. Tous les chiffres d’un même littéral doivent appartenir à la même famille ; un mélange est rejeté au premier chiffre incompatible.
 - Les chaînes utilisent des guillemets doubles ou les guillemets arabes «texte». Les retours de ligne physiques LF et CR sont interdits dans une chaîne, y compris après une barre oblique inverse.
 - Les commentaires commencent par #.
@@ -22,8 +22,12 @@ description: Grammaire et sémantique actuelles de Rukn.
 ## Grammaire abrégée
 
     program      = { statement } ;
-    statement    = declaration | assignment | print_statement | if_statement
-                 | while_statement | block | expression_statement ;
+    statement    = function_declaration | return_statement | declaration
+                 | assignment | print_statement | if_statement | while_statement
+                 | block | expression_statement ;
+    function_declaration = "دالة" identifier "(" [ parameter_list ] ")" block ;
+    parameter_list = identifier { "," identifier } ;
+    return_statement = "أرجع" [ expression ] terminator ;
     declaration  = "دع" identifier "=" expression terminator ;
     assignment   = identifier "=" expression terminator ;
     print_statement = "اطبع" ( "(" expression ")" | expression ) terminator ;
@@ -40,7 +44,9 @@ description: Grammaire et sémantique actuelles de Rukn.
     factor       = unary { ("*" | "/") unary } ;
     unary        = ("!" | "-") unary | primary ;
     primary      = number | string | "صحيح" | "خطأ" | "لاشيء"
-                 | identifier | "(" expression ")" ;
+                 | call_expression | identifier | "(" expression ")" ;
+    call_expression = identifier "(" [ argument_list ] ")" ;
+    argument_list = expression { "," expression } ;
 
 ## Évaluation
 
@@ -54,6 +60,11 @@ description: Grammaire et sémantique actuelles de Rukn.
 - L’affectation d’un nom non défini est une erreur. L’affectation est une instruction, pas une expression.
 - Les conditions de إذا et بينما doivent produire un booléen ; aucune conversion implicite de vérité n’est effectuée.
 - Les conditions de boucle sont évaluées dans l’ordre source. Au-delà de 1 000 000 évaluations cumulées de conditions while, l’exécution est interrompue pour borner les boucles incontrôlées.
+- Les fonctions se déclarent avec `دالة nom(paramètre, ...)` et sont autorisées uniquement au niveau supérieur dans cette version. Elles appartiennent à un espace global distinct ; ce ne sont pas des valeurs de première classe pouvant être affectées, retournées ou stockées.
+- Les arguments sont évalués de gauche à droite dans l’environnement de l’appelant. L’arité doit correspondre exactement ; au plus 64 paramètres/arguments sont admis.
+- Le corps d’une fonction s’exécute avec l’environnement global et un nouvel environnement de paramètres/variables locales. Il ne capture pas les variables locales de l’appelant ; les fermetures et déclarations de fonctions imbriquées ne sont pas prises en charge. Les affectations globales persistent après l’appel.
+- `أرجع expression؛` retourne une valeur ; `أرجع؛` retourne `لاشيء`. Une fonction qui termine sans retour explicite retourne aussi `لاشيء`. Un retour hors fonction produit une erreur.
+- Les appels récursifs sont pris en charge avec une profondeur active maximale de 128 ; la profondeur d’expression est bornée indépendamment dans chaque cadre de fonction.
 - Une variable inconnue et la division par zéro sont des erreurs.
 - Les résultats numériques non finis produisent un diagnostic.
 - Les instructions sont évaluées dans l’ordre source et la sortie est collectée.
@@ -70,9 +81,11 @@ L’implémentation applique actuellement les limites suivantes :
 | Taille d’une chaîne à l’exécution | 1 048 576 octets UTF-8 (1 Mio) |
 | Budget cumulé d’allocations/copies de chaînes par exécution | 16 777 216 octets (16 Mio) |
 | Évaluations des conditions while par exécution | 1 000 000 |
+| Profondeur active des appels de fonction | 128 |
+| Paramètres / arguments de fonction | 64 |
 
 Le budget compte de manière conservative les copies de valeurs chaîne, les résultats de concaténation et la sortie collectée pendant une exécution. Il s’agit d’un comptage cumulatif, et non d’une mesure exacte du tas encore vivant. Les entrées dépassant ces bornes sont rejetées avec une erreur du langage. Ces limites d’implémentation peuvent évoluer avant une version stable ; elles ne constituent pas un bac à sable formel ni une garantie contre toutes les formes de déni de service.
 
 ## Lacunes connues
 
-La grammaire n’est pas encore générée depuis une définition formelle. La normalisation Unicode, la politique sur les identifiants visuellement confondables, les liaisons immuables, un système de types statique, les fonctions, collections, modules, une IR typée, une VM bytecode et un corpus commun aux futures implémentations interpréteur/VM/compilateur restent des travaux ouverts avant une version stable.
+La grammaire n’est pas encore générée depuis une définition formelle. La normalisation Unicode, la politique sur les identifiants visuellement confondables, les liaisons immuables, un système de types statique, les fonctions de première classe et les fermetures, les collections, modules, une IR typée, une VM bytecode et un corpus commun aux futures implémentations interpréteur/VM/compilateur restent des travaux ouverts avant une version stable.
