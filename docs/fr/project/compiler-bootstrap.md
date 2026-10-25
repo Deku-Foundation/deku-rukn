@@ -18,7 +18,7 @@ Un compilateur doit initialement être exécuté par un programme existant, un a
 - **Base de confiance réductible :** réduire, versionner, tester et auditer l’implémentation initiale et les outils externes au fil du temps.
 - **Étapes reproductibles :** chaque stade passe le même corpus de conformité ; la reproductibilité binaire est recherchée lorsque le backend et l’environnement le permettent.
 
-Réécrire immédiatement le projet en Rukn ne supprime pas les dépendances. Rukn possède maintenant des blocs, des portées lexicales, l’affectation, des conditions et une boucle while bornée, mais il lui manque encore fonctions, modules, collections et bibliothèque suffisante pour exprimer proprement un compilateur. Il faut stabiliser la sémantique de cette base, puis accroître les capacités du langage par étapes révisées.
+Réécrire immédiatement le projet en Rukn ne supprime pas les dépendances. Rukn possède maintenant blocs, portées lexicales, affectation, conditions, boucle while bornée, fonctions nommées de niveau supérieur, paramètres, retours et récursion. Il lui manque encore les valeurs de fonction de première classe, fermetures, modules, collections et bibliothèque nécessaire à un compilateur. Il faut stabiliser ces sémantiques, puis définir les frontières de modules et une bibliothèque standard minimale.
 
 ## Modèle d’amorçage
 
@@ -57,8 +57,8 @@ Il s’agit d’une architecture cible. Le stade 1 et les stades auto-hébergés
 
 Avant d’écrire le compilateur en Rukn, spécifier :
 
-- sémantique des expressions, instructions, blocs et portées lexicales ;
-- fonctions, paramètres, retours et récursion ;
+- sémantique des expressions, instructions, blocs et portées lexicales (implémentées expérimentalement, à stabiliser par les tests de conformité) ;
+- fonctions de première classe, fermetures, frontières de modules et modèle d’importation ;
 - système de types, largeurs numériques et débordements, mutabilité et inférence ;
 - collections, enregistrements ou types algébriques, chaînes et propagation explicite des erreurs ;
 - modules, imports, positions source et format stable des diagnostics ;
@@ -126,7 +126,7 @@ La linguistique informatique arabe peut éclairer la terminologie, la morphologi
 1. Maintenir un corpus de conformité explicite et le réviser à chaque changement de comportement.
 2. Séparer le fuzzing du parseur de la cible de bout en bout.
 3. Stabiliser la sémantique du contrôle de flux existant, puis spécifier types et nombres avant d’ajouter d’autres fonctionnalités.
-4. Implémenter et tester fonctions et frontières de modules avant le port du compilateur.
+4. Les fonctions nommées, paramètres, retours et récursion ont maintenant des tests de régression ; définir et tester les frontières de modules et la bibliothèque standard minimale avant le port du compilateur.
 5. Choisir bytecode ou backend natif à partir des preuves de conformité et d’un plan documenté de cible/ABI.
 
 Voir la [feuille de route](/fr/project/roadmap), la [stratégie de test](/fr/reference/testing-strategy) et le [registre des décisions](/fr/project/design-decisions).
