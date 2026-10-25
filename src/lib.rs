@@ -577,7 +577,7 @@ impl Parser {
                 })
             {
                 return Err(LangError::at(
-                    format!("تعريف دالة مكرر: {}", name.lexeme),
+                    format!("تعريف دالة مكرر: {}", name.source_lexeme),
                     name,
                 ));
             }
@@ -597,7 +597,7 @@ impl Parser {
             let name = self.consume(TokenKind::Identifier, "توقعت اسمًا بعد «دالة»")?;
             if is_builtin_function(&name.lexeme) {
                 return Err(LangError::at(
-                    format!("اسم «{}» محجوز لدالة مدمجة", name.lexeme),
+                    format!("اسم «{}» محجوز لدالة مدمجة", name.source_lexeme),
                     &name,
                 ));
             }
@@ -617,7 +617,7 @@ impl Parser {
                         .any(|existing: &Token| existing.lexeme == parameter.lexeme)
                     {
                         return Err(LangError::at(
-                            format!("اسم معامل مكرر: {}", parameter.lexeme),
+                            format!("اسم معامل مكرر: {}", parameter.source_lexeme),
                             &parameter,
                         ));
                     }
@@ -1236,7 +1236,7 @@ impl Interpreter {
             }
         }
         Err(LangError::at(
-            format!("إسناد إلى متغير غير معرّف: {}", name.lexeme),
+            format!("إسناد إلى متغير غير معرّف: {}", name.source_lexeme),
             name,
         ))
     }
@@ -1566,7 +1566,7 @@ impl Interpreter {
                         .then(|| Value::Function(name.lexeme.clone()))
                     })
                     .ok_or_else(|| {
-                        LangError::at(format!("متغير غير معرّف: {}", name.lexeme), name)
+                        LangError::at(format!("متغير غير معرّف: {}", name.source_lexeme), name)
                     })?;
                 self.reserve_runtime_string_bytes(value.string_bytes(), name)?;
                 Ok(value)
@@ -1588,7 +1588,7 @@ impl Interpreter {
                         .then(|| Value::Function(name.lexeme.clone()))
                     })
                     .ok_or_else(|| {
-                        LangError::at(format!("دالة غير معرّفة: {}", name.lexeme), name)
+                        LangError::at(format!("دالة غير معرّفة: {}", name.source_lexeme), name)
                     })?;
                 self.reserve_runtime_string_bytes(callee.string_bytes(), name)?;
                 match callee {
@@ -1596,7 +1596,7 @@ impl Interpreter {
                         self.call_function(&function_name, name, paren, arguments)
                     }
                     _ => Err(LangError::at(
-                        format!("القيمة «{}» ليست دالة قابلة للاستدعاء", name.lexeme),
+                        format!("القيمة «{}» ليست دالة قابلة للاستدعاء", name.source_lexeme),
                         name,
                     )),
                 }
@@ -1801,6 +1801,17 @@ mod tests {
         // U+0627 ARABIC LETTER ALEF + U+0654 HAMZA ABOVE normalizes to U+0623 ALEF WITH HAMZA ABOVE.
         let source = "دع أ = ٧؛ اطبع(ا\u{0654})؛";
         assert_eq!(run(source).unwrap(), ["7"]);
+    }
+
+    #[test]
+    fn diagnostics_preserve_original_identifier_spelling_after_nfc() {
+        let error = run("اطبع(ا\u{0654})؛").unwrap_err();
+        assert!(error.message.contains("متغير غير معرّف"));
+        assert!(
+            error.message.contains("ا\u{0654}"),
+            "diagnostic lost original source spelling: {}",
+            error.message
+        );
     }
 
     #[test]
