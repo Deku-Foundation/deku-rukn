@@ -450,7 +450,6 @@ enum Expr {
 #[derive(Debug, Clone)]
 enum Stmt {
     Function {
-        keyword: Token,
         name: Token,
         parameters: Vec<Token>,
         body: Vec<Stmt>,
@@ -531,8 +530,8 @@ impl Parser {
         let mut statements = Vec::new();
         while !self.check(TokenKind::Eof) {
             let statement = self.statement()?;
-            if let Stmt::Function { name, .. } = &statement {
-                if statements.iter().any(|previous| {
+            if let Stmt::Function { name, .. } = &statement
+                && statements.iter().any(|previous| {
                     matches!(
                         previous,
                         Stmt::Function {
@@ -540,12 +539,12 @@ impl Parser {
                             ..
                         } if previous_name.lexeme == name.lexeme
                     )
-                }) {
-                    return Err(LangError::at(
-                        format!("تعريف دالة مكرر: {}", name.lexeme),
-                        name,
-                    ));
-                }
+                })
+            {
+                return Err(LangError::at(
+                    format!("تعريف دالة مكرر: {}", name.lexeme),
+                    name,
+                ));
             }
             statements.push(statement);
         }
@@ -591,7 +590,6 @@ impl Parser {
             let opening = self.consume(TokenKind::LeftBrace, "توقعت كتلة «{ ... }» لجسم الدالة")?;
             let body = self.block_statements(&opening)?;
             return Ok(Stmt::Function {
-                keyword,
                 name,
                 parameters,
                 body,
