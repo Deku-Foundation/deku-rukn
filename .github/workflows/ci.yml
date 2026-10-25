@@ -31,6 +31,10 @@ jobs:
         run: |
           cargo run --locked -- examples/hello.rukn > /tmp/rukn-output.txt
           diff -u <(printf 'مرحبًا يا العالم\n42\nخطأ\nصحيح\n') /tmp/rukn-output.txt
+      - name: Verify function and recursion example
+        run: |
+          cargo run --locked -- examples/functions.rukn > /tmp/rukn-functions-output.txt
+          diff -u <(printf '42\n120\n') /tmp/rukn-functions-output.txt
 
   docs:
     name: Documentation site
