@@ -30,10 +30,12 @@ Milestones are evidence-based, not time promises. A feature is complete only whe
 
 ## M2 — Programming abstractions
 
-- [ ] Functions, parameters and return values.
+- [x] Named top-level functions, parameters, return values and recursion, with a bounded call depth and conformance tests (draft 0.6).
+- [ ] First-class function values and closures.
 - [ ] Collections and iteration.
 - [ ] Modules, imports and a dependency model.
 - [ ] Explicit error propagation and semantics for additional loop forms.
+- [ ] Stabilize numeric semantics and define a static type-checking direction.
 - [ ] A standard library with documented stability levels.
 
 ## M3 — Tooling
