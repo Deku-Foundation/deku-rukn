@@ -16,3 +16,9 @@ incompatible_types	1		جمع عددين	اطبع(1 + "2")؛
 unterminated_string	1		نص غير مغلق	اطبع("نص)؛
 unsupported_string_escape	1		تسلسل هروب غير مدعوم	اطبع("خطأ\\q")؛
 missing_statement_terminator	1		الفاصلة المنقوطة	اطبع(١)
+if_else_decision	0	كبير\n		إذا (٣ > ٢) { اطبع(«كبير»)؛ } وإلا { اطبع(«صغير»)؛ }
+while_assignment	0	0\n1\n2\n		دع العد = ٠؛ بينما (العد < ٣) { اطبع(العد)؛ العد = العد + ١؛ }
+lexical_scope_shadowing	0	معدل\nخارج\n		دع الاسم = «خارج»؛ { دع الاسم = «داخل»؛ الاسم = «معدل»؛ اطبع(الاسم)؛ } اطبع(الاسم)؛
+non_boolean_if_condition	1		شرط «إذا»	إذا (١) { اطبع(١)؛ }
+undefined_assignment	1		غير معرّف	غائب = ١؛
+missing_block_closer	1		توقعت «}»	إذا (صحيح) { اطبع(١)؛
