@@ -11,6 +11,9 @@ pub const MAX_STRING_BYTES: usize = MAX_SOURCE_BYTES;
 pub const MAX_RUNTIME_STRING_BYTES: usize = 16 * 1024 * 1024;
 /// Maximum number of while-condition evaluations in one program run.
 pub const MAX_LOOP_CONDITION_EVALUATIONS: usize = 1_000_000;
+/// Maximum recursive function-call depth.
+pub const MAX_CALL_DEPTH: usize = 128;
+const MAX_FUNCTION_PARAMETERS: usize = 64;
 const MAX_TOKENS: usize = 16_384;
 // Keep recursion well below typical thread stack limits; this is a safety bound, not a language feature.
 const MAX_NESTING: usize = 64;
@@ -48,6 +51,7 @@ enum TokenKind {
     RightParen,
     LeftBrace,
     RightBrace,
+    Comma,
     Plus,
     Minus,
     Star,
@@ -68,6 +72,8 @@ enum TokenKind {
     String,
     Let,
     Print,
+    Function,
+    Return,
     If,
     Else,
     While,
@@ -119,6 +125,7 @@ impl Lexer {
                 ')' => tokens.push(self.token(TokenKind::RightParen)),
                 '{' => tokens.push(self.token(TokenKind::LeftBrace)),
                 '}' => tokens.push(self.token(TokenKind::RightBrace)),
+                ',' => tokens.push(self.token(TokenKind::Comma)),
                 '+' => tokens.push(self.token(TokenKind::Plus)),
                 '-' => tokens.push(self.token(TokenKind::Minus)),
                 '*' => tokens.push(self.token(TokenKind::Star)),
@@ -289,6 +296,8 @@ impl Lexer {
         let kind = match text.as_str() {
             "دع" => TokenKind::Let,
             "اطبع" => TokenKind::Print,
+            "دالة" => TokenKind::Function,
+            "أرجع" => TokenKind::Return,
             "إذا" => TokenKind::If,
             "وإلا" => TokenKind::Else,
             "بينما" => TokenKind::While,
@@ -416,6 +425,11 @@ enum Expr {
         token: Token,
     },
     Variable(Token),
+    Call {
+        name: Token,
+        paren: Token,
+        arguments: Vec<Expr>,
+    },
     Grouping(Box<Expr>),
     Unary {
         operator: Token,
@@ -434,6 +448,16 @@ enum Expr {
 }
 #[derive(Debug, Clone)]
 enum Stmt {
+    Function {
+        keyword: Token,
+        name: Token,
+        parameters: Vec<Token>,
+        body: Vec<Stmt>,
+    },
+    Return {
+        keyword: Token,
+        value: Option<Expr>,
+    },
     Let {
         name: Token,
         initializer: Expr,
@@ -467,6 +491,7 @@ struct Parser {
     tokens: Vec<Token>,
     current: usize,
     nesting: usize,
+    block_depth: usize,
 }
 impl Parser {
     fn new(tokens: Vec<Token>) -> Self {
@@ -474,6 +499,7 @@ impl Parser {
             tokens,
             current: 0,
             nesting: 0,
+            block_depth: 0,
         }
     }
     fn enter_nesting(&mut self, token: &Token) -> Result<(), LangError> {
@@ -508,6 +534,61 @@ impl Parser {
         Ok(statements)
     }
     fn statement(&mut self) -> Result<Stmt, LangError> {
+        if self.matches(TokenKind::Function) {
+            let keyword = self.previous().clone();
+            if self.block_depth != 0 {
+                return Err(LangError::at(
+                    "تعريف الدوال مسموح في المستوى الأعلى فقط في هذه النسخة",
+                    &keyword,
+                ));
+            }
+            let name = self.consume(TokenKind::Identifier, "توقعت اسمًا بعد «دالة»")?;
+            self.consume(TokenKind::LeftParen, "توقعت «(» بعد اسم الدالة")?;
+            let mut parameters = Vec::new();
+            if !self.check(TokenKind::RightParen) {
+                loop {
+                    if parameters.len() >= MAX_FUNCTION_PARAMETERS {
+                        return Err(LangError::at(
+                            format!("تجاوزت الدالة حد المعاملات ({MAX_FUNCTION_PARAMETERS})"),
+                            self.peek(),
+                        ));
+                    }
+                    let parameter = self.consume(TokenKind::Identifier, "توقعت اسم معامل")?;
+                    if parameters
+                        .iter()
+                        .any(|existing: &Token| existing.lexeme == parameter.lexeme)
+                    {
+                        return Err(LangError::at(
+                            format!("اسم معامل مكرر: {}", parameter.lexeme),
+                            &parameter,
+                        ));
+                    }
+                    parameters.push(parameter);
+                    if !self.matches(TokenKind::Comma) {
+                        break;
+                    }
+                }
+            }
+            self.consume(TokenKind::RightParen, "توقعت «)» بعد معاملات الدالة")?;
+            let opening = self.consume(TokenKind::LeftBrace, "توقعت كتلة «{ ... }» لجسم الدالة")?;
+            let body = self.block_statements(&opening)?;
+            return Ok(Stmt::Function {
+                keyword,
+                name,
+                parameters,
+                body,
+            });
+        }
+        if self.matches(TokenKind::Return) {
+            let keyword = self.previous().clone();
+            let value = if self.check(TokenKind::Semicolon) {
+                None
+            } else {
+                Some(self.expression()?)
+            };
+            self.consume(TokenKind::Semicolon, "أنهِ تعليمة الإرجاع بالفاصلة المنقوطة «؛»")?;
+            return Ok(Stmt::Return { keyword, value });
+        }
         if self.matches(TokenKind::Let) {
             let name = self.consume(TokenKind::Identifier, "توقعت اسمًا بعد «دع»")?;
             self.consume(TokenKind::Equal, "توقعت «=» بعد اسم المتغير")?;
@@ -592,7 +673,9 @@ impl Parser {
 
     fn block_statements(&mut self, opening: &Token) -> Result<Vec<Stmt>, LangError> {
         self.enter_nesting(opening)?;
+        self.block_depth += 1;
         let result = self.block_statements_inner();
+        self.block_depth -= 1;
         self.nesting -= 1;
         result
     }
@@ -700,8 +783,46 @@ impl Parser {
                 right: Box::new(right),
             });
         }
-        self.primary()
+        self.call()
     }
+
+    fn call(&mut self) -> Result<Expr, LangError> {
+        let mut expression = self.primary()?;
+        while self.matches(TokenKind::LeftParen) {
+            let mut arguments = Vec::new();
+            if !self.check(TokenKind::RightParen) {
+                loop {
+                    if arguments.len() >= MAX_FUNCTION_PARAMETERS {
+                        return Err(LangError::at(
+                            format!("تجاوز الاستدعاء حد المعاملات ({MAX_FUNCTION_PARAMETERS})"),
+                            self.peek(),
+                        ));
+                    }
+                    arguments.push(self.expression()?);
+                    if !self.matches(TokenKind::Comma) {
+                        break;
+                    }
+                }
+            }
+            let paren = self.consume(TokenKind::RightParen, "توقعت «)» بعد معاملات الاستدعاء")?;
+            let name = match expression {
+                Expr::Variable(name) => name,
+                _ => {
+                    return Err(LangError::at(
+                        "يدعم ركن حاليًا استدعاء الدوال المسماة فقط",
+                        &paren,
+                    ));
+                }
+            };
+            expression = Expr::Call {
+                name,
+                paren,
+                arguments,
+            };
+        }
+        Ok(expression)
+    }
+
     fn primary(&mut self) -> Result<Expr, LangError> {
         if self.matches(TokenKind::False) {
             let token = self.previous().clone();
@@ -820,21 +941,36 @@ impl fmt::Display for Value {
         }
     }
 }
+#[derive(Debug, Clone)]
+struct FunctionDef {
+    parameters: Vec<Token>,
+    body: Vec<Stmt>,
+}
+
+enum Flow {
+    Continue,
+    Return { value: Value, keyword: Token },
+}
+
 struct Interpreter {
     environment: Vec<HashMap<String, Value>>,
+    functions: HashMap<String, FunctionDef>,
     output: Vec<String>,
     evaluation_depth: usize,
     runtime_string_bytes: usize,
     loop_condition_evaluations: usize,
+    call_depth: usize,
 }
 impl Interpreter {
     fn new() -> Self {
         Self {
             environment: vec![HashMap::new()],
+            functions: HashMap::new(),
             output: Vec::new(),
             evaluation_depth: 0,
             runtime_string_bytes: 0,
             loop_condition_evaluations: 0,
+            call_depth: 0,
         }
     }
     fn reserve_runtime_string_bytes(
@@ -966,6 +1102,7 @@ impl Interpreter {
         if self.evaluation_depth >= MAX_NESTING {
             let token = match expr {
                 Expr::Variable(token) => Some(token),
+                Expr::Call { name, .. } => Some(name),
                 Expr::Unary { operator, .. }
                 | Expr::Binary { operator, .. }
                 | Expr::Logical { operator, .. } => Some(operator),
