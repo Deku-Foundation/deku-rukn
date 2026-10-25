@@ -21,6 +21,7 @@ Rukn s’exécute actuellement depuis les sources avec la chaîne d’outils Rus
     cargo build --release --locked
     cargo run --locked -- examples/hello.rukn
     cargo run --locked -- examples/functions.rukn
+    cargo run --locked -- examples/lists.rukn
 
 Sortie attendue pour `hello.rukn` :
 
