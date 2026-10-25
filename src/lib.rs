@@ -1255,9 +1255,7 @@ impl Interpreter {
                 })?;
                 if output_bytes > MAX_STRING_BYTES {
                     return Err(LangError::at(
-                        format!(
-                            "تجاوزت مخرجات الطباعة الحد الأقصى للنص ({MAX_STRING_BYTES} بايت)"
-                        ),
+                        format!("تجاوزت مخرجات الطباعة الحد الأقصى للنص ({MAX_STRING_BYTES} بايت)"),
                         keyword,
                     ));
                 }
@@ -1350,20 +1348,14 @@ impl Interpreter {
                     Value::String(value) => value.chars().count(),
                     Value::List(list) => list.items.len(),
                     _ => {
-                        return Err(LangError::at(
-                            "تتطلب «طول» نصًا أو قائمة",
-                            callsite,
-                        ));
+                        return Err(LangError::at("تتطلب «طول» نصًا أو قائمة", callsite));
                     }
                 };
                 Ok(Value::Number(length as f64))
             }
             "أضف" => {
                 let Value::List(list) = &values[0] else {
-                    return Err(LangError::at(
-                        "يتطلب المعامل الأول في «أضف» قائمة",
-                        callsite,
-                    ));
+                    return Err(LangError::at("يتطلب المعامل الأول في «أضف» قائمة", callsite));
                 };
                 if list.items.len() >= MAX_LIST_ELEMENTS {
                     return Err(LangError::at(
@@ -1536,7 +1528,7 @@ impl Interpreter {
                     .or_else(|| {
                         (self.functions.contains_key(&name.lexeme)
                             || is_builtin_function(&name.lexeme))
-                            .then(|| Value::Function(name.lexeme.clone()))
+                        .then(|| Value::Function(name.lexeme.clone()))
                     })
                     .ok_or_else(|| {
                         LangError::at(format!("متغير غير معرّف: {}", name.lexeme), name)
@@ -1558,7 +1550,7 @@ impl Interpreter {
                     .or_else(|| {
                         (self.functions.contains_key(&name.lexeme)
                             || is_builtin_function(&name.lexeme))
-                            .then(|| Value::Function(name.lexeme.clone()))
+                        .then(|| Value::Function(name.lexeme.clone()))
                     })
                     .ok_or_else(|| {
                         LangError::at(format!("دالة غير معرّفة: {}", name.lexeme), name)
@@ -1625,19 +1617,18 @@ impl Interpreter {
                     }
                 };
                 let value = match target {
-                    Value::List(list) => list.items.get(index).cloned().ok_or_else(|| {
-                        LangError::at("فهرس القائمة خارج الحدود", bracket)
-                    })?,
+                    Value::List(list) => list
+                        .items
+                        .get(index)
+                        .cloned()
+                        .ok_or_else(|| LangError::at("فهرس القائمة خارج الحدود", bracket))?,
                     Value::String(text) => text
                         .chars()
                         .nth(index)
                         .map(|character| Value::String(character.to_string()))
                         .ok_or_else(|| LangError::at("فهرس النص خارج الحدود", bracket))?,
                     _ => {
-                        return Err(LangError::at(
-                            "تدعم الفهرسة القوائم والنصوص فقط",
-                            bracket,
-                        ));
+                        return Err(LangError::at("تدعم الفهرسة القوائم والنصوص فقط", bracket));
                     }
                 };
                 self.reserve_runtime_string_bytes(value.string_bytes(), bracket)?;
@@ -2221,7 +2212,10 @@ mod tests {
             "اطبع([١][١٫٥])؛",
             "اطبع(١[٠])؛",
         ] {
-            assert!(run(source).is_err(), "expected an indexing error for {source}");
+            assert!(
+                run(source).is_err(),
+                "expected an indexing error for {source}"
+            );
         }
         let error = run("أضف(١, ٢)؛").unwrap_err();
         assert!(error.message.contains("قائمة"));
