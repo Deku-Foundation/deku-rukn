@@ -20,7 +20,7 @@ pub const MAX_COLLECTION_DEPTH: usize = 64;
 /// Maximum number of while-condition evaluations in one program run.
 pub const MAX_LOOP_CONDITION_EVALUATIONS: usize = 1_000_000;
 /// Maximum recursive function-call depth.
-pub const MAX_CALL_DEPTH: usize = 128;
+pub const MAX_CALL_DEPTH: usize = 32;
 const MAX_FUNCTION_PARAMETERS: usize = 64;
 const MAX_TOKENS: usize = 16_384;
 // Keep recursion well below typical thread stack limits; this is a safety bound, not a language feature.
@@ -2248,7 +2248,7 @@ mod tests {
     fn recursive_function_calls_are_bounded() {
         let error = run("دالة تكرار() { أرجع تكرار()؛ } اطبع(تكرار())؛").unwrap_err();
         assert!(error.message.contains("عمق استدعاء الدوال"));
-        assert_eq!(MAX_CALL_DEPTH, 128);
+        assert_eq!(MAX_CALL_DEPTH, 32);
     }
 
     #[test]
