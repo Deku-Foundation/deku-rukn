@@ -60,12 +60,12 @@ Au 24 octobre 2026, la dernière version taguée de cargo-fuzz est la [0.13.2](h
 Séquence suggérée :
 
 1. Garder les tests de comportement normal et d’entrée invalide.
-2. Maintenir le corpus CLI machine-readable contenant source, stdout attendu, fragment de diagnostic et code de sortie ; l’étendre à chaque changement sémantique.
+2. Maintenir le corpus CLI machine-readable contenant source, stdout attendu, fragment de diagnostic et code de sortie ; il couvre actuellement 21 cas, dont les portées, affectations, conditions, boucles bornées et chemins d’erreur. L’étendre à chaque changement sémantique.
 3. Fuzzer lexer, parseur et exécution, puis transformer chaque défaut minimisé en test de non-régression.
 4. Ne mesurer les performances qu’en validant d’abord la correction contre le corpus.
 5. Publier charges, matériel, version du compilateur, commandes et variance de chaque comparaison.
 
-La cible de fuzzing de bout en bout et un corpus CLI de conformité de 15 cas sont actifs en CI. Le fuzzing ciblé du parseur, les campagnes longues et des benchmarks reproductibles restent à réaliser.
+La cible de fuzzing de bout en bout et un corpus CLI de conformité de 21 cas sont actifs en CI. Le fuzzing ciblé du parseur, les campagnes longues et des benchmarks reproductibles restent à réaliser.
 
 ## 4. Éditeurs et interopérabilité
 
