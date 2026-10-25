@@ -18,7 +18,7 @@ Un compilateur doit initialement être exécuté par un programme existant, un a
 - **Base de confiance réductible :** réduire, versionner, tester et auditer l’implémentation initiale et les outils externes au fil du temps.
 - **Étapes reproductibles :** chaque stade passe le même corpus de conformité ; la reproductibilité binaire est recherchée lorsque le backend et l’environnement le permettent.
 
-Réécrire immédiatement le projet en Rukn ne supprime pas les dépendances. Rukn possède maintenant blocs, portées lexicales, affectation, conditions, boucle while bornée, fonctions nommées, références de fonction comme valeurs, appels d’ordre supérieur, paramètres, retours et récursion. Il lui manque encore les fermetures, modules, collections et bibliothèque nécessaire à un compilateur. Il faut stabiliser ces sémantiques, puis définir les frontières de modules et une bibliothèque standard minimale.
+Réécrire immédiatement le projet en Rukn ne supprime pas les dépendances. Rukn possède maintenant blocs, portées lexicales, affectation, conditions, boucle while bornée, listes hétérogènes immuables, indexation à base zéro, `طول`/`أضف`, fonctions nommées, références de fonction comme valeurs, appels d’ordre supérieur, paramètres, retours et récursion. Il lui manque encore les fermetures, modules, cartes/enregistrements, outils de manipulation de fichiers et bibliothèque standard nécessaires à un compilateur. Il faut stabiliser ces sémantiques, puis définir les frontières de modules et une bibliothèque standard minimale.
 
 ## Modèle d’amorçage
 
@@ -58,7 +58,7 @@ Il s’agit d’une architecture cible. Le stade 1 et les stades auto-hébergés
 Avant d’écrire le compilateur en Rukn, spécifier :
 
 - sémantique des expressions, instructions, blocs et portées lexicales (implémentées expérimentalement, à stabiliser par les tests de conformité) ;
-- fermetures, frontières de modules et modèle d’importation ;
+- fermetures, frontières de modules, modèle d’importation, cartes/enregistrements et opérations de bibliothèque pour les fichiers ;
 - système de types, largeurs numériques et débordements, mutabilité et inférence ;
 - collections, enregistrements ou types algébriques, chaînes et propagation explicite des erreurs ;
 - modules, imports, positions source et format stable des diagnostics ;
