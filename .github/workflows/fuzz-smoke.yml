@@ -31,10 +31,14 @@ jobs:
         run: cargo +nightly install cargo-fuzz --version 0.13.2 --locked
       - name: Check fuzz-target formatting
         run: cargo +nightly fmt --manifest-path fuzz/Cargo.toml --all -- --check
-      - name: Build fuzz target
+      - name: Build raw-input fuzz target
         run: cargo +nightly fuzz build run_source
-      - name: Run bounded libFuzzer campaign
+      - name: Build structured-program fuzz target
+        run: cargo +nightly fuzz build generated_program
+      - name: Run bounded raw-input libFuzzer campaign
         run: cargo +nightly fuzz run run_source -- -max_total_time=60 -timeout=5 -max_len=16384 -print_final_stats=1
+      - name: Run bounded structured-program libFuzzer campaign
+        run: cargo +nightly fuzz run generated_program -- -max_total_time=60 -timeout=5 -max_len=256 -print_final_stats=1
       - name: Upload crashing inputs
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
