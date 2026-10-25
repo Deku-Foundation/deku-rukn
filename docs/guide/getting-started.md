@@ -27,6 +27,7 @@ Run the included example:
 Run the named-functions and recursion example:
 
     cargo run --locked -- examples/functions.rukn
+    cargo run --locked -- examples/lists.rukn
 
 Expected output for `hello.rukn`:
 
