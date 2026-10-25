@@ -2231,6 +2231,19 @@ mod tests {
     }
 
     #[test]
+    fn printed_list_output_is_bounded_before_formatting() {
+        let long_value = "x".repeat(400_000);
+        let source = format!("دع النص = «{long_value}»؛ اطبع([النص, النص, النص])؛");
+        assert!(source.len() < MAX_SOURCE_BYTES);
+        let error = run(&source).unwrap_err();
+        assert!(
+            error.message.contains("مخرجات الطباعة"),
+            "unexpected diagnostic: {}",
+            error.message
+        );
+    }
+
+    #[test]
     fn deeply_nested_lists_and_large_append_workloads_are_bounded() {
         let mut nested = "دع قائمة = ٠؛".to_owned();
         for _ in 0..(MAX_COLLECTION_DEPTH + 1) {
