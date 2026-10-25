@@ -18,7 +18,7 @@ A programming language needs a decision record, not just a roadmap. This page tr
 
 | ID | Topic | Status | Evidence required to close |
 | --- | --- | --- | --- |
-| RUKN-DR-0001 | Unicode identifier profile and normalization | XID baseline implemented; normalization open | Pinned `unicode-ident`, Arabic-script conformance tests; normalization/confusable policy and migration analysis remain open |
+| RUKN-DR-0001 | Unicode identifier profile and normalization | XID plus NFC identifier normalization implemented in draft 0.9; confusables/mixed-script/bidi presentation remain open | Pinned `unicode-ident` and `unicode-normalization`, Arabic canonical-equivalence tests, preservation of literal text/source positions; review XID updates separately |
 | RUKN-DR-0002 | Confusables and bidirectional-control policy | Open research; rejected-character code points are shown | Threat model, strings/comments, terminal/editor examples, false-positive review |
 | RUKN-DR-0003 | Tree-walk interpreter, bytecode VM, or native backend | Deferred | Stable semantics, common conformance suite, reproducible benchmarks |
 | RUKN-DR-0004 | Bootstrap and self-hosting | Deferred | Stable parser, standard library, compiler tests, reproducible bootstrap |
