@@ -431,6 +431,15 @@ enum Expr {
         paren: Token,
         arguments: Vec<Expr>,
     },
+    List {
+        elements: Vec<Expr>,
+        bracket: Token,
+    },
+    Index {
+        target: Box<Expr>,
+        index: Box<Expr>,
+        bracket: Token,
+    },
     Grouping(Box<Expr>),
     Unary {
         operator: Token,
