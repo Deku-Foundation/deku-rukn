@@ -62,6 +62,6 @@ Résultat attendu :
 
 **Expérimental · pré-alpha · non destiné à la production.**
 
-Rukn prend maintenant en charge l’affectation, les portées lexicales, les conditions booléennes, une boucle `بينما` bornée, les fonctions nommées, paramètres, retours et récursion. Les fonctions de première classe, fermetures, modules, collections, gestionnaire de paquets, VM bytecode, compilation native, intégration IDE et auto-hébergement restent des objectifs futurs.
+Rukn prend maintenant en charge l’affectation, les portées lexicales, les conditions booléennes, une boucle `بينما` bornée, les fonctions nommées, les références de fonction comme valeurs, les appels d’ordre supérieur, paramètres, retours et récursion. Les fermetures, modules, collections, gestionnaire de paquets, VM bytecode, compilation native, intégration IDE et auto-hébergement restent des objectifs futurs.
 
 Les priorités immédiates sont une spécification précise, des diagnostics fiables, une politique des identifiants Unicode, des tests de non-régression et une construction reproductible du site.
