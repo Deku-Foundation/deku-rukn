@@ -1004,6 +1004,26 @@ impl Interpreter {
         Ok(())
     }
     fn interpret(mut self, statements: &[Stmt]) -> Result<Vec<String>, LangError> {
+        // Register top-level function signatures before executing statements so
+        // recursion, mutual recursion, and forward calls have deterministic lookup.
+        for statement in statements {
+            if let Stmt::Function {
+                name,
+                parameters,
+                body,
+                ..
+            } = statement
+            {
+                self.functions.insert(
+                    name.lexeme.clone(),
+                    FunctionDef {
+                        parameters: parameters.clone(),
+                        body: Arc::new(body.clone()),
+                    },
+                );
+            }
+        }
+
         for statement in statements {
             match self.execute(statement)? {
                 Flow::Continue => {}
@@ -1054,27 +1074,7 @@ impl Interpreter {
 
     fn execute(&mut self, statement: &Stmt) -> Result<Flow, LangError> {
         let flow = match statement {
-            Stmt::Function {
-                keyword,
-                name,
-                parameters,
-                body,
-            } => {
-                if self.environment.len() != 1 {
-                    return Err(LangError::at(
-                        "تعريف الدوال مسموح في المستوى الأعلى فقط في هذه النسخة",
-                        keyword,
-                    ));
-                }
-                self.functions.insert(
-                    name.lexeme.clone(),
-                    FunctionDef {
-                        parameters: parameters.clone(),
-                        body: Arc::new(body.clone()),
-                    },
-                );
-                Flow::Continue
-            }
+            Stmt::Function { .. } => Flow::Continue,
             Stmt::Return { keyword, value } => {
                 let value = match value {
                     Some(expression) => self.evaluate(expression)?,
