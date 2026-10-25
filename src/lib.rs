@@ -1,6 +1,7 @@
 //! A small Arabic-first interpreter. This milestone is experimental, not a stable language ABI.
 use std::collections::HashMap;
 use std::fmt;
+use std::sync::Arc;
 use unicode_ident::{is_xid_continue, is_xid_start};
 
 /// Maximum source size in UTF-8 bytes accepted by the interpreter and CLI.
@@ -954,7 +955,7 @@ impl fmt::Display for Value {
 #[derive(Debug, Clone)]
 struct FunctionDef {
     parameters: Vec<Token>,
-    body: Vec<Stmt>,
+    body: Arc<Vec<Stmt>>,
 }
 
 enum Flow {
@@ -1069,7 +1070,7 @@ impl Interpreter {
                     name.lexeme.clone(),
                     FunctionDef {
                         parameters: parameters.clone(),
-                        body: body.clone(),
+                        body: Arc::new(body.clone()),
                     },
                 );
                 Flow::Continue
@@ -1220,7 +1221,7 @@ impl Interpreter {
 
         let execution = (|| {
             let mut flow = Flow::Continue;
-            for statement in &function.body {
+            for statement in function.body.iter() {
                 flow = self.execute(statement)?;
                 if matches!(&flow, Flow::Return { .. }) {
                     break;
