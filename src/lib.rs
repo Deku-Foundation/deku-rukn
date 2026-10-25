@@ -1127,7 +1127,7 @@ mod tests {
     fn runtime_string_allocation_budget_rejects_repeated_large_copies() {
         let literal = "x".repeat(128 * 1024);
         let mut source = format!("دع النص = «{literal}»؛\n");
-        for index in 0..200 {
+        for index in 0..(MAX_RUNTIME_STRING_BYTES / (128 * 1024) + 2) {
             source.push_str(&format!("دع نسخة_{index} = النص؛\n"));
         }
         assert!(source.len() < MAX_SOURCE_BYTES);
