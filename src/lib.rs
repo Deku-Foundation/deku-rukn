@@ -1858,6 +1858,25 @@ mod tests {
     }
 
     #[test]
+    fn named_function_values_can_be_assigned_passed_and_returned() {
+        let alias = "دالة جمع(أ, ب) { أرجع أ + ب؛ } دع عملية = جمع؛ اطبع(عملية(٢, ٣))؛";
+        assert_eq!(run(alias).unwrap(), ["5"]);
+
+        let higher_order = "دالة جمع(أ, ب) { أرجع أ + ب؛ } دالة تطبيق(عملية, أ, ب) { أرجع عملية(أ, ب)؛ } اطبع(تطبيق(جمع, ٤, ٥))؛";
+        assert_eq!(run(higher_order).unwrap(), ["9"]);
+
+        let returned = "دالة جمع(أ, ب) { أرجع أ + ب؛ } دالة موفر() { أرجع جمع؛ } دع مجموع = موفر()؛ اطبع(مجموع(٧, ٨))؛";
+        assert_eq!(run(returned).unwrap(), ["15"]);
+    }
+
+    #[test]
+    fn non_callable_variable_shadowing_a_function_is_a_diagnostic() {
+        let source = "دالة جمع(أ, ب) { أرجع أ + ب؛ } دع جمع = ١؛ جمع(٢, ٣)؛";
+        let error = run(source).unwrap_err();
+        assert!(error.message.contains("ليست دالة قابلة للاستدعاء"));
+    }
+
+    #[test]
     fn empty_program_is_valid() {
         assert!(run("").unwrap().is_empty());
     }
