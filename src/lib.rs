@@ -2261,7 +2261,11 @@ mod tests {
             nested.push_str(" قائمة = أضف([], قائمة)؛");
         }
         let depth_error = run(&nested).unwrap_err();
-        assert!(depth_error.message.contains("التداخل"));
+        assert!(
+            depth_error.message.contains("التداخل"),
+            "unexpected nested-list diagnostic: {}",
+            depth_error.message
+        );
 
         let growth =
             "دع قائمة = []؛ دع عد = ٠؛ بينما (عد < 2000) { قائمة = أضف(قائمة, ٠)؛ عد = عد + ١؛ }";
