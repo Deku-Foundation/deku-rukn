@@ -22,14 +22,14 @@ Sortie collectée ou erreur localisée
 ## Composants
 
 - **Lexer :** ponctuation, identifiants, nombres, chaînes, commentaires et mots-clés arabes.
-- **Parseur :** précédence par descente récursive et profondeur de syntaxe bornée.
-- **Évaluateur :** exécution dans l’ordre source ; les types incompatibles et résultats numériques non finis produisent un diagnostic.
+- **Parseur :** précédence, affectation, blocs entre accolades, conditions et boucles while par descente récursive ; profondeur des blocs bornée.
+- **Évaluateur :** exécution dans l’ordre source avec environnements lexicaux imbriqués. Les blocs créent une portée ; l’affectation met à jour la liaison existante la plus proche. Les conditions de `إذا` et `بينما` doivent être booléennes, avec un budget par exécution pour les évaluations de conditions while. Les types incompatibles et résultats numériques non finis produisent un diagnostic.
 - **CLI :** lit un fichier UTF-8, écrit les résultats sur stdout et les erreurs sur stderr avec un code de sortie non nul.
 - **Tests :** caractères arabes, conversion des chiffres, précédence, erreurs de types, noms inconnus, sources mal formées et limites de ressources.
 
 ## Limites de ressources implémentées
 
-L’implémentation définit des limites pour la taille source, le nombre de jetons, la profondeur du parseur, la taille d’une chaîne et le budget cumulé d’allocations/copies de chaînes à l’exécution. Elle rejette les sources et expressions trop grandes, les concaténations excessives et les programmes qui dépassent le budget avec des erreurs du langage. Le budget compte les copies des valeurs chaîne, les résultats de concaténation et la sortie collectée. Les opérations numériques rejettent aussi les résultats non finis au lieu de laisser circuler silencieusement l’infini ou NaN.
+L’implémentation définit des limites pour la taille source, le nombre de jetons, l’imbrication syntaxique et des blocs, la taille d’une chaîne, le budget cumulé d’allocations/copies de chaînes et les évaluations de conditions while. Elle rejette les sources trop grandes, la syntaxe trop imbriquée, les concaténations excessives, les boucles incontrôlées et les dépassements de budget avec des erreurs du langage. Le budget des chaînes compte les copies des valeurs, les concaténations et la sortie collectée. Le budget des boucles autorise au maximum 1 000 000 d’évaluations de conditions while cumulées par exécution. Les opérations numériques rejettent aussi les résultats non finis au lieu de laisser circuler silencieusement l’infini ou NaN.
 
 Ces garde-fous ne constituent pas un bac à sable formel. Ils doivent rester documentés et couverts par des tests de non-régression.
 
