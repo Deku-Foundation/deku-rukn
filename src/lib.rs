@@ -399,7 +399,10 @@ fn is_identifier_continue(ch: char) -> bool {
 
 #[derive(Debug, Clone)]
 enum Expr {
-    Literal { value: Value, token: Token },
+    Literal {
+        value: Value,
+        token: Token,
+    },
     Variable(Token),
     Grouping(Box<Expr>),
     Unary {
@@ -484,7 +487,10 @@ impl Parser {
                 self.consume(TokenKind::RightParen, "توقعت «)» بعد قيمة الطباعة")?;
             }
             self.consume(TokenKind::Semicolon, "أنهِ التعليمة بالفاصلة المنقوطة «؛»")?;
-            return Ok(Stmt::Print { expression, keyword });
+            return Ok(Stmt::Print {
+                expression,
+                keyword,
+            });
         }
         let expression = self.expression()?;
         self.consume(TokenKind::Semicolon, "أنهِ التعليمة بالفاصلة المنقوطة «؛»")?;
@@ -590,15 +596,24 @@ impl Parser {
     fn primary(&mut self) -> Result<Expr, LangError> {
         if self.matches(TokenKind::False) {
             let token = self.previous().clone();
-            return Ok(Expr::Literal { value: Value::Bool(false), token });
+            return Ok(Expr::Literal {
+                value: Value::Bool(false),
+                token,
+            });
         }
         if self.matches(TokenKind::True) {
             let token = self.previous().clone();
-            return Ok(Expr::Literal { value: Value::Bool(true), token });
+            return Ok(Expr::Literal {
+                value: Value::Bool(true),
+                token,
+            });
         }
         if self.matches(TokenKind::Nil) {
             let token = self.previous().clone();
-            return Ok(Expr::Literal { value: Value::Nil, token });
+            return Ok(Expr::Literal {
+                value: Value::Nil,
+                token,
+            });
         }
         if self.matches(TokenKind::Number) {
             let token = self.previous().clone();
@@ -608,12 +623,18 @@ impl Parser {
             if !value.is_finite() {
                 return Err(LangError::at("يجب أن يكون العدد محدودًا", &token));
             }
-            return Ok(Expr::Literal { value: Value::Number(value), token });
+            return Ok(Expr::Literal {
+                value: Value::Number(value),
+                token,
+            });
         }
         if self.matches(TokenKind::String) {
             let token = self.previous().clone();
             let value = decode_string_literal(&token)?;
-            return Ok(Expr::Literal { value: Value::String(value), token });
+            return Ok(Expr::Literal {
+                value: Value::String(value),
+                token,
+            });
         }
         if self.matches(TokenKind::Identifier) {
             return Ok(Expr::Variable(self.previous().clone()));
@@ -736,7 +757,10 @@ impl Interpreter {
                 let value = self.evaluate(initializer)?;
                 self.environment.insert(name.lexeme.clone(), value);
             }
-            Stmt::Print { expression, keyword } => {
+            Stmt::Print {
+                expression,
+                keyword,
+            } => {
                 let value = self.evaluate(expression)?;
                 self.reserve_runtime_string_bytes(value.string_bytes(), keyword)?;
                 self.output.push(value.to_string());
@@ -755,7 +779,7 @@ impl Interpreter {
                 | Expr::Binary { operator, .. }
                 | Expr::Logical { operator, .. } => Some(operator),
                 Expr::Literal { token, .. } => Some(token),
-            Expr::Grouping(_) => None,
+                Expr::Grouping(_) => None,
             };
             return Err(match token {
                 Some(token) => LangError::at(
@@ -781,8 +805,12 @@ impl Interpreter {
                 Ok(value.clone())
             }
             Expr::Variable(name) => {
-                let Some(bytes) = self.environment.get(&name.lexeme).map(Value::string_bytes) else {
-                    return Err(LangError::at(format!("متغير غير معرّف: {}", name.lexeme), name));
+                let Some(bytes) = self.environment.get(&name.lexeme).map(Value::string_bytes)
+                else {
+                    return Err(LangError::at(
+                        format!("متغير غير معرّف: {}", name.lexeme),
+                        name,
+                    ));
                 };
                 self.reserve_runtime_string_bytes(bytes, name)?;
                 self.environment
@@ -1147,6 +1175,23 @@ mod tests {
         assert!(source.len() < MAX_SOURCE_BYTES);
         let error = run(&source).unwrap_err();
         assert!(error.message.contains("الحد الأقصى"), "{}", error.message);
+        assert!(error.line > 0 && error.column > 0);
+    }
+
+    #[test]
+    fn repeated_prints_respect_runtime_string_allocation_budget() {
+        let literal = "x".repeat(128 * 1024);
+        let mut source = format!("دع النص = «{literal}»؛\n");
+        for _ in 0..(MAX_RUNTIME_STRING_BYTES / (128 * 1024) + 2) {
+            source.push_str("اطبع(النص)؛\n");
+        }
+        assert!(source.len() < MAX_SOURCE_BYTES);
+        let error = run(&source).unwrap_err();
+        assert!(
+            error.message.contains("ميزانية النصوص"),
+            "unexpected diagnostic: {}",
+            error.message
+        );
         assert!(error.line > 0 && error.column > 0);
     }
 
