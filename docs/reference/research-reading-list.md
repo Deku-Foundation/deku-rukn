@@ -47,6 +47,8 @@ Rukn currently uses a hand-written lexer, recursive-descent parser and tree-walk
 
 **Parser-library review (not adopted as a dependency):** [winnow 1.0.4](https://docs.rs/winnow/latest/winnow/) is a maintained parser-combinator toolbox with imperative and declarative styles. [Chumsky 0.13.0](https://docs.rs/chumsky/latest/chumsky/) offers error-recovery and parser-combinator capabilities; its GitHub repository was archived after the project moved to Codeberg ([repository notice](https://github.com/zesterer/chumsky)). For Rukn's small grammar, the existing recursive-descent parser remains easier to audit. Revisit a parser-library migration when grammar complexity, error recovery or measured maintenance costs justify it—not merely to increase the dependency count.
 
+**Compiler bootstrap and assurance:** the [Rust Compiler Development Guide](https://rustc-dev-guide.rust-lang.org/) documents staged compiler builds and architecture; the [LLVM Kaleidoscope tutorial](https://llvm.org/docs/tutorial/) is a worked path from a small front end to IR and native output; [CompCert](https://compcert.org/doc/) is a research reference for formally verified compilation. Ken Thompson's [Reflections on Trusting Trust](https://doi.org/10.1145/358198.358210) explains why trusting the compiler binary matters as well as reviewing source. These references are synthesized into Rukn's [compiler bootstrap strategy](/project/compiler-bootstrap); self-hosting is a target, not an existing capability.
+
 ## 3. Testing, fuzzing and performance
 
 - [Rust Compiler Development Guide: Fuzzing](https://rustc-dev-guide.rust-lang.org/fuzzing.html) — practical guidance on finding and minimizing compiler failures.
@@ -55,16 +57,17 @@ Rukn currently uses a hand-written lexer, recursive-descent parser and tree-walk
 As checked on 24 October 2026, the latest tagged cargo-fuzz release is [0.13.2](https://github.com/rust-fuzz/cargo-fuzz/releases/tag/0.13.2), published 9 June 2026. Rukn pins that version in its optional smoke workflow; re-check upstream before upgrading.
 - [Criterion.rs](https://github.com/criterion-rs/criterion.rs) — statistical microbenchmarking for Rust.
 - [Rust testing documentation](https://doc.rust-lang.org/book/ch11-00-testing.html) — unit, integration and documentation test foundations.
+- [Selective Feature-Sensitive Coverage for Conformance Testing of Programming Languages (2026)](https://doi.org/10.1145/3808231) — recent peer-reviewed research on designing conformance tests around language features and execution paths.
 
 Suggested sequence:
 
 1. Preserve unit tests for normal behaviour and invalid input.
-2. Add a machine-readable conformance corpus with input, expected output/error class, and exit status.
+2. Maintain the machine-readable CLI conformance corpus with input, expected stdout, diagnostic fragment, and exit status; extend it whenever semantics change.
 3. Fuzz lexer/parser/run boundaries and convert each minimized issue into a regression test.
 4. Benchmark only with correctness checked against that corpus.
 5. Record source workloads, hardware, compiler version, commands and variance for every published comparison.
 
-The bounded end-to-end fuzz smoke target is now active in CI. Parser-specific fuzzing, a formal conformance corpus and reproducible benchmark gates remain future work.
+The bounded end-to-end fuzz smoke target and a 15-case CLI conformance corpus are active in CI. Parser-specific fuzzing, longer campaigns and reproducible benchmark gates remain future work.
 
 ## 4. Editor and tooling interoperability
 
