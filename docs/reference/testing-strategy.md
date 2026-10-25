@@ -13,7 +13,7 @@ description: A practical validation plan for the Rukn lexer, parser, evaluator, 
 | --- | --- | --- |
 | Lexer and string decoding | Token kinds, numeral conversion, source locations, invalid characters, escape decoding | Arabic and ASCII semicolons, three digit families, unterminated strings, escaped delimiters, unknown escapes |
 | Parser | Precedence, associativity, required terminators, bounded nesting | `2 + 3 * 4`, missing `)`, deeply nested unary expressions |
-| Evaluator | Value semantics and failure behavior | Mixed-type addition, undefined names, division by zero, non-finite arithmetic |
+| Evaluator | Value semantics and failure behavior | Mixed-type addition, undefined names, division by zero, non-finite arithmetic, bounded runtime string copies |
 | CLI | Bounded file input, UTF-8 validation, stdout/stderr and exit codes | Missing path, multiple arguments, invalid UTF-8, over-limit source files |
 | Documentation | Pages resolve and snippets remain accurate | Build all three locales; compare the featured example to CI output |
 | Release | Repeatable checks and compatibility notes | Locked dependencies, draft spec review, release checklist |
@@ -27,7 +27,7 @@ String delimiter and escape behavior is documented in [String literal behavior](
 - Numeric literal normalization does not change the value represented by an accepted numeral.
 - Operator precedence is consistent with the specification and tested for mixed operators.
 - Invalid arithmetic produces a diagnostic instead of silently returning infinity or NaN.
-- Source, token, and parser-nesting limits reject oversized input predictably.
+- Source, token, parser-nesting, single-string, and cumulative runtime string-allocation limits reject excessive inputs predictably.
 - The CLI reads no more than one byte beyond the source-size limit before rejecting an oversized file; it must not buffer an unbounded file before calling the interpreter.
 - All code examples in the documentation are either copied from a real example file or explicitly labelled as illustrative.
 
