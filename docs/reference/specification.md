@@ -75,7 +75,7 @@ The print parentheses are optional in the implementation, but if an opening pare
 - Arguments are evaluated left to right in the caller's environment. Arity must match exactly; at most 64 parameters/arguments are accepted.
 - A function body runs with the global environment and a fresh parameter/local environment. It cannot capture caller-block locals; closures and nested function declarations are unsupported. Assignments to global bindings persist after the call.
 - `أرجع expression؛` returns a value; `أرجع؛` returns `لاشيء`. Falling off the end of a function also returns `لاشيء`. A return outside a function is an error.
-- Recursive calls are supported, with a maximum active call depth of 128. Expression nesting is bounded independently within each function frame.
+- Recursive calls are supported, with a maximum active call depth of 32 in the current tree-walk interpreter; a managed VM stack is required before raising this limit. Expression nesting is bounded independently within each function frame.
 - The interpreter evaluates statements in source order and collects print output.
 
 ## Implemented resource limits
@@ -90,7 +90,7 @@ The current implementation applies these guardrails:
 | Single runtime string | 1,048,576 UTF-8 bytes (1 MiB) |
 | Cumulative runtime string allocation/copy budget per run | 16,777,216 bytes (16 MiB) |
 | while-condition evaluations per run | 1,000,000 |
-| Active function-call depth | 128 |
+| Active function-call depth (tree-walk interpreter) | 32 |
 | Function parameters / call arguments | 64 |
 | Elements in one list | 16,384 |
 | Cumulative list elements allocated/copied per run | 1,000,000 |
