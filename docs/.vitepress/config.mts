@@ -23,6 +23,7 @@ const enSidebar = [
     { text: 'Visual identity', link: '/project/visual-identity' },
     { text: 'Roadmap', link: '/project/roadmap' },
     { text: 'Compiler bootstrap', link: '/project/compiler-bootstrap' },
+    { text: 'Self-hosting design', link: '/project/self-hosting-design' },
     { text: 'Contributing', link: '/project/contributing' },
   ] },
 ]
@@ -48,6 +49,7 @@ const arSidebar = [
     { text: 'الهوية البصرية', link: '/ar/project/visual-identity' },
     { text: 'خارطة الطريق', link: '/ar/project/roadmap' },
     { text: 'إقلاع المترجم', link: '/ar/project/compiler-bootstrap' },
+    { text: 'تصميم البناء الذاتي', link: '/ar/project/self-hosting-design' },
     { text: 'المساهمة', link: '/ar/project/contributing' },
   ] },
 ]
@@ -73,6 +75,7 @@ const frSidebar = [
     { text: 'Identité visuelle', link: '/fr/project/visual-identity' },
     { text: 'Feuille de route', link: '/fr/project/roadmap' },
     { text: 'Amorçage du compilateur', link: '/fr/project/compiler-bootstrap' },
+    { text: 'Conception de l’auto-hébergement', link: '/fr/project/self-hosting-design' },
     { text: 'Contribuer', link: '/fr/project/contributing' },
   ] },
 ]
@@ -110,6 +113,7 @@ export default defineConfig({
         { text: 'Testing strategy', link: '/reference/testing-strategy' },
         { text: 'Research reading list', link: '/reference/research-reading-list' },
         { text: 'Design decisions', link: '/project/design-decisions' },
+        { text: 'Self-hosting design', link: '/project/self-hosting-design' },
       ] },
       { text: 'Project', items: [
         { text: 'Visual identity', link: '/project/visual-identity' },
@@ -149,6 +153,7 @@ export default defineConfig({
             { text: 'استراتيجية الاختبار', link: '/ar/reference/testing-strategy' },
             { text: 'قائمة المراجع البحثية', link: '/ar/reference/research-reading-list' },
             { text: 'قرارات التصميم', link: '/ar/project/design-decisions' },
+            { text: 'تصميم البناء الذاتي', link: '/ar/project/self-hosting-design' },
           ] },
           { text: 'المشروع', items: [
             { text: 'الهوية البصرية', link: '/ar/project/visual-identity' },
@@ -187,6 +192,7 @@ export default defineConfig({
             { text: 'Stratégie de test', link: '/fr/reference/testing-strategy' },
             { text: 'Bibliographie technique', link: '/fr/reference/research-reading-list' },
             { text: 'Décisions de conception', link: '/fr/project/design-decisions' },
+            { text: 'Conception de l’auto-hébergement', link: '/fr/project/self-hosting-design' },
           ] },
           { text: 'Projet', items: [
             { text: 'Identité visuelle', link: '/fr/project/visual-identity' },
