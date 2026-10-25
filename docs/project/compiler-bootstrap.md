@@ -18,7 +18,7 @@ A compiler must initially be executed by an existing machine-code runtime, assem
 - **Reducible trust base:** the stage-zero implementation and external build tools are minimized, versioned, tested, and auditable over time.
 - **Reproducible stages:** each compiler stage passes the same conformance suite; binary reproducibility is pursued where the backend and build environment make it practical.
 
-Rewriting the project in Rukn immediately would not remove dependencies. Rukn now has blocks, lexical scopes, assignment, conditions, bounded while loops, named top-level functions, parameters, returns and recursion. It still lacks first-class function values, closures, modules, collections and the library facilities needed to express a compiler cleanly. The next task is to stabilize these semantics, then define module boundaries and the minimum standard library.
+Rewriting the project in Rukn immediately would not remove dependencies. Rukn now has blocks, lexical scopes, assignment, conditions, bounded while loops, named top-level functions, function references as values, higher-order calls, parameters, returns and recursion. It still lacks closures, modules, collections and the library facilities needed to express a compiler cleanly. The next task is to stabilize these semantics, then define module boundaries and the minimum standard library.
 
 ## Bootstrap model
 
@@ -58,7 +58,7 @@ This is a target architecture. Stage 1 and later self-hosted stages do not exist
 Before implementing the compiler in Rukn, decide and specify:
 
 - expression and statement semantics, blocks and lexical scopes (implemented experimentally; stabilize through conformance tests);
-- first-class functions, closures, module boundaries and a defined import model;
+- closures, module boundaries and a defined import model;
 - a type model, numeric widths and overflow rules, mutability, and type inference policy;
 - collections, records or algebraic data types, strings, and explicit error propagation;
 - modules, imports, source locations, and a stable diagnostic format;
@@ -132,7 +132,7 @@ Arabic computational-linguistics research can inform language-facing choices suc
 1. Keep the new CLI conformance corpus small, explicit, and reviewed as observable behavior changes.
 2. Separate parser/fuzz coverage from the end-to-end interpreter target.
 3. Stabilize the semantics of the existing control flow; specify types and numeric behavior before adding more language features.
-4. Named functions, parameters, returns and recursion now have regression tests; next define and test module boundaries and the minimum standard library before attempting to port the compiler.
+4. Named function values, higher-order calls, parameters, returns and recursion now have regression tests; next define and test module boundaries and the minimum standard library before attempting to port the compiler.
 5. Choose a bytecode or native backend only with conformance evidence and a written target/ABI plan.
 
 See the [roadmap](/project/roadmap), [testing strategy](/reference/testing-strategy), and [design-decision register](/project/design-decisions).
