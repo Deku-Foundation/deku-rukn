@@ -29,7 +29,7 @@ Collected output or a structured language error
 
 ## Implemented resource limits
 
-The current implementation defines explicit limits for source size, token count and parser nesting. It rejects oversized source, excess tokens and deeply nested expressions with language errors. Numeric operations also reject non-finite results instead of silently allowing infinity or NaN to flow through the program.
+The current implementation defines explicit limits for source size, token count, parser nesting, individual runtime string values, and cumulative runtime string allocations/copies. It rejects oversized source, excess tokens, deeply nested expressions, oversized concatenation results, and programs that exceed the per-run string budget with language errors. The budget accounts for string clones, concatenation results and captured print output. Numeric operations also reject non-finite results instead of silently allowing infinity or NaN to flow through the program.
 
 These limits are practical guardrails, not a formal sandbox or proof against every denial-of-service scenario. They should remain visible in the specification and be covered by regression tests whenever adjusted.
 
