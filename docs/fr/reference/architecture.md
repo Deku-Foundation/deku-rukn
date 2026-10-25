@@ -29,7 +29,7 @@ Sortie collectée ou erreur localisée
 
 ## Limites de ressources implémentées
 
-L’implémentation définit des limites pour la taille source, le nombre de jetons et la profondeur du parseur. Elle rejette les sources ou expressions dépassant ces limites avec des erreurs du langage. Les opérations numériques rejettent aussi les résultats non finis au lieu de laisser circuler silencieusement l’infini ou NaN.
+L’implémentation définit des limites pour la taille source, le nombre de jetons, la profondeur du parseur, la taille d’une chaîne et le budget cumulé d’allocations/copies de chaînes à l’exécution. Elle rejette les sources et expressions trop grandes, les concaténations excessives et les programmes qui dépassent le budget avec des erreurs du langage. Le budget compte les copies des valeurs chaîne, les résultats de concaténation et la sortie collectée. Les opérations numériques rejettent aussi les résultats non finis au lieu de laisser circuler silencieusement l’infini ou NaN.
 
 Ces garde-fous ne constituent pas un bac à sable formel. Ils doivent rester documentés et couverts par des tests de non-régression.
 
