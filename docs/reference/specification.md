@@ -11,7 +11,7 @@ description: The current grammar, values and semantics of Rukn.
 
 - Source files are UTF-8.
 - Identifiers begin with underscore or a Unicode XID_Start character; later characters may be underscore or Unicode XID_Continue characters, using the pinned `unicode-ident 1.0.27` dependency (UAX #31). This permits supported combining marks after the first character.
-- Identifier tokens are normalized to NFC using the pinned `unicode-normalization 0.1.25` dependency before keyword recognition and name lookup. Canonically equivalent spellings refer to the same binding; original source line/column positions are retained. String literal contents and comments are not normalized.
+- Identifier tokens are normalized to NFC using the pinned `unicode-normalization 0.1.25` dependency before keyword recognition and name lookup. Canonically equivalent spellings refer to the same binding; original source line/column positions and the original spelling for diagnostics are retained. Unchanged identifiers do not store a duplicate raw spelling. String literal contents and comments are not normalized.
 - NFC normalization does not detect visual confusables or mixed-script identifiers. Dedicated confusable warnings, mixed-script policy and bidirectional-source presentation/diagnostics are not implemented yet.
 - Scientific notation is not part of the current numeric-literal grammar.
 - Reserved words: دع, اطبع, دالة, أرجع, إذا, وإلا, بينما, صحيح, خطأ, لاشيء, و, أو.
