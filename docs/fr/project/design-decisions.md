@@ -27,6 +27,7 @@ Un langage nécessite un registre de décisions, pas seulement une feuille de ro
 | RUKN-DR-0007 | Taille des chaînes et budget cumulé de copies à l’exécution | Garde-fou implémenté dans le brouillon 0.4 ; comptage conservateur, pas un bac à sable | Tests de copies répétées, concaténation et sortie imprimée ; revoir les limites avant 1.0 et en cas d’intégration |
 | RUKN-DR-0008 | Noyau minimal de contrôle et portées lexicales | Base expérimentale implémentée dans le brouillon 0.5 | Cas de conformité pour l’ombrage, l’affectation, les conditions booléennes, les limites de boucle et les blocs mal formés ; revue d’ergonomie avant 1.0 |
 | RUKN-DR-0009 | Fonctions nommées, retours et limites de récursion | Brouillon 0.7 : les références nommées peuvent être des valeurs ; les fermetures restent différées | Tests d’arité, appels anticipés/récursion mutuelle, appels d’ordre supérieur, propagation des retours, égalité des références, absence de capture de l’appelant et limite d’appels |
+| RUKN-DR-0010 | Listes immuables, indexation et budgets de collections | Brouillon 0.8 : listes hétérogènes immuables, indexation à base zéro, `طول` / `أضف` ; cartes/enregistrements différés | Tests d’immutabilité d’ajout, bornes, indexation Unicode scalaire, profondeur imbriquée, budget cumulatif d’éléments copiés et sortie imprimée |
 
 Ces entrées sont des sujets de recherche, pas une autorisation d’implémenter une option particulière.
 
