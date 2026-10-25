@@ -5,21 +5,21 @@ description: Primary standards and engineering references for developing Rukn as
 
 # Research reading list
 
-**Reviewed: 24 October 2026.** This is a curated starting point, not a claim that Rukn conforms to every linked standard. Prefer primary standards and official project documentation over summaries. Record the version and access date when a technical decision depends on a source.
+**Reviewed: 25 October 2026.** This is a curated starting point, not a claim that Rukn conforms to every linked standard. Prefer primary standards and official project documentation over summaries. Record the version and access date when a technical decision depends on a source.
 
-## 1. Arabic text, identifiers and Unicode security
+## 1. Arabic language, identifiers and Unicode security
 
 | Source | What it informs | Status in Rukn |
 | --- | --- | --- |
-| [UAX #31 — Unicode Identifiers and Syntax](https://www.unicode.org/reports/tr31/) | Identifier start/continue properties, profiles and normalization guidance | Normative reference; Rukn uses pinned `unicode-ident 1.0.27` for XID_Start/XID_Continue, with underscore tailoring |
-| [UAX #15 — Unicode Normalization Forms](https://www.unicode.org/reports/tr15/) | NFC/NFKC and equivalence rules | Open design question; identifier normalization is not implemented |
+| [UAX #31 — Unicode Identifiers and Syntax](https://www.unicode.org/reports/tr31/) | Identifier start/continue properties, profiles and normalization guidance | Normative reference; Rukn uses pinned `unicode-ident 1.0.27` for XID_Start/XID_Continue and pinned `unicode-normalization 0.1.25` for NFC identifier tokens |
+| [UAX #15 — Unicode Normalization Forms](https://www.unicode.org/reports/tr15/) | NFC/NFKC and equivalence rules | NFC identifier normalization is implemented and tested; literal strings/comments remain unchanged; NFKC is not used |
 | [UTS #39 — Unicode Security Mechanisms](https://www.unicode.org/reports/tr39/) | Confusable detection, mixed-script review and security profiles | Open design question; no dedicated confusable checker exists |
 | [UAX #9 — Unicode Bidirectional Algorithm](https://www.unicode.org/reports/tr9/) | Correct display of mixed right-to-left and left-to-right text | Relevant to source display, diagnostics, documentation and future editor tooling |
 | [UTS #55 — Unicode Source Code Handling](https://www.unicode.org/reports/tr55/) | Unicode usability and security recommendations specifically for source code | Recommended design reference before stabilizing identifiers and editor diagnostics |
 
 The Unicode Consortium’s current Unicode 18.0 publications include UAX #31 revision 45 (1 September 2026), UAX #15 revision 58 (12 August 2026), UTS #39 revision 34 (27 August 2026), and UAX #9 revision 52 (1 September 2026). Use the “Latest Version” links above rather than copying tables from older articles. These version details were checked on 23 October 2026.
 
-Rukn uses [unicode-ident 1.0.27](https://docs.rs/unicode-ident/1.0.27/unicode_ident/) for XID classification. The crate is intentionally pinned in `Cargo.lock`; changing it may alter which source identifiers are accepted, so treat dependency updates as language-specification changes and run the conformance tests. NFC/NFKC normalization is not implemented.
+Rukn uses pinned [unicode-ident 1.0.27](https://docs.rs/unicode-ident/1.0.27/unicode_ident/) for XID classification and [unicode-normalization 0.1.25](https://docs.rs/crate/unicode-normalization/0.1.25) for NFC identifier normalization. Both are locked in `Cargo.lock`. NFC applies before keyword recognition/name lookup; string-literal contents and comments are preserved. Updates to either crate can affect language behavior and require conformance tests and compatibility review.
 
 ### Questions to resolve before a stable identifier specification
 
@@ -32,6 +32,16 @@ Rukn uses [unicode-ident 1.0.27](https://docs.rs/unicode-ident/1.0.27/unicode_id
 Use valid/invalid program pairs and a versioned conformance corpus. Do not silently normalise user strings as a side effect of normalising identifiers.
 
 The numeric-literal change follows Unicode's documented Arabic decimal punctuation and CLDR's model of locale-sensitive decimal symbols. Rukn accepts U+066B only as a numeric-literal separator; this does not imply locale-sensitive output formatting or acceptance of grouping separators. See [Unicode CLDR, Part 3: Numbers](https://unicode.org/reports/tr35/tr35-numbers.html) and [Unicode Technical Report #25, Unicode Support for Mathematics](https://unicode-org.github.io/unicode-reports/tr25/tr25.html).
+
+### Arabic programming languages and localization research
+
+- [ARABLAN: Design of an Arabic Programming Language (1995)](https://www.sciencedirect.com/science/article/pii/0096055195000062) — historical Arabic-language design, primarily educational.
+- [Designing and Implementing an Arabic Programming Language for Teaching Pupils (2019)](https://doi.org/10.35741/issn.0258-2724.54.3.11) — describes lexical, syntactic and semantic analysis and translation of Arabic source to C++; useful prior art, not evidence of a self-hosted native toolchain.
+- [Arabic Programming Language Evolution—A Survey (2018)](https://www.academia.edu/39953345/Arabic_Programming_Language_Evolution-A_Survey) — secondary survey; consult its primary references for claims about individual languages.
+- [Learning to Code in Localized Programming Languages (ACM Learning @ Scale 2017)](https://doi.org/10.1145/3051457.3051464) — a study of over 15,000 Scratch users in five countries supporting localization in a learning context; it does not show that Arabic syntax alone improves compiler or generated-code performance.
+- [PWCT2 dual-language self-hosted visual language (2025 preprint)](https://arxiv.org/abs/2509.20426) — a modern case study, not an independently replicated performance benchmark.
+
+The implementation implications and limits of these studies are documented in the [self-hosting design](/project/self-hosting-design).
 
 ## 2. Language semantics and Rust implementation
 
