@@ -586,7 +586,10 @@ impl Parser {
             } else {
                 Some(self.expression()?)
             };
-            self.consume(TokenKind::Semicolon, "أنهِ تعليمة الإرجاع بالفاصلة المنقوطة «؛»")?;
+            self.consume(
+                TokenKind::Semicolon,
+                "أنهِ تعليمة الإرجاع بالفاصلة المنقوطة «؛»",
+            )?;
             return Ok(Stmt::Return { keyword, value });
         }
         if self.matches(TokenKind::Let) {
@@ -797,9 +800,7 @@ impl Parser {
                     loop {
                         if arguments.len() >= MAX_FUNCTION_PARAMETERS {
                             return Err(LangError::at(
-                                format!(
-                                    "تجاوز الاستدعاء حد المعاملات ({MAX_FUNCTION_PARAMETERS})"
-                                ),
+                                format!("تجاوز الاستدعاء حد المعاملات ({MAX_FUNCTION_PARAMETERS})"),
                                 self.peek(),
                             ));
                         }
@@ -809,8 +810,7 @@ impl Parser {
                         }
                     }
                 }
-                let paren =
-                    self.consume(TokenKind::RightParen, "توقعت «)» بعد معاملات الاستدعاء")?;
+                let paren = self.consume(TokenKind::RightParen, "توقعت «)» بعد معاملات الاستدعاء")?;
                 Ok((arguments, paren))
             })();
             self.nesting -= 1;
@@ -1007,10 +1007,7 @@ impl Interpreter {
             match self.execute(statement)? {
                 Flow::Continue => {}
                 Flow::Return { keyword, .. } => {
-                    return Err(LangError::at(
-                        "لا يمكن استخدام «أرجع» خارج دالة",
-                        &keyword,
-                    ));
+                    return Err(LangError::at("لا يمكن استخدام «أرجع» خارج دالة", &keyword));
                 }
             }
         }
@@ -1169,9 +1166,11 @@ impl Interpreter {
         closing_paren: &Token,
         arguments: &[Expr],
     ) -> Result<Value, LangError> {
-        let function = self.functions.get(&name.lexeme).cloned().ok_or_else(|| {
-            LangError::at(format!("دالة غير معرّفة: {}", name.lexeme), name)
-        })?;
+        let function = self
+            .functions
+            .get(&name.lexeme)
+            .cloned()
+            .ok_or_else(|| LangError::at(format!("دالة غير معرّفة: {}", name.lexeme), name))?;
         if arguments.len() != function.parameters.len() {
             return Err(LangError::at(
                 format!(
