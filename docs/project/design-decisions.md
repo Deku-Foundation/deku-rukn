@@ -27,6 +27,7 @@ A programming language needs a decision record, not just a roadmap. This page tr
 | RUKN-DR-0007 | Runtime string size and cumulative copy budget | Implemented guardrail in draft 0.4; conservative accounting, not a sandbox | Regression tests for repeated copies, concatenation and print output; review limits before 1.0 and for embedding |
 | RUKN-DR-0008 | Minimum control-flow core and lexical scopes | Implemented experimental baseline in draft 0.5 | Conformance cases for scope/shadowing, assignment, boolean conditions, loop limits and malformed blocks; revisit language ergonomics before 1.0 |
 | RUKN-DR-0009 | Named functions, return flow and recursion limits | Draft 0.7: top-level named functions can be referenced as values; closures remain deferred | Tests for exact arity, forward/mutual recursion, higher-order calls, return propagation, named-reference equality, no caller-local capture and call-depth limit |
+| RUKN-DR-0010 | Immutable lists, indexing and collection budgets | Draft 0.8: heterogeneous immutable lists, zero-based indexes, `طول` / `أضف`; maps/records deferred | Tests for append immutability, bounds, Unicode scalar indexing, nested depth, cumulative element-copy budget and printed-output budget |
 
 These entries are research topics, not approvals to implement a specific option.
 
