@@ -22,14 +22,14 @@ Collected output or a structured language error
 ## Components
 
 - **Lexer:** recognizes punctuation, identifiers, numeric literals, strings, comments and Arabic keywords.
-- **Parser:** implements operator precedence with recursive-descent functions and bounds nested syntax.
-- **Evaluator:** evaluates statements in source order. Values are numbers, strings, booleans and a nil-like value; invalid type combinations and non-finite arithmetic produce diagnostics.
+- **Parser:** implements operator precedence, assignment, braced blocks, conditionals and while loops with recursive-descent functions; block nesting is bounded.
+- **Evaluator:** evaluates statements in source order with nested lexical environments. Blocks push and pop scopes; assignment updates the nearest existing binding. `إذا` and `بينما` conditions must be booleans, and while-condition evaluations have a per-run budget. Invalid type combinations and non-finite arithmetic produce diagnostics.
 - **CLI:** reads one UTF-8 source file, prints successful output to stdout, and reports errors to stderr with a non-zero exit code.
 - **Tests:** cover Arabic tokens, numeral normalization, precedence, type errors, unknown variables, malformed source and resource-limit regressions.
 
 ## Implemented resource limits
 
-The current implementation defines explicit limits for source size, token count, parser nesting, individual runtime string values, and cumulative runtime string allocations/copies. It rejects oversized source, excess tokens, deeply nested expressions, oversized concatenation results, and programs that exceed the per-run string budget with language errors. The budget accounts for string clones, concatenation results and captured print output. Numeric operations also reject non-finite results instead of silently allowing infinity or NaN to flow through the program.
+The current implementation defines explicit limits for source size, token count, parser/block nesting, individual runtime string values, cumulative runtime string allocations/copies, and while-condition evaluations. It rejects oversized source, excess tokens, deeply nested syntax, oversized concatenation results, runaway loops, and programs that exceed the per-run string budget with language errors. The string budget accounts for string clones, concatenation results and captured print output. The loop budget allows at most 1,000,000 condition evaluations across all while loops in one run. Numeric operations also reject non-finite results instead of silently allowing infinity or NaN to flow through the program.
 
 These limits are practical guardrails, not a formal sandbox or proof against every denial-of-service scenario. They should remain visible in the specification and be covered by regression tests whenever adjusted.
 
