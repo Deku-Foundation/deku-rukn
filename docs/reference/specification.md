@@ -5,7 +5,7 @@ description: The current grammar, values and semantics of Rukn.
 
 # Rukn language specification
 
-**Status: draft, version 0.6.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
+**Status: draft, version 0.7.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
 
 ## Lexical rules
 
@@ -66,7 +66,7 @@ The print parentheses are optional in the implementation, but if an opening pare
 - A variable lookup for an unknown name is an error.
 - Division by positive or negative zero is an error.
 - Non-finite numeric results are rejected with a language diagnostic.
-- Function declarations use `دالة name(parameter, ...)` and are permitted only at top level in this version. All top-level function names are registered before statement execution, so forward calls and mutual recursion work. Duplicate function names are rejected during parsing. Function names occupy a separate global function namespace; they are not first-class values and cannot be returned, assigned, or stored.
+- Function declarations use `دالة name(parameter, ...)` and are permitted only at top level in this version. All top-level function names are registered before statement execution, so forward calls and mutual recursion work. Duplicate function names are rejected during parsing. A function name evaluates to a named function reference when no lexical variable shadows it; references can be assigned to variables, passed as arguments, and returned from functions. Calls use identifier syntax (`name(...)`), so an alias can be called but arbitrary call results cannot yet be chained directly. Function references do not capture an environment: closures and nested function declarations are unsupported.
 - Arguments are evaluated left to right in the caller's environment. Arity must match exactly; at most 64 parameters/arguments are accepted.
 - A function body runs with the global environment and a fresh parameter/local environment. It cannot capture caller-block locals; closures and nested function declarations are unsupported. Assignments to global bindings persist after the call.
 - `أرجع expression؛` returns a value; `أرجع؛` returns `لاشيء`. Falling off the end of a function also returns `لاشيء`. A return outside a function is an error.
@@ -92,4 +92,4 @@ The runtime string budget conservatively counts string-value clones, concatenati
 
 ## Known gaps
 
-The grammar is not yet generated from a formal parser definition. Unicode normalization, a confusable-identifier policy, immutable bindings, a static type checker, first-class functions and closures, collections, modules, a typed intermediate representation, bytecode, and a conformance corpus shared across future interpreter/VM/compiler implementations remain open work before a stable language release.
+The grammar is not yet generated from a formal parser definition. Unicode normalization, a confusable-identifier policy, immutable bindings, a static type checker, closures, collections, modules, a typed intermediate representation, bytecode, and a conformance corpus shared across future interpreter/VM/compiler implementations remain open work before a stable language release.
