@@ -45,6 +45,8 @@ Rukn utilise actuellement un lexer écrit à la main, un parseur récursif desce
 
 **Revue des bibliothèques de parsing (non adoptées) :** [winnow 1.0.4](https://docs.rs/winnow/latest/winnow/) offre une boîte à outils de parsing flexible. [Chumsky 0.13.0](https://docs.rs/chumsky/latest/chumsky/) propose des combinateurs et de la récupération d’erreurs ; son dépôt GitHub a été archivé après le déplacement du projet vers Codeberg. Pour la grammaire actuelle, le parseur récursif maison est plus simple à auditer. Réévaluer une migration si la complexité ou les coûts de maintenance la justifient.
 
+**Amorçage et assurance du compilateur :** le [Rust Compiler Development Guide](https://rustc-dev-guide.rust-lang.org/) décrit l’architecture et les builds par étapes ; le [tutoriel LLVM Kaleidoscope](https://llvm.org/docs/tutorial/) présente un chemin pratique du frontend à l’IR et au code natif ; [CompCert](https://compcert.org/doc/) est une référence de recherche en compilation formellement vérifiée. L’article de Ken Thompson [Reflections on Trusting Trust](https://doi.org/10.1145/358198.358210) explique pourquoi le binaire du compilateur compte autant que son code source. Ces leçons sont synthétisées dans la [stratégie d’amorçage de Rukn](/fr/project/compiler-bootstrap) ; l’auto-hébergement reste un objectif, pas une capacité actuelle.
+
 ## 3. Tests, fuzzing et performance
 
 - [Rust Compiler Development Guide : Fuzzing](https://rustc-dev-guide.rust-lang.org/fuzzing.html) — détecter et minimiser les défauts de compilateur.
@@ -53,16 +55,17 @@ Rukn utilise actuellement un lexer écrit à la main, un parseur récursif desce
 Au 24 octobre 2026, la dernière version taguée de cargo-fuzz est la [0.13.2](https://github.com/rust-fuzz/cargo-fuzz/releases/tag/0.13.2), publiée le 9 juin 2026. Rukn épingle cette version dans son workflow de test optionnel ; vérifier la dernière version amont avant toute mise à niveau.
 - [Criterion.rs](https://github.com/criterion-rs/criterion.rs) — microbenchmarks statistiques pour Rust.
 - [Documentation des tests Rust](https://doc.rust-lang.org/book/ch11-00-testing.html) — tests unitaires, d’intégration et documentation.
+- [Selective Feature-Sensitive Coverage for Conformance Testing of Programming Languages (2026)](https://doi.org/10.1145/3808231) — recherche récente avec comité de lecture sur les tests de conformité conçus autour des fonctionnalités et chemins d’exécution.
 
 Séquence suggérée :
 
 1. Garder les tests de comportement normal et d’entrée invalide.
-2. Créer un corpus machine-readable avec source, sortie ou classe d’erreur et code de sortie attendus.
+2. Maintenir le corpus CLI machine-readable contenant source, stdout attendu, fragment de diagnostic et code de sortie ; l’étendre à chaque changement sémantique.
 3. Fuzzer lexer, parseur et exécution, puis transformer chaque défaut minimisé en test de non-régression.
 4. Ne mesurer les performances qu’en validant d’abord la correction contre le corpus.
 5. Publier charges, matériel, version du compilateur, commandes et variance de chaque comparaison.
 
-La cible de fuzzing de bout en bout, bornée, est maintenant active en CI. Le fuzzing ciblé du parseur, un corpus formel de conformité et des benchmarks reproductibles restent à réaliser.
+La cible de fuzzing de bout en bout et un corpus CLI de conformité de 15 cas sont actifs en CI. Le fuzzing ciblé du parseur, les campagnes longues et des benchmarks reproductibles restent à réaliser.
 
 ## 4. Éditeurs et interopérabilité
 
