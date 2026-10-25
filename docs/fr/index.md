@@ -26,7 +26,7 @@ features:
     link: /fr/guide/language
     linkText: Explorer le langage
   - title: Noyau réduit et explicite
-    details: Un interpréteur d’arbre en Rust avec nombres, chaînes, booléens, variables, opérateurs et diagnostics clairs.
+    details: Un interpréteur d’arbre en Rust avec nombres, chaînes, listes immuables, portées lexicales, contrôle de flux, fonctions nommées et diagnostics clairs.
     link: /fr/reference/architecture
     linkText: Comprendre l’interpréteur
   - title: La recherche avant les promesses
