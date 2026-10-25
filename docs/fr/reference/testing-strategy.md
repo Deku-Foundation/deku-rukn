@@ -5,7 +5,7 @@ description: Plan pratique pour tester le lexer, le parseur, l’évaluateur, la
 
 # Stratégie de test et de conformité
 
-**Statut : base d’ingénierie avec fuzzing borné et corpus de conformité CLI.** Les tests unitaires et les contrôles CI standard restent les validations principales. Le test d’intégration sans dépendance supplémentaire exécute le corpus de 21 cas contre la vraie CLI, en vérifiant stdout, code de sortie et fragment de diagnostic. Le corpus couvre l’ombrage lexical, l’affectation, les conditions if/else, les boucles while, les conditions non booléennes, les blocs mal formés et l’affectation d’un nom inconnu. Un workflow distinct lance une campagne libFuzzer de 60 secondes pour les pull requests qui modifient le code source ou le répertoire fuzz, chaque semaine et manuellement. Le fuzzing ciblé du parseur, les campagnes longues, les assertions structurées de diagnostics et les benchmarks restent à réaliser.
+**Statut : base d’ingénierie avec fuzzing borné et corpus de conformité CLI.** Les tests unitaires et les contrôles CI standard restent les validations principales. Le test d’intégration sans dépendance supplémentaire exécute le corpus de 30 cas contre la vraie CLI, en vérifiant stdout, code de sortie et fragment de diagnostic. Le corpus couvre l’ombrage lexical, l’affectation, if/else, while, les appels nommés, la récursion, les retours, les erreurs d’arité, les fonctions inconnues, les blocs mal formés et les limites de ressources. Un workflow distinct lance une campagne libFuzzer de 60 secondes pour les pull requests qui modifient le code source ou le répertoire fuzz, chaque semaine et manuellement. Le fuzzing ciblé du parseur, les campagnes longues, les assertions structurées de diagnostics et les benchmarks restent à réaliser.
 
 ## Couches de test
 
@@ -13,7 +13,7 @@ description: Plan pratique pour tester le lexer, le parseur, l’évaluateur, la
 | --- | --- | --- |
 | Lexer | Types de jetons, conversion des chiffres, positions, caractères invalides | Points-virgules arabes/ASCII, trois familles de chiffres, chaîne non terminée |
 | Parseur | Précédence, associativité, blocs, terminators et profondeur bornée | `2 + 3 * 4`, parenthèse ou accolade manquante, blocs et expressions très imbriqués |
-| Évaluateur | Sémantique des valeurs et échecs | Addition de types différents, nom ou affectation inconnus, ombrage lexical, conditions booléennes, boucles bornées, division par zéro, résultats non finis, budget de copies de chaînes |
+| Évaluateur | Sémantique des valeurs et échecs | Types incompatibles, nom/affectation inconnus, ombrage lexical, conditions booléennes, boucles bornées, appels nommés, propagation des retours, limites d’arité et de récursion, division par zéro, résultats non finis, budget de copies de chaînes |
 | CLI | Entrée fichier, stdout/stderr, codes de sortie | Chemin absent, arguments multiples, fichier non UTF-8 |
 | Documentation | Liens et exemples exacts | Construire les trois locales et comparer l’exemple au résultat CI |
 | Publication | Contrôles reproductibles et compatibilité | Dépendances verrouillées, revue de la spécification, liste de publication |
@@ -28,6 +28,8 @@ description: Plan pratique pour tester le lexer, le parseur, l’évaluateur, la
 - Les limites de source, de jetons, d’imbrication des blocs, de taille d’une chaîne, du budget de copies et des évaluations de conditions while rejettent les entrées excessives de façon prévisible.
 - L’affectation modifie la liaison lexicale existante la plus proche ; les noms locaux ne fuient pas vers la portée extérieure.
 - Les conditions if/while exigent des booléens et n’utilisent pas de conversion implicite de vérité.
+- Les arguments sont évalués de gauche à droite, l’arité doit correspondre, la récursion respecte la limite d’appels actifs et les fonctions ne capturent pas les variables locales de l’appelant.
+- Le retour doit se propager dans les blocs/conditions et un retour au niveau supérieur doit produire un diagnostic.
 - Chaque exemple documentaire provient d’un fichier réel ou est explicitement présenté comme illustratif.
 
 Le corpus actuel constitue le premier contrat de compatibilité exécutable de la CLI. Étendez-le à chaque nouvelle fonctionnalité, catégorie de diagnostic ou limite de ressources ; conservez un format indépendant de l’interpréteur actuel afin que de futures VM et implémentations de compilateur puissent le partager.
