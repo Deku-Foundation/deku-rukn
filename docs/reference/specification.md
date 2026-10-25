@@ -5,13 +5,14 @@ description: The current grammar, values and semantics of Rukn.
 
 # Rukn language specification
 
-**Status: draft, version 0.8.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
+**Status: draft, version 0.9.** This document specifies the current interpreter, not a future 1.0 language. Any behavior not listed here should be treated as unsupported.
 
 ## Lexical rules
 
 - Source files are UTF-8.
 - Identifiers begin with underscore or a Unicode XID_Start character; later characters may be underscore or Unicode XID_Continue characters, using the pinned `unicode-ident 1.0.27` dependency (UAX #31). This permits supported combining marks after the first character.
-- Identifiers are not normalized; visually confusable detection and bidirectional-control diagnostics are not implemented.
+- Identifier tokens are normalized to NFC using the pinned `unicode-normalization 0.1.25` dependency before keyword recognition and name lookup. Canonically equivalent spellings refer to the same binding; original source line/column positions are retained. String literal contents and comments are not normalized.
+- NFC normalization does not detect visual confusables or mixed-script identifiers. Dedicated confusable warnings, mixed-script policy and bidirectional-source presentation/diagnostics are not implemented yet.
 - Scientific notation is not part of the current numeric-literal grammar.
 - Reserved words: دع, اطبع, دالة, أرجع, إذا, وإلا, بينما, صحيح, خطأ, لاشيء, و, أو.
 - Number literals accept ASCII, Arabic-Indic and Extended Arabic-Indic (Persian) digits. The decimal separator may be the ASCII full stop (`.`) or Arabic decimal separator (`٫`, U+066B); both have the same numeric meaning. A separator must be followed by at least one digit. Repeated separators are invalid. Every digit in one numeric literal must come from the same digit family; mixing families is rejected at the first mismatching digit.
@@ -99,4 +100,4 @@ The runtime string budget conservatively counts string-value clones, named funct
 
 ## Known gaps
 
-The grammar is not yet generated from a formal parser definition. Unicode normalization, a confusable-identifier policy, immutable bindings, a static type checker, closures, records/maps, modules, a typed intermediate representation, bytecode, and a conformance corpus shared across future interpreter/VM/compiler implementations remain open work before a stable language release.
+The grammar is not yet generated from a formal parser definition. A confusable-identifier policy, mixed-script diagnostics, immutable bindings, a static type checker, closures, records/maps, modules, a typed intermediate representation, bytecode, and a conformance corpus shared across future interpreter/VM/compiler implementations remain open work before a stable language release.
