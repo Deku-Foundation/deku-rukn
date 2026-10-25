@@ -1000,14 +1000,28 @@ enum Value {
     String(String),
     Bool(bool),
     Function(String),
+    List(Rc<ListValue>),
     Nil,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+struct ListValue {
+    items: Vec<Value>,
+    depth: usize,
 }
 impl Value {
     fn string_bytes(&self) -> usize {
         match self {
             Self::String(value) => value.len(),
             Self::Function(name) => name.len(),
-            Self::Number(_) | Self::Bool(_) | Self::Nil => 0,
+            Self::Number(_) | Self::Bool(_) | Self::List(_) | Self::Nil => 0,
+        }
+    }
+
+    fn collection_depth(&self) -> usize {
+        match self {
+            Self::List(list) => list.depth,
+            Self::Number(_) | Self::String(_) | Self::Bool(_) | Self::Function(_) | Self::Nil => 0,
         }
     }
 }
@@ -1020,6 +1034,16 @@ impl fmt::Display for Value {
             Self::Bool(true) => write!(f, "صحيح"),
             Self::Bool(false) => write!(f, "خطأ"),
             Self::Function(name) => write!(f, "<دالة {name}>"),
+            Self::List(list) => {
+                write!(f, "[")?;
+                for (index, value) in list.items.iter().enumerate() {
+                    if index != 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "{value}")?;
+                }
+                write!(f, "]")
+            }
             Self::Nil => write!(f, "لاشيء"),
         }
     }
@@ -1043,6 +1067,7 @@ struct Interpreter {
     runtime_string_bytes: usize,
     loop_condition_evaluations: usize,
     call_depth: usize,
+    runtime_collection_elements: usize,
 }
 impl Interpreter {
     fn new() -> Self {
@@ -1054,6 +1079,7 @@ impl Interpreter {
             runtime_string_bytes: 0,
             loop_condition_evaluations: 0,
             call_depth: 0,
+            runtime_collection_elements: 0,
         }
     }
     fn reserve_runtime_string_bytes(
@@ -1105,6 +1131,26 @@ impl Interpreter {
             }
         }
         Ok(self.output)
+    }
+
+    fn reserve_runtime_collection_elements(
+        &mut self,
+        elements: usize,
+        token: &Token,
+    ) -> Result<(), LangError> {
+        let Some(total) = self.runtime_collection_elements.checked_add(elements) else {
+            return Err(LangError::at("تجاوز عدّاد عناصر المجموعات نطاقه", token));
+        };
+        if total > MAX_RUNTIME_COLLECTION_ELEMENTS {
+            return Err(LangError::at(
+                format!(
+                    "تجاوز البرنامج ميزانية عناصر المجموعات ({MAX_RUNTIME_COLLECTION_ELEMENTS})"
+                ),
+                token,
+            ));
+        }
+        self.runtime_collection_elements = total;
+        Ok(())
     }
 
     fn define_variable(&mut self, name: &Token, value: Value) -> Result<(), LangError> {
