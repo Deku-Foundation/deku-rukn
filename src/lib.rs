@@ -8,7 +8,7 @@ use unicode_ident::{is_xid_continue, is_xid_start};
 pub const MAX_SOURCE_BYTES: usize = 1_048_576;
 /// Maximum size, in UTF-8 bytes, of a single runtime string value.
 pub const MAX_STRING_BYTES: usize = MAX_SOURCE_BYTES;
-/// Conservative cumulative budget for runtime string clones, concatenations and output.
+/// Conservative cumulative budget for runtime string clones, concatenations, copied names and formatted output.
 pub const MAX_RUNTIME_STRING_BYTES: usize = 16 * 1024 * 1024;
 /// Maximum number of while-condition evaluations in one program run.
 pub const MAX_LOOP_CONDITION_EVALUATIONS: usize = 1_000_000;
