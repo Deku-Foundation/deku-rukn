@@ -5,7 +5,7 @@ description: Plan pratique pour tester le lexer, le parseur, l’évaluateur, la
 
 # Stratégie de test et de conformité
 
-**Statut : base d’ingénierie avec cible de fuzzing bornée.** Les tests unitaires et les contrôles CI standard restent les validations principales. Un workflow distinct lance une campagne libFuzzer de 60 secondes pour les pull requests qui modifient le code source ou le répertoire fuzz, chaque semaine et manuellement. Un corpus formel, des campagnes longues et des seuils de benchmark restent à réaliser.
+**Statut : base d’ingénierie avec fuzzing borné et corpus de conformité CLI.** Les tests unitaires et les contrôles CI standard restent les validations principales. Le test d’intégration sans dépendance supplémentaire exécute le corpus de 15 cas contre la vraie CLI, en vérifiant stdout, code de sortie et fragment de diagnostic. Un workflow distinct lance une campagne libFuzzer de 60 secondes pour les pull requests qui modifient le code source ou le répertoire fuzz, chaque semaine et manuellement. Le fuzzing ciblé du parseur, les campagnes longues, les assertions structurées de diagnostics et les benchmarks restent à réaliser.
 
 ## Couches de test
 
@@ -28,7 +28,7 @@ description: Plan pratique pour tester le lexer, le parseur, l’évaluateur, la
 - Les limites de source, de jetons, de profondeur, de taille d’une chaîne et du budget cumulé d’allocations/copies doivent rejeter les entrées excessives de façon prévisible.
 - Chaque exemple documentaire provient d’un fichier réel ou est explicitement présenté comme illustratif.
 
-Un corpus lisible par machine associant source, stdout attendu, catégorie d’erreur et code de sortie faciliterait les tests et la comparaison future de plusieurs implémentations.
+Le corpus actuel constitue le premier contrat de compatibilité exécutable de la CLI. Étendez-le à chaque nouvelle fonctionnalité, catégorie de diagnostic ou limite de ressources ; conservez un format indépendant de l’interpréteur actuel afin que de futures VM et implémentations de compilateur puissent le partager.
 
 ## Plan de fuzzing
 
