@@ -434,10 +434,21 @@ enum Expr {
 }
 #[derive(Debug, Clone)]
 enum Stmt {
-    Let { name: Token, initializer: Expr },
-    Assign { name: Token, value: Expr },
-    Print { expression: Expr, keyword: Token },
-    Block { statements: Vec<Stmt> },
+    Let {
+        name: Token,
+        initializer: Expr,
+    },
+    Assign {
+        name: Token,
+        value: Expr,
+    },
+    Print {
+        expression: Expr,
+        keyword: Token,
+    },
+    Block {
+        statements: Vec<Stmt>,
+    },
     If {
         keyword: Token,
         condition: Expr,
@@ -524,7 +535,9 @@ impl Parser {
             self.consume(TokenKind::RightParen, "توقعت «)» بعد شرط «إذا»")?;
             let then_branch = Box::new(self.required_block("توقعت كتلة «{ ... }» بعد شرط «إذا»")?);
             let else_branch = if self.matches(TokenKind::Else) {
-                Some(Box::new(self.required_block("توقعت كتلة «{ ... }» بعد «وإلا»")?))
+                Some(Box::new(
+                    self.required_block("توقعت كتلة «{ ... }» بعد «وإلا»")?,
+                ))
             } else {
                 None
             };
@@ -907,7 +920,9 @@ impl Interpreter {
             }
             Stmt::Block { statements } => {
                 self.environment.push(HashMap::new());
-                let result = statements.iter().try_for_each(|statement| self.execute(statement));
+                let result = statements
+                    .iter()
+                    .try_for_each(|statement| self.execute(statement));
                 self.environment.pop();
                 result?;
             }
@@ -924,10 +939,7 @@ impl Interpreter {
                     }
                 }
                 _ => {
-                    return Err(LangError::at(
-                        "يتطلب شرط «إذا» قيمة منطقية",
-                        keyword,
-                    ));
+                    return Err(LangError::at("يتطلب شرط «إذا» قيمة منطقية", keyword));
                 }
             },
             Stmt::While {
@@ -940,10 +952,7 @@ impl Interpreter {
                     Value::Bool(true) => self.execute(body)?,
                     Value::Bool(false) => break,
                     _ => {
-                        return Err(LangError::at(
-                            "يتطلب شرط «بينما» قيمة منطقية",
-                            keyword,
-                        ));
+                        return Err(LangError::at("يتطلب شرط «بينما» قيمة منطقية", keyword));
                     }
                 }
             },
@@ -1106,8 +1115,8 @@ pub fn run(source: &str) -> Result<Vec<String>, LangError> {
 #[cfg(test)]
 mod tests {
     use super::{
-        MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING, MAX_RUNTIME_STRING_BYTES,
-        MAX_SOURCE_BYTES, run,
+        MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING, MAX_RUNTIME_STRING_BYTES, MAX_SOURCE_BYTES,
+        run,
     };
 
     #[test]
@@ -1382,10 +1391,7 @@ mod tests {
     #[test]
     fn conditional_blocks_select_the_expected_branch() {
         assert_eq!(
-            run(
-                "دع العدد = ٣؛ إذا (العدد > ٢) { اطبع(«كبير»)؛ } وإلا { اطبع(«صغير»)؛ }"
-            )
-            .unwrap(),
+            run("دع العدد = ٣؛ إذا (العدد > ٢) { اطبع(«كبير»)؛ } وإلا { اطبع(«صغير»)؛ }").unwrap(),
             ["كبير"]
         );
         assert_eq!(
@@ -1397,10 +1403,7 @@ mod tests {
     #[test]
     fn while_loops_and_assignment_work() {
         assert_eq!(
-            run(
-                "دع العد = ٠؛ بينما (العد < ٣) { اطبع(العد)؛ العد = العد + ١؛ }"
-            )
-            .unwrap(),
+            run("دع العد = ٠؛ بينما (العد < ٣) { اطبع(العد)؛ العد = العد + ١؛ }").unwrap(),
             ["0", "1", "2"]
         );
     }
@@ -1408,10 +1411,8 @@ mod tests {
     #[test]
     fn lexical_scopes_shadow_without_leaking_and_assign_nearest_binding() {
         assert_eq!(
-            run(
-                "دع الاسم = «خارج»؛ { دع الاسم = «داخل»؛ الاسم = «معدل»؛ اطبع(الاسم)؛ } اطبع(الاسم)؛"
-            )
-            .unwrap(),
+            run("دع الاسم = «خارج»؛ { دع الاسم = «داخل»؛ الاسم = «معدل»؛ اطبع(الاسم)؛ } اطبع(الاسم)؛")
+                .unwrap(),
             ["معدل", "خارج"]
         );
     }
