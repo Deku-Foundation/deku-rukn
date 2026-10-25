@@ -22,3 +22,12 @@ lexical_scope_shadowing	0	معدل\nخارج\n		دع الاسم = «خارج»؛
 non_boolean_if_condition	1		شرط «إذا»	إذا (١) { اطبع(١)؛ }
 undefined_assignment	1		غير معرّف	غائب = ١؛
 missing_block_closer	1		توقعت «}»	إذا (صحيح) { اطبع(١)؛
+named_function_call	0	42\n		دالة جمع(أ, ب) { أرجع أ + ب؛ } اطبع(جمع(٢٠, ٢٢))؛
+recursive_factorial	0	120\n		دالة عاملي(ن) { إذا (ن <= ١) { أرجع ١؛ } أرجع ن * عاملي(ن - ١)؛ } اطبع(عاملي(٥))؛
+implicit_nil_return	0	داخل\nلاشيء\n		دالة رسالة() { اطبع(«داخل»)؛ } اطبع(رسالة())؛
+return_outside_function	1		خارج دالة	أرجع ١؛
+undefined_function	1		دالة غير معرّفة	مجهولة(١)؛
+function_arity_mismatch	1		تتطلب 1 معاملًا	دالة واحدة(أ) { أرجع أ؛ } اطبع(واحدة())؛
+duplicate_function_parameter	1		معامل مكرر	دالة تكرار(أ, أ) { أرجع أ؛ }
+nested_function_definition	1		المستوى الأعلى	{ دالة محلية() { أرجع ١؛ } }
+recursion_depth_limit	1		عمق استدعاء الدوال	دالة تكرار() { أرجع تكرار()؛ } اطبع(تكرار())؛
