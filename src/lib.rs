@@ -1396,8 +1396,8 @@ pub fn run(source: &str) -> Result<Vec<String>, LangError> {
 #[cfg(test)]
 mod tests {
     use super::{
-        MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING, MAX_RUNTIME_STRING_BYTES, MAX_SOURCE_BYTES,
-        run,
+        MAX_CALL_DEPTH, MAX_LOOP_CONDITION_EVALUATIONS, MAX_NESTING,
+        MAX_RUNTIME_STRING_BYTES, MAX_SOURCE_BYTES, run,
     };
 
     #[test]
@@ -1734,6 +1734,62 @@ mod tests {
         let error = run(&source).unwrap_err();
         assert!(error.message.contains("الحد الأقصى للتداخل"));
         assert!(error.line > 0 && error.column > 0);
+    }
+
+    #[test]
+    fn named_functions_accept_arguments_and_return_values() {
+        assert_eq!(
+            run("دالة جمع(أ, ب) { أرجع أ + ب؛ } اطبع(جمع(٢٠, ٢٢))؛").unwrap(),
+            ["42"]
+        );
+        assert_eq!(
+            run("دالة رسالة() { اطبع(«داخل»)؛ } اطبع(رسالة())؛").unwrap(),
+            ["داخل", "لاشيء"]
+        );
+    }
+
+    #[test]
+    fn recursive_functions_work() {
+        let source = "دالة عاملي(ن) { إذا (ن <= ١) { أرجع ١؛ } أرجع ن * عاملي(ن - ١)؛ } اطبع(عاملي(٥))؛";
+        assert_eq!(run(source).unwrap(), ["120"]);
+    }
+
+    #[test]
+    fn function_calls_can_update_globals_without_capturing_caller_locals() {
+        let source = "دع عام = ١؛ دالة زد(زيادة) { عام = عام + زيادة؛ أرجع عام؛ } اطبع(زد(٢))؛ اطبع(عام)؛";
+        assert_eq!(run(source).unwrap(), ["3", "3"]);
+
+        let dynamic_scope = "دالة اقرأ() { أرجع محلي؛ } { دع محلي = ٢؛ اطبع(اقرأ())؛ }";
+        let error = run(dynamic_scope).unwrap_err();
+        assert!(error.message.contains("غير معرّف"));
+    }
+
+    #[test]
+    fn function_errors_are_reported_with_source_locations() {
+        let return_error = run("أرجع ١؛").unwrap_err();
+        assert!(return_error.message.contains("خارج دالة"));
+
+        let undefined_error = run("مجهولة(١)؛").unwrap_err();
+        assert!(undefined_error.message.contains("دالة غير معرّفة"));
+
+        let arity_error =
+            run("دالة واحدة(أ) { أرجع أ؛ } اطبع(واحدة())؛").unwrap_err();
+        assert!(arity_error.message.contains("تتطلب 1 معاملًا"));
+
+        let duplicate_parameter =
+            run("دالة تكرار(أ, أ) { أرجع أ؛ }").unwrap_err();
+        assert!(duplicate_parameter.message.contains("معامل مكرر"));
+
+        let nested_definition =
+            run("{ دالة محلية() { أرجع ١؛ } }").unwrap_err();
+        assert!(nested_definition.message.contains("المستوى الأعلى"));
+    }
+
+    #[test]
+    fn recursive_function_calls_are_bounded() {
+        let error = run("دالة تكرار() { أرجع تكرار()؛ } اطبع(تكرار())؛").unwrap_err();
+        assert!(error.message.contains("عمق استدعاء الدوال"));
+        assert_eq!(MAX_CALL_DEPTH, 128);
     }
 
     #[test]
