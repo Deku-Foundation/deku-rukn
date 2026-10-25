@@ -22,10 +22,10 @@ Collected output or a structured language error
 ## Components
 
 - **Lexer:** recognizes punctuation, identifiers, numeric literals, strings, comments and Arabic keywords.
-- **Parser:** implements operator precedence, assignment, braced blocks, conditionals and while loops with recursive-descent functions; block nesting is bounded.
-- **Evaluator:** evaluates statements in source order with nested lexical environments. Blocks push and pop scopes; assignment updates the nearest existing binding. `إذا` and `بينما` conditions must be booleans, and while-condition evaluations have a per-run budget. Invalid type combinations and non-finite arithmetic produce diagnostics.
+- **Parser:** implements precedence, assignment, braced blocks, conditionals, bounded while loops, named function declarations, calls and return statements with recursive descent. Nested function declarations are rejected, parameter/argument counts are capped, and syntax nesting is bounded.
+- **Evaluator:** evaluates statements in source order with nested lexical environments. Named functions use a global function table and a fresh parameter/local environment; they do not capture caller locals. Return flow propagates through blocks and conditionals, recursive calls are allowed up to depth 128, and each call accepts at most 64 arguments. `إذا` and `بينما` conditions must be booleans, and while-condition evaluations have a per-run budget.
 - **CLI:** reads one UTF-8 source file, prints successful output to stdout, and reports errors to stderr with a non-zero exit code.
-- **Tests:** cover Arabic tokens, numeral normalization, precedence, type errors, unknown variables, malformed source and resource-limit regressions.
+- **Tests:** cover Arabic tokens, numeral normalization, precedence, type errors, unknown names/assignments, scopes, conditions, loops, named calls, returns, recursion limits, malformed source and resource-limit regressions.
 
 ## Implemented resource limits
 
@@ -48,7 +48,7 @@ Rust provides enums for tokens and values, explicit error handling, memory-safet
 - Unicode normalization, Arabic combining marks and visually confusable identifiers.
 - Which keywords are reserved and how identifiers interact with future syntax.
 - Type rules, mutation and lexical scopes.
-- Functions, modules and error propagation.
+- First-class function values, closures, modules and explicit error propagation.
 - Stable package/module format and standard-library stability.
 - Tree-walk execution versus bytecode VM or native back ends.
 - Foreign-function interface and ABI policy.
