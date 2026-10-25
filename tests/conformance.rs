@@ -55,7 +55,10 @@ fn cli_matches_machine_readable_conformance_corpus() {
 
         let name = fields[0];
         assert!(
-            !name.is_empty() && name.chars().all(|ch| ch.is_ascii_alphanumeric() || ch == '_'),
+            !name.is_empty()
+                && name
+                    .chars()
+                    .all(|ch| ch.is_ascii_alphanumeric() || ch == '_'),
             "{}:{}: invalid case name {:?}",
             CORPUS_PATH,
             line_number,
