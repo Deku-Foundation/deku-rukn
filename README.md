@@ -86,7 +86,7 @@ Self-hosting is a long-term research goal, not a current feature or a substitute
 
 ## Branch policy
 
-Keep only `main` and `dev` as persistent branches. Make routine changes on `dev`, run the relevant quality gates, and promote to `main` through a reviewed pull request after checks pass. Avoid long-lived feature branches.
+Keep `main` and `dev` as the only persistent repository branches. Maintainers make routine changes on `dev`, run the relevant checks and review the diff, then fast-forward `main` to the exact verified `dev` commit. Do not create repository-side feature branches or use a pull request to promote `dev` to `main`. External contributors may propose changes from forks for review into `dev`.
 
 ## Contributing and security
 
