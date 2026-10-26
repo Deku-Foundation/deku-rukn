@@ -21,4 +21,8 @@ For documentation, use the checked-in lockfile so CI and local validation instal
 - Update the language specification when syntax or semantics change.
 - Keep Arabic, French and English documentation aligned for user-visible changes.
 - Do not claim a feature is implemented until code, tests and documentation agree.
-- Keep pull requests focused and explain compatibility impact.
+- For external contributions, keep pull requests focused and explain compatibility impact. Maintainer changes are made on `dev`; after checks pass, promote by fast-forwarding `main` to the verified `dev` commit.
+
+## Documentation style
+
+Write for the reader's task. State what is implemented, what has been tested and what remains planned; keep important limitations and translations aligned. Follow the [Deku Foundation technical writing standard](https://github.com/Deku-Foundation/.github/blob/main/EDITORIAL_STYLE.md).
