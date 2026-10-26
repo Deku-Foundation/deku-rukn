@@ -62,6 +62,6 @@ Expected output:
 
 **Experimental · pre-alpha · not for production use.**
 
-Rukn now includes assignment, lexical block scopes, boolean conditions, a bounded `بينما` loop, named top-level functions, function references as values, higher-order calls, parameters, returns and recursion. Closures, modules, collections, a package manager, a bytecode VM, native compilation, IDE integration and a self-hosting compiler remain future research and engineering goals.
+The current interpreter supports assignment, lexical block scopes, boolean conditions, bounded `بينما` loops, named top-level functions, function references, higher-order calls, parameters, returns, recursion, immutable lists, zero-based indexing and the `طول` / `أضف` built-ins. Closures, nested function declarations, records/maps, modules, a package manager, bytecode VM, native compilation, IDE integration and self-hosting remain future work.
 
 The first priorities are a precise and tested language specification, robust diagnostics, Unicode identifier policy, regression tests, and a reproducible documentation build.
