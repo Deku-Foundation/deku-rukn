@@ -54,4 +54,4 @@ Then run cargo run -- hello.rukn.
 - Every statement currently ends with ؛ or ;. String literals must end on the same line.
 - Errors include the source line and column.
 
-The CLI accepts one source file. A REPL, closures, modules/imports, collections, language-level file I/O, package manager, bytecode VM and native compilation are not implemented yet.
+The current interpreter supports assignments, scoped blocks, conditions, bounded loops, named functions, recursion, immutable lists, zero-based indexing, and the `طول` / `أضف` built-ins. The CLI accepts one source file. A REPL, closures, nested function declarations, records/maps, modules/imports, language-level file/network access, package manager, bytecode VM, native compilation and IDE integration are not implemented yet.

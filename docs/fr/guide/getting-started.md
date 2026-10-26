@@ -37,4 +37,4 @@ Sortie attendue pour `hello.rukn` :
     دع العدد = ٦ * ٧؛
     اطبع(العدد)؛
 
-Chaque instruction se termine par ؛ ou ;. Le programme accepte un seul fichier source. Les fonctions nommées, références de fonction comme valeurs, appels d’ordre supérieur, paramètres, retours, récursion et boucles sont pris en charge expérimentalement. Les fermetures, modules/imports, collections, accès fichiers/réseau depuis le langage, VM bytecode et compilation native ne sont pas encore implémentés.
+Chaque instruction se termine par ؛ ou ;. Le programme accepte un seul fichier source. L’interpréteur prend en charge l’affectation, les portées lexicales, les conditions, les boucles bornées, les fonctions nommées, les références de fonction, les appels d’ordre supérieur, les paramètres, les retours, la récursion, les listes immuables, l’indexation à partir de zéro et `طول` / `أضف`. Les fermetures, fonctions imbriquées, enregistrements/cartes, modules/imports, accès fichiers/réseau depuis le langage, gestionnaire de paquets, VM bytecode, compilation native et intégration IDE ne sont pas encore implémentés.
