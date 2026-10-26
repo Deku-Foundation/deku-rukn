@@ -18,9 +18,9 @@ Rukn is an experimental Arabic-first programming language. Its current Rust impl
 
 **Experimental · pre-alpha · not for production use.**
 
-The initial Rust tree-walk interpreter supports variable declarations, printing, numbers, strings, booleans, a nil-like value, arithmetic, comparisons and equality. Rukn is not self-hosting.
+The current Rust tree-walk interpreter supports variable declarations and assignment, lexical block scopes, boolean conditionals, bounded `بينما` loops, named top-level functions, function references, higher-order calls, parameters, returns and recursion. Values include numbers, strings, booleans, `لاشيء`, and immutable lists with indexing; the built-ins `طول` and `أضف` operate on strings and lists. Identifier names are normalized to NFC for keyword recognition and lookup. Rukn is not self-hosting.
 
-Implemented now: variable declarations, assignment, lexical block scopes, boolean conditionals, bounded while loops, named top-level functions, function references as values, higher-order calls, parameters, returns and recursion, Arabic keywords and booleans, Unicode identifiers, numbers and strings. Not implemented yet: closures, modules, collections, a package manager, bytecode VM, native compiler, IDE integration, language-level file/network access or a stable 1.0 specification.
+Not implemented yet: closures, nested function declarations, modules, records/maps, a package manager, bytecode VM, native compiler, IDE integration, language-level file/network access, a static type checker or a stable 1.0 specification.
 
 ## Example
 
@@ -48,7 +48,7 @@ The repository also contains focused examples: [named functions and recursion](e
 
 - **Arabic-first syntax:** Arabic keywords, Unicode identifiers and Arabic-Indic numerals; each numeric literal uses one digit family consistently.
 - **Explicit semantics:** no implicit conversion between strings and numbers.
-- **Unicode-aware engineering:** identifier rules are tested against a documented profile; normalization and visual-confusable policy remain explicit research questions.
+- **Unicode-aware engineering:** identifiers use a documented XID profile and NFC normalization; visual-confusable and mixed-script diagnostics remain open work.
 - **Evidence-led development:** language behavior is specified and tested, while proposed features are labelled as proposals.
 - **Safe implementation:** Rust implementation with no unsafe Rust.
 

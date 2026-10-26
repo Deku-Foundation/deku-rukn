@@ -18,7 +18,7 @@ Every statement ends with the Arabic semicolon ؛ or the ASCII semicolon ;.
 
 Numeric literals accept either the ASCII dot or the Arabic decimal separator ٫ (U+066B). Both 12.5 and ١٢٫٥ represent the same value; the separator must be followed by at least one digit. Use one digit family throughout a number: ASCII, Arabic-Indic (٠١٢٣), or Extended Arabic-Indic (Persian; ۰۱۲۳). Mixing families inside one numeric literal is an error.
 
-A binding can be reassigned by declaring the same name again in the same scope; lexical scopes and immutable bindings are not implemented yet.
+Declaring the same name again in one scope replaces that scope's current binding. Bindings are mutable; immutable bindings are not implemented. Braced blocks create lexical scopes, and nested blocks can shadow outer names.
 
 ### Print a value
 
@@ -128,6 +128,7 @@ Expected output: `5` and `9`.
 | String | "hello", «أهلًا» | Single-line text |
 | Boolean | صحيح, خطأ | Displayed using Arabic words |
 | Nil-like | لاشيء | Represents an absent value |
+| List | `[١, «text»]` | Immutable; zero-based indexing; `أضف` returns a new list |
 
 Arabic-Indic digits (٠١٢٣٤٥٦٧٨٩), Eastern Arabic-Indic digits (۰۱۲۳۴۵۶۷۸۹) and ASCII digits are accepted in number literals.
 
@@ -163,7 +164,7 @@ Undefined variables, malformed strings, unsupported characters, division by zero
 
 ## Not part of the language yet
 
-Closures, anonymous functions, arbitrary call-expression chaining, collections, user-defined types, modules, explicit error-handling syntax, a static type checker and a stable ABI are not implemented yet. Named function values, higher-order calls, parameters, returns, recursion, conditionals, blocks, lexical scopes, assignment and bounded while loops are implemented. See the specification and roadmap.
+Closures, anonymous functions, arbitrary call-expression chaining, records/maps, user-defined types, modules, explicit error-handling syntax, a static type checker and a stable ABI are not implemented yet. Immutable lists, zero-based indexing, `طول` and `أضف` are implemented, as are named function values, higher-order calls, parameters, returns, recursion, conditions, blocks, lexical scopes, assignment and bounded `بينما` loops. See the specification and roadmap.
 
 
 ## Unicode identifiers
@@ -179,4 +180,4 @@ Arabic and Persian letters are supported, as are combining marks when the XID pr
 اطبع(پ)؛
 ```
 
-Identifier text is **not normalized**. Canonically or visually similar spellings are not guaranteed to resolve to the same name. The normalization, confusable-warning, and invisible bidirectional-control policies remain open research; see [Unicode and identifier security](/reference/unicode-and-security). Updating the Unicode identifier data is a language-behavior change and must include conformance tests.
+Identifier tokens are normalized to NFC before keyword recognition and name lookup. Canonically equivalent spellings therefore resolve to the same binding. String contents and comments are not normalized. NFC does not detect visual confusables or mixed-script identifiers; warnings, mixed-script policy and bidirectional-source diagnostics remain open work. See [Unicode and identifier security](/reference/unicode-and-security). Updating the Unicode identifier data changes language behavior and must include conformance tests.

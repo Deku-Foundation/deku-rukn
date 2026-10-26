@@ -94,7 +94,7 @@ Sortie attendue :
 120
 ```
 
-`أرجع expression؛` retourne une valeur. `أرجع؛` retourne `لاشيء`, et une fonction qui se termine sans retour explicite retourne également `لاشيء`. Un retour hors fonction est une erreur. Dans cette version, les fonctions ne peuvent être déclarées qu’au niveau supérieur ; la récursion est limitée à 32 appels actifs dans l’interpréteur arborescent actuel et chaque liste accepte au plus 64 paramètres/arguments.
+`أرجع expression؛` retourne une valeur. `أرجع؛` retourne `لاشيء`, et une fonction qui se termine sans retour explicite retourne également `لاشيء`. Un retour hors fonction est une erreur. Dans cette version, les fonctions ne peuvent être déclarées qu’au niveau supérieur. La récursion est limitée à 32 appels actifs dans l’interpréteur arborescent actuel ; une fonction accepte au plus 64 paramètres et un appel au plus 64 arguments.
 
 Un nom de fonction peut aussi être utilisé comme valeur : l’affecter à une variable, le passer à une autre fonction ou le retourner. Les appels utilisent encore un identifiant ; stockez donc une fonction retournée dans une variable avant de l’appeler. Les références ne capturent pas les variables locales de l’appelant. Fermetures, fonctions anonymes, déclarations imbriquées, modules et typage statique restent à réaliser.
 
@@ -116,6 +116,7 @@ Sortie attendue : `5` puis `9`.
 | Texte | "hello", «أهلًا» |
 | Booléen | صحيح, خطأ |
 | Valeur nulle | لاشيء |
+| Liste | `[١, «texte»]` | Immuable ; indexation à partir de zéro ; `أضف` renvoie une nouvelle liste |
 
 ## Opérateurs
 
@@ -140,7 +141,7 @@ Un commentaire commence par # et se termine à la fin de la ligne. Les variables
 
 ## Fonctionnalités pas encore implémentées
 
-Les fermetures, fonctions anonymes, chaînage direct d’un résultat d’appel, collections, types définis par l’utilisateur, modules, syntaxe explicite de gestion des erreurs, système de types statique et ABI stable ne sont pas encore implémentés. Les références de fonctions nommées, appels d’ordre supérieur, paramètres, retours, récursion, conditions, blocs, portées lexicales, affectations et boucles `بينما` bornées sont pris en charge expérimentalement. Consultez la spécification et la feuille de route.
+Les fermetures, fonctions anonymes, chaînage direct d’un résultat d’appel, enregistrements/cartes, types définis par l’utilisateur, modules, syntaxe explicite de gestion des erreurs, système de types statique et ABI stable ne sont pas encore implémentés. Les listes immuables, l’indexation à partir de zéro, `طول` et `أضف` sont disponibles, tout comme les références de fonctions nommées, appels d’ordre supérieur, paramètres, retours, récursion, conditions, blocs, portées lexicales, affectations et boucles `بينما` bornées. Consultez la spécification et la feuille de route.
 
 
 ## Identifiants Unicode
@@ -156,4 +157,4 @@ Les lettres arabes et persanes sont prises en charge, ainsi que les marques comb
 اطبع(پ)؛
 ```
 
-Les noms d’identifiants ne sont **pas normalisés**. Des graphies canoniquement équivalentes ou visuellement similaires ne désignent donc pas nécessairement le même nom. La normalisation, les avertissements de confusables et le traitement des contrôles bidirectionnels invisibles restent des sujets ouverts ; voir [Unicode et sécurité des identifiants](/fr/reference/unicode-and-security). Une mise à jour des données Unicode des identifiants modifie le comportement du langage et doit inclure des tests de conformité.
+Les jetons d’identifiant sont normalisés en NFC avant la reconnaissance des mots-clés et la résolution des noms. Deux graphies canoniquement équivalentes désignent donc la même liaison. Le contenu des chaînes et des commentaires n’est pas normalisé. NFC ne détecte pas les confusables visuels ni le mélange de scripts ; les avertissements dédiés et les diagnostics des contrôles bidirectionnels restent à développer. Voir [Unicode et sécurité des identifiants](/fr/reference/unicode-and-security). Une mise à jour des données Unicode des identifiants modifie le comportement du langage et doit inclure des tests de conformité.
