@@ -12,7 +12,7 @@
   <a href="https://github.com/Deku-Foundation/deku-rukn/actions">CI workflows</a>
 </p>
 
-Rukn explores programming syntax and diagnostics designed to read naturally in Arabic while remaining interoperable with the wider software ecosystem. This repository contains the language implementation, draft specification, tests, research notes, and multilingual documentation.
+Rukn is an experimental Arabic-first programming language. Its current Rust implementation is a tree-walk interpreter; the project includes a draft specification, tests, research notes and documentation in Arabic, French and English.
 
 ## Project status
 
