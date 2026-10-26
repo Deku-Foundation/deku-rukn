@@ -1,6 +1,6 @@
 ---
 title: Bibliographie technique
-description: Normes primaires et références d’ingénierie pour un langage de programmation arabe robuste.
+description: Normes et références d’ingénierie pour Rukn, un langage pensé d’abord pour l’arabe et implémenté en Rust.
 ---
 
 # Bibliographie technique

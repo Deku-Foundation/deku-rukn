@@ -1,6 +1,6 @@
 ---
 title: Research reading list
-description: Primary standards and engineering references for developing Rukn as a robust Arabic-first programming language.
+description: Primary standards and engineering references for Rukn, an Arabic-first programming language implemented in Rust.
 ---
 
 # Research reading list

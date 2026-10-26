@@ -41,7 +41,7 @@ N’intégrez pas du code non fiable dans un service privilégié multi-tenant s
 
 ## Pourquoi Rust d’abord ?
 
-Rust apporte des types énumérés pour les jetons et valeurs, une gestion explicite des erreurs, des garanties de sûreté mémoire par défaut et un écosystème de tests robuste. Rust est le langage d’implémentation, pas une contrainte imposée à la syntaxe ou à la sémantique future.
+Rust apporte des types énumérés pour les jetons et valeurs, une gestion explicite des erreurs, des garanties de sûreté mémoire par défaut et des outils de test, de formatage et d’analyse statique. Rust est le langage d’implémentation, pas une contrainte imposée à la syntaxe ou à la sémantique future.
 
 ## Questions ouvertes
 

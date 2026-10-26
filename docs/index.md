@@ -64,4 +64,4 @@ Expected output:
 
 The current interpreter supports assignment, lexical block scopes, boolean conditions, bounded `بينما` loops, named top-level functions, function references, higher-order calls, parameters, returns, recursion, immutable lists, zero-based indexing and the `طول` / `أضف` built-ins. Closures, nested function declarations, records/maps, modules, a package manager, bytecode VM, native compilation, IDE integration and self-hosting remain future work.
 
-The first priorities are a precise and tested language specification, robust diagnostics, Unicode identifier policy, regression tests, and a reproducible documentation build.
+The first priorities are a tested language specification, diagnostics with source locations, a documented Unicode identifier policy, regression tests, and a reproducible documentation build.
